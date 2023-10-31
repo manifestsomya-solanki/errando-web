@@ -85,6 +85,7 @@ function App() {
         <Route path="/signup-pro" element={<SignUpPage />} />
         <Route path="/signup-customer" element={<SignUpCustomer />} />
         <Route path="/sign-in" element={<SignInPage />} />
+
         {isLoggedIn && role === "customer" && (
           <Route>
             <Route path="/settings" element={<Settings />}>
@@ -116,6 +117,7 @@ function App() {
                 index
                 element={<Navigate to="/services/service-detail" replace />}
               />
+
               <Route
                 path="/services/service-detail/:id"
                 element={<ServiceDetail />}

@@ -17,7 +17,7 @@ function DeleteReviewModal({
 }) {
   const { theme } = useTheme();
   const { deleteReview, isDeleteReviewLoading } = useReview();
-
+  console.log(reviewId);
   const businessId = useParams();
 
   const url = `https://erranddo.kodecreators.com/api/v1/reviews?page=1&per_page=10&user_business_id=${businessId?.id}`;
@@ -34,7 +34,7 @@ function DeleteReviewModal({
         {theme === "light" && <div children={<Close color="black" />} />}
         {theme === "dark" && <div children={<Close color="white" />} />}
       </button>
-      <div className="flex flex-col items-center xl:w-[400px] md:w-[450px] xl:mt-1 md:mt-2 p-3 gap-2">
+      <div className="flex flex-col items-center xl:w-[400px] md:w-[450px] xl:mt-1 md:mt-2 p-3 gap-2 ">
         <div className="pb-7 xs:w-full xl:pl-0 md:pl-3">
           <Heading
             variant="subTitle"
@@ -53,7 +53,7 @@ function DeleteReviewModal({
           <Button
             loading={isDeleteReviewLoading}
             type="submit"
-            buttonClassName="text-white w-48 xs:w-36 xs:text-sm bg-green-500 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 xl:text-lg md:text-sm rounded-xl xl:h-12 lg:h-10 xs:h-10 md:px-8 xs:px-5 text-center mr-3 md:mr-0 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+            buttonClassName="text-white w-48 xs:w-36 xs:text-sm bg-green-500 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 xl:text-lg md:text-sm rounded-xl xl:h-12 lg:h-10 xs:h-10 md:px-8 xs:px-5 text-center mr-3 md:mr-0 dark:bg-blue-600 dark:hover:bg-blue-700 "
             onClick={async () => {
               await deleteReview(reviewId);
               await mutate();

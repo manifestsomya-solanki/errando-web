@@ -187,7 +187,7 @@ function AddServiceModal({
                 ) : null}
               </div>
               <div className="pb-3">
-                <Label required label="Choose Services" />
+                <Label required label="Choose Service" />
                 <DropdownCompoenet
                   className="my-2 !z-20 relative"
                   isImage={true}

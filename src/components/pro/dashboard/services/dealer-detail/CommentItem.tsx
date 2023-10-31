@@ -7,9 +7,6 @@ import Reply from "../../../../../assets/reply.svg";
 import { useState } from "react";
 import ResponseModal from "../../../../../layout/pro-models/ResponseModal";
 
-import Button from "../../../../UI/Button";
-import Dustbin from "../../../../../assets/Dustbin";
-import { useTheme } from "../../../../../store/theme-context";
 import DeleteReviewModal from "../../../../../layout/pro-models/DeleteReviewModal";
 
 function CommentItem(props: {
@@ -26,8 +23,6 @@ function CommentItem(props: {
 }) {
   const [response, setResponse] = useState(false);
   const [reviewId, setReviewId] = useState(false);
-
-  const { theme } = useTheme();
 
   return (
     <>
@@ -56,19 +51,7 @@ function CommentItem(props: {
             variant="subTitle"
             headingclassname="text-textColor !font-bold tracking-wide text-md dark:text-darktextColor"
           />
-          <div className="flex gap-4">
-            <Button
-              onClick={() => {
-                setReviewId(true);
-              }}
-              variant="ghost"
-              buttonClassName="border-none dark:bg-dimGray"
-            >
-              {theme === "light" && (
-                <div children={<Dustbin color="black" />} />
-              )}
-              {theme === "dark" && <div children={<Dustbin color="white" />} />}
-            </Button>
+          <div>
             <img src={Flag} className="" />
           </div>
         </div>

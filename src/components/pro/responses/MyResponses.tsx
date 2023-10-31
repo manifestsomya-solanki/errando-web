@@ -75,7 +75,7 @@ function MyResponses() {
     "Per day / Per Head",
     "Per week",
     "Per Month",
-    "One Time Fee",
+    "Fixed Price",
   ];
 
   const [showModal, setShowModal] = useState(false);
@@ -90,7 +90,7 @@ function MyResponses() {
         leadsDetail?.request_quotes?.length > 0
           ? leadsDetail?.request_quotes[0]?.quote.toString()
           : "",
-      payment_type: "One time fee",
+      payment_type: "Fixed Price",
     },
     enableReinitialize: true,
     validate: (values) => {
@@ -472,7 +472,7 @@ function MyResponses() {
                       isImage={true}
                       placeholder={
                         leadsDetail?.request_quotes[0]?.payment_type ??
-                        "One time fee"
+                        "Fixed Price"
                       }
                       menuClassName=" h-max soft-searchbar"
                       placeholderClassName="text-xs "

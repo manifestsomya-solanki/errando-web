@@ -84,7 +84,7 @@ function LeadsBar() {
                 headingclassname="!font-semibold my-2  text-primaryGreen   tracking-wide "
               />
             </HomeCard>
-            <HomeCard
+            {/* <HomeCard
               className={`rounded-md py-3 w-full flex justify-center gap-2 items-center my-3 ${
                 count?.user?.available_credits == "0"
                   ? "text-red-600"
@@ -104,7 +104,7 @@ function LeadsBar() {
                 variant="subHeader"
                 headingclassname="!font-semibold my-2    tracking-wide "
               />
-            </HomeCard>
+            </HomeCard> */}
           </div>
           <LeadsList />
         </div>

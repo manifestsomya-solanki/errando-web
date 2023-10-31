@@ -168,7 +168,11 @@ function LeaveReviewModal(props: {
             />
             <Heading
               variant="smallTitle"
-              text="I confirm the information above is accurate"
+              text={
+                <label htmlFor="default-checkbox">
+                  I confirm the information above is accurate
+                </label>
+              }
               headingclassname="text-slate-500 text-center xs:text-xs"
             />
           </div>

@@ -13,7 +13,7 @@ import { useState } from "react";
 import EditNameDescriptionModal from "../../../../../layout/pro-models/EditNameDescriptionModalt";
 import "./check.css"; // Replace with your CSS file path
 
-function DangerousHTML({
+export function DangerousHTML({
   dangerouslySetInnerHTML,
 }: {
   dangerouslySetInnerHTML: { __html: string };

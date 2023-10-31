@@ -49,7 +49,7 @@ function ResponsesList() {
       )}
       {leadsResponse && leadsResponse?.length > 0 && (
         <TableFooter
-          valid={Math.ceil(total / 5) === page ? false : true}
+          valid={Math.ceil(total / 10) === page ? false : true}
           slice={leadsResponse ?? []}
           page={page}
           prev={handlePrevPage}

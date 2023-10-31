@@ -38,6 +38,7 @@ function MyReviewsList() {
                   comment={item?.response}
                   id={item.id}
                   user_business_id={item.user_business_id}
+                  page_key="my-reviews"
                 />
               );
             })

@@ -67,13 +67,11 @@ export const LeadContext = createContext<LeadResponeType>({
   total: 0,
 });
 
-const base = "https://erranddo.kodecreators.com/api/v1/user-requests?for_pro=1";
-
 const LeadContextProProvider = (props: { children: React.ReactNode }) => {
   const [isLoading, setIsLoading] = useState(false);
   const id = JSON.parse(localStorage.getItem("data") ?? "").id;
   const [error, setError] = useState("");
-  const perPage = 5;
+  const perPage = 10;
   const [currentPage, setCurrentPage] = useState(1);
   const [url, setUrl] = useState(
     `https://erranddo.kodecreators.com/api/v1/user-requests?for_pro=1&page=${currentPage}&per_page=${perPage}`

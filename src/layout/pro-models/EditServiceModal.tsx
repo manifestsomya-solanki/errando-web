@@ -110,7 +110,7 @@ function EditServiceModal({
           <Heading
             headingclassname="mt-3  text-textColor text-lg !font-semibold dark:text-white"
             variant="subHeader"
-            text="Save Changes"
+            text={serviceBusiness && serviceBusiness[0]?.service?.name}
           />
           <Formik<EditBusinessService>
             initialValues={{
@@ -194,38 +194,7 @@ function EditServiceModal({
                     />
                   ) : null}
                 </div>
-                <div className="pb-3">
-                  <Label required label="Update Business Services" />
-                  <DropdownCompoenet
-                    value={
-                      serviceBusiness
-                        ? {
-                            value: serviceBusiness[0]?.service?.id,
-                            label: serviceBusiness[0]?.service?.name,
-                          }
-                        : undefined
-                    }
-                    className="my-2 !z-30 relative "
-                    isImage={true}
-                    placeholder={
-                      props.values.service_id && serviceData
-                        ? serviceData[0].service.name
-                        : "Select a business Service"
-                    }
-                    options={
-                      serviceData?.map((item) => ({
-                        value: item?.id,
-                        label: item?.service?.name,
-                      })) || []
-                    }
-                    onChange={(newValue) => {
-                      props.setFieldValue("service_id", newValue.value);
-                    }}
-                  />
-                  {props?.touched?.service_id && props?.errors?.service_id ? (
-                    <Error error={props?.errors?.service_id} className="mt-2" />
-                  ) : null}
-                </div>
+
                 {props.values.nation_wide || props.values.remote_service ? (
                   <div>
                     <Label required label="Enter Location" />

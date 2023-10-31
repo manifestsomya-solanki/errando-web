@@ -115,7 +115,7 @@ function VerifyMobileModal(props: {
               ) : null}
             </div>
 
-            <div className="flex flex-col items-center xl:w-[550px] md:w-[450px] lg:pb-24 xs:pb-20  gap-2">
+            <div className="flex flex-col items-center xl:w-[550px] md:w-[450px] lg:pb-20 md:pb-16 xs:pb-10  gap-2">
               <div className="text-center flex flex-row gap-2">
                 <button
                   className="text-green-500"
@@ -134,29 +134,30 @@ function VerifyMobileModal(props: {
                   className="text-primaryBlue"
                   type="button"
                   onClick={() => {
-                    manageLoading(false), props.onCancel("edit");
+                    manageLoading(false), props.onCancel("1");
                   }}
                 >
                   Change number
                 </button>
               </div>
             </div>
-            <div className="flex gap-5 xl:w-[550px] md:w-[450px] justify-center">
+
+            <div className="flex flex-col gap-5 xl:w-[550px] md:w-[450px] justify-center items-center">
+              <Error
+                error={error}
+                className="text-center   xl:w-[550px] md:w-[450px]"
+              />
               <Button
                 disabled={
                   formik?.values?.mobile_number?.length === 0 ? true : false
                 }
                 loading={isLoading}
                 type="submit"
-                buttonClassName="text-white  w-3/6 bg-[#0003FF] hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 xl:text-lg md:text-sm rounded-xl xl:h-12 lg:h-10 xs:h-10 md:px-6 xs:px-5 text-center mr-3 md:mr-0 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                buttonClassName="text-white  w-3/6 bg-[#0003FF] hover:bg-blue-800  xl:text-lg md:text-sm rounded-xl xl:h-12 lg:h-10 xs:h-10 md:px-6 xs:px-5 text-center mr-3 md:mr-0 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 disabled:text-white"
               >
                 <p className="text-center w-full">Continue</p>
               </Button>
             </div>
-            <Error
-              error={error}
-              className="text-center mt-3  xl:w-[550px] md:w-[450px]"
-            />
           </form>
         </Modal>
       )}

@@ -47,7 +47,7 @@ function RegistrationModal(props: {
       formData.set("email", values.email);
       formData.set("mobile_number", values.mobile_number);
       if (isedit) {
-        formData.set("key", "edit");
+        formData.set("key", "1");
       }
       localStorage.setItem("email", values.email);
       localStorage.setItem("mobile_number", values.mobile_number);
@@ -67,7 +67,7 @@ function RegistrationModal(props: {
           email={formik.values.email}
           open={openMenu}
           onCancel={(key: string) => {
-            if (key === "edit") {
+            if (key === "1") {
               setIsEdit(true);
             }
             setOpenMenu(false);

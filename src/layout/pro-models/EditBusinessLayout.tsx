@@ -12,6 +12,7 @@ import { useBusiness } from "../../store/pro/dashboard-context";
 import { useTheme } from "../../store/theme-context";
 import { useEffect, useState } from "react";
 import TextArea from "../../components/UI/TextArea.tsx";
+import PostCodeDetails from "../../components/UI/PostCodeDetails.tsx";
 
 function EditBusinessModal({
   onCancel,
@@ -82,6 +83,8 @@ function EditBusinessModal({
 
             const formData = new FormData(); //initialize formdata
             formData.set("name", values.name);
+            formData.set("postcode_id", values.postcode_id.toString());
+
             formData.set("description", values.description);
             if (values.profile_picture)
               formData.set("image", values.profile_picture);
@@ -172,7 +175,7 @@ function EditBusinessModal({
               </div>
 
               <div className="py-0">
-                <Label required label="Enter Name for Business" />
+                <Label required label="Enter Business Name" />
                 <Input
                   id="name"
                   name="name"
@@ -184,7 +187,23 @@ function EditBusinessModal({
                 ) : null}
               </div>
               <div className="py-3">
-                <Label required label="Enter Description for Business" />
+                <Label required label="Enter Business Postcode " />
+                <PostCodeDetails
+                  initialValue={props?.values?.postcode_id}
+                  inputClass="border-gray-200"
+                  type="text"
+                  id="postcode_id"
+                  name="postcode_id"
+                  onChange={(ev: any) => {
+                    props.setFieldValue("postcode_id", ev);
+                  }}
+                />
+                {props?.touched?.postcode_id && props?.errors?.postcode_id ? (
+                  <Error error={props?.errors?.postcode_id} className="mt-2" />
+                ) : null}
+              </div>
+              <div className="py-3">
+                <Label required label="Enter Business Description " />
                 <TextArea
                   rows="8"
                   cols="50"

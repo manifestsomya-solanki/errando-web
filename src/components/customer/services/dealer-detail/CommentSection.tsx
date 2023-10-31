@@ -37,6 +37,7 @@ function CommentSection() {
                   date={formattedDate}
                   comment={item?.response}
                   id={item.id}
+                  page_key="business-reviews"
                 />
               );
             })

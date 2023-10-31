@@ -19,12 +19,12 @@ function CommentItem(props: {
   comment: string;
   user_id: number;
   user_business_id?: number;
+  page_key: string;
 }) {
-  console.log(props.user_business_id);
   const { userData } = useAuth();
   const [openModal, setOpenModal] = useState(false);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
-
+  console.log(props.page_key);
   return (
     <div>
       {openModal && (
@@ -40,6 +40,7 @@ function CommentItem(props: {
             setOpenDeleteModal(false);
           }}
           reviewId={props.id}
+          page_key={props.page_key}
         />
       )}
       <div className="flex flex-col gap-3 border-b-[0.5px] border-b-slate-300 py-5">
