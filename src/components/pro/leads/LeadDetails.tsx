@@ -128,41 +128,41 @@ function LeadDetails() {
                 loading={isBuyLeadLoading}
               />
             </div>
-            <div className="flex w-full items-center gap-3">
-              <img src={Credit} className="w-5 h-5 object-cover" />
-              <Heading
-                text={`6 credits`}
-                variant="subHeader"
-                headingclassname="!font-normal !text-sm mx-1 text-textColor tracking-wide dark:text-white"
-              />
-              <Button
-                disabled={
-                  leadsDetail?.leads_count > 0 ||
-                  userData?.available_credits == 0
-                }
-                variant="filled"
-                color="primary"
-                size="normal"
-                children="Buy Outright"
-                buttonClassName="!px-4 py-2 text-sm tracking-wide disabled:text-white"
-                onClick={() => handleBuy("outright")}
-                loading={isBuyOutrightLoading}
-              />
-            </div>
-          </div>
-          <div className=" relative w-full">
-            <div className="absolute flex lg:right-0 xl:right-8 2xl:right-28">
-              <Heading
-                text={`Why share this lead?`}
-                variant="subHeader"
-                headingclassname="!font-normal !text-sm mx-1 text-textColor tracking-wide dark:text-white"
-              />
-              <Heading
-                text={`BUY OUTRIGHT`}
-                variant="subHeader"
-                headingclassname="!font-normal !text-sm mx-1 text-primaryYellow tracking-wide dark:text-primaryYellow"
-              />
-            </div>
+            {leadsDetail.leads_count === 0 && (
+              <div className="flex w-full items-center gap-3 relative">
+                <img src={Credit} className="w-5 h-5 object-cover" />
+                <Heading
+                  text={`6 credits`}
+                  variant="subHeader"
+                  headingclassname="!font-normal !text-sm mx-1 text-textColor tracking-wide dark:text-white"
+                />
+                <Button
+                  disabled={
+                    leadsDetail?.leads_count > 0 ||
+                    userData?.available_credits == 0
+                  }
+                  variant="filled"
+                  color="primary"
+                  size="normal"
+                  children="Buy Outright"
+                  buttonClassName="!px-4 py-2 text-sm tracking-wide disabled:text-white"
+                  onClick={() => handleBuy("outright")}
+                  loading={isBuyOutrightLoading}
+                />
+                <div className="absolute flex left-0 -bottom-10">
+                  <Heading
+                    text={`Why share this lead?`}
+                    variant="subHeader"
+                    headingclassname="!font-normal !text-sm mx-1 text-textColor tracking-wide dark:text-white"
+                  />
+                  <Heading
+                    text={`BUY OUTRIGHT`}
+                    variant="subHeader"
+                    headingclassname="!font-normal !text-sm mx-1 text-primaryYellow tracking-wide dark:text-primaryYellow"
+                  />
+                </div>
+              </div>
+            )}
           </div>
         </HomeCard>
       )}

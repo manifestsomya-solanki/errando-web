@@ -1,6 +1,6 @@
 import { createContext, useContext, useState } from "react";
 import { BusinessData } from "../../models/home";
-import useSWR from "swr";
+import useSWR, { KeyedMutator } from "swr";
 import { fetcher } from "../customer/home-context";
 import { AddBusinessData, Business } from "../../models/pro/business";
 import { toast } from "react-toastify";
@@ -17,6 +17,11 @@ type BusinessResponseType = {
   isBussinessDetailLoading: boolean;
   detailBusiness: (id?: number) => void;
   editBusiness: (formData: FormData, serviceId: string) => void;
+  deleteBusiness: (businessId: string) => void;
+  deleteServiceBusiness: (businessId: string) => void;
+
+  mutate: KeyedMutator<any>;
+
   setError: React.Dispatch<React.SetStateAction<string>>;
   editServiceBusiness: (formData: FormData, serviceId: number) => void;
   deleteImage: (id: number) => Promise<void>;
@@ -30,6 +35,15 @@ export const BusinessContext = createContext<BusinessResponseType>({
   isBussinessDetailLoading: false,
   addBusiness: (data) => {
     console.log(data);
+  },
+  deleteBusiness: (data) => {
+    console.log(data);
+  },
+  deleteServiceBusiness: (data) => {
+    console.log(data);
+  },
+  mutate: async () => {
+    console.log();
   },
   addServiceBusiness: async (data) => {
     console.log(data);
@@ -212,8 +226,52 @@ const BusinessContextProvider = (props: { children: React.ReactNode }) => {
       });
     }
   };
+
+  const deleteHandler = async (id: string) => {
+    setIsLoading(true);
+    setError("");
+    const token = localStorage.getItem("token");
+
+    const res = await fetch(
+      `https://erranddo.kodecreators.com/api/v1/businesses/${id}/delete`,
+      {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    if (res.status === 200) {
+      const data = await res.json();
+
+      if (data.status === "1") {
+        toast.success("Business delete successfully !", {
+          hideProgressBar: false,
+          position: "bottom-left",
+        });
+        setIsLoading(false);
+        await mutate();
+        await serviceMutate();
+      } else {
+        setError(data.message);
+        toast.error(data.message, {
+          hideProgressBar: false,
+          position: "bottom-left",
+        });
+      }
+    } else {
+      const data = await res.json();
+      setIsLoading(false);
+      setError(data.message);
+      toast.error(data.message, {
+        hideProgressBar: false,
+        position: "bottom-left",
+      });
+    }
+  };
   const { page } = useService();
-  console.log(page, "paaage");
+
   const serviceUrl = `https://erranddo.kodecreators.com/api/v1/business-services?page=${page}&per_page=${8}&user_id=${id}`;
   const { mutate: serviceMutate } = useSWR(serviceUrl, fetcher);
   //edit service business
@@ -257,6 +315,48 @@ const BusinessContextProvider = (props: { children: React.ReactNode }) => {
     }
   };
 
+  const deleteServiceHandler = async (id: string) => {
+    setIsLoading(true);
+    setError("");
+    const token = localStorage.getItem("token");
+
+    const res = await fetch(
+      `https://erranddo.kodecreators.com/api/v1/business-services/${id}/delete`,
+      {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    if (res.status === 200) {
+      const data = await res.json();
+
+      if (data.status === "1") {
+        toast.success("Business service  deleted successfully !", {
+          hideProgressBar: false,
+          position: "bottom-left",
+        });
+        setIsLoading(false);
+        await serviceMutate();
+      } else {
+        setError(data.message);
+        toast.error(data.message, {
+          hideProgressBar: false,
+          position: "bottom-left",
+        });
+      }
+    } else {
+      const data = await res.json();
+      setIsLoading(false);
+      setError(data.message);
+      toast.error(data.message, {
+        hideProgressBar: false,
+        position: "bottom-left",
+      });
+    }
+  };
   const deleteImage = async (id: number) => {
     const token = localStorage.getItem("token") ?? "{}";
     setError("");
@@ -306,11 +406,14 @@ const BusinessContextProvider = (props: { children: React.ReactNode }) => {
         detailBusiness: DetailBusiness,
         addServiceBusiness: AddServiceBusiness,
         editServiceBusiness: EditServiceBusiness,
+        deleteServiceBusiness: deleteServiceHandler,
         editBusiness: EditBusiness,
+        deleteBusiness: deleteHandler,
         isBussinessLoading: isBusinessLoading,
         isBussinessDetailLoading: isBusinessDetailLoading,
         error: error,
         setError: setError,
+        mutate: businessMutate,
         deleteImage: deleteImage,
       }}
     >

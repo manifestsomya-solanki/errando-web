@@ -1,18 +1,21 @@
 import React, { useState, useContext } from "react";
 import { createContext } from "react";
 import { AddResponseData, ReviewData } from "../../models/customer/reviewlist";
-import useSWR from "swr";
+import useSWR, { KeyedMutator } from "swr";
 import { fetcher } from "../customer/home-context";
 import { toast } from "react-toastify";
 
 type ReviewResponseType = {
   data?: ReviewData[];
   deleteReview: (id: number) => Promise<void>;
+  flagReview: (id: number) => Promise<void>;
+
   getBusinessReviews: (id?: number) => void;
   addResponse: (formData: FormData, id: string) => void;
   isLoading: boolean;
   isDeleteReviewLoading: boolean;
   error: string;
+  mutate: KeyedMutator<any>;
 };
 
 export const ReviewContext = createContext<ReviewResponseType>({
@@ -20,7 +23,13 @@ export const ReviewContext = createContext<ReviewResponseType>({
   getBusinessReviews: (d) => {
     console.log(d);
   },
+  mutate: async () => {
+    console.log();
+  },
   deleteReview: async (id: number) => {
+    console.log(id);
+  },
+  flagReview: async (id: number) => {
     console.log(id);
   },
   addResponse: (formData: FormData, id: string) => console.log(id, formData),
@@ -113,15 +122,49 @@ const ReviewContextProProvider = (props: { children: React.ReactNode }) => {
       setIsDeleteReviewLoading(false);
     }
   };
+  const flagReview = async (id: number) => {
+    const token = localStorage.getItem("token") ?? "{}";
+    setError("");
+    setIsDeleteReviewLoading(true);
+
+    const res = await fetch(
+      `https://erranddo.kodecreators.com/api/v1/reviews/${id}/flag`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    if (res.status === 200) {
+      setError("");
+      setIsDeleteReviewLoading(false);
+
+      const data: any = await res.json();
+      if (data.status === "1") {
+        toast.success(data.message);
+      } else {
+        setError(data.message);
+        toast.error(data.error);
+      }
+    } else {
+      const data: any = await res.json();
+      setError(data.message);
+      setIsDeleteReviewLoading(false);
+    }
+  };
+
   return (
     <ReviewContext.Provider
       value={{
         data: datarender,
         deleteReview: deleteReview,
+        flagReview: flagReview,
         getBusinessReviews: getBusinessReviews,
         addResponse: AddResponse,
         isLoading: isReviewLoading,
         isDeleteReviewLoading: isDeleteReviewLoading,
+        mutate: mutate,
         error: error,
       }}
     >

@@ -226,23 +226,16 @@ function MyResponses() {
               headingclassname="!font-bold  text-textColor  text-xl tracking-wide dark:text-white"
             />
           </div>
-          <div className="flex justify-between py-4 border-b-[0.5px] border-b-slate-200 xs:flex-col lg:flex-row">
-            <div className="flex items-center gap-2">
+          <div className="flex justify-between lg:items-center py-4 border-b-[0.5px] border-b-slate-200 xs:flex-col lg:flex-row">
+            <div>
               {/* <img src={ProfileImage} className="" /> */}
-              <img
-                src={
-                  leadsDetail?.user?.img_avatar
-                    ? `https://erranddo.kodecreators.com/storage/${leadsDetail?.user?.img_avatar}`
-                    : NoImage
-                }
-                className="w-20 h-20 rounded-full object-cover"
-              />
+
               <div className="flex flex-col">
                 {leadsDetail?.provider_bussiness[0]?.name ? (
                   <Heading
                     text={leadsDetail?.provider_bussiness[0].name}
                     variant="subTitle"
-                    headingclassname="!font-semibold  !text-lg mx-1 tracking-wide dark:text-white "
+                    headingclassname="!font-semibold  !text-lg mx-1 tracking-wide dark:text-white capitalize"
                   />
                 ) : (
                   <Heading
@@ -301,27 +294,41 @@ function MyResponses() {
             </div>
           </div>
           <div className="py-4 grid lg:grid-cols-2 xs:gap-3 lg:gap-0">
-            <div>
-              <Heading
-                text={"Name"}
-                variant="subTitle"
-                headingclassname="!font-semibold text-slate-400 !text-sm  mx-1 tracking-wide dark:text-white "
-              />
-              {leadsDetail?.user?.full_name ? (
-                <div className="flex gap-3">
+            <div className="flex items-center gap-2">
+              {leadsDetail?.user?.img_avatar ? (
+                <img
+                  src={`https://erranddo.kodecreators.com/storage/${leadsDetail?.user?.img_avatar}`}
+                  className="w-20 h-20 rounded-full object-cover"
+                />
+              ) : (
+                <Heading
+                  text={leadsDetail?.user?.full_name.slice(0, 1)}
+                  variant="subTitle"
+                  headingclassname="!font-semibold text-slate-400 !text-2xl   tracking-wide dark:text-white px-6 py-4 rounded-full bg-slate-300"
+                />
+              )}
+              <div>
+                <Heading
+                  text={"Name"}
+                  variant="subTitle"
+                  headingclassname="!font-semibold text-slate-400 !text-sm  mx-1 tracking-wide dark:text-white "
+                />
+                {leadsDetail?.user?.full_name ? (
+                  <div className="flex gap-3">
+                    <Heading
+                      text={leadsDetail?.user?.full_name}
+                      variant="subHeader"
+                      headingclassname="!font-normal !text-lg mx-1 text-textColor tracking-wide dark:text-white"
+                    />
+                  </div>
+                ) : (
                   <Heading
-                    text={leadsDetail?.user?.full_name}
+                    text="--"
                     variant="subHeader"
                     headingclassname="!font-normal !text-lg mx-1 text-textColor tracking-wide dark:text-white"
                   />
-                </div>
-              ) : (
-                <Heading
-                  text="--"
-                  variant="subHeader"
-                  headingclassname="!font-normal !text-lg mx-1 text-textColor tracking-wide dark:text-white"
-                />
-              )}
+                )}
+              </div>
             </div>
             <div>
               <Heading

@@ -54,6 +54,7 @@ function PhotosTitle(props: any) {
       <div className=" items-center flex gap-2">
         {isQuote?.length > 0 ? (
           <Button
+            disabled={props.page_key !== "customer"}
             variant="filled"
             color="secondary"
             size="normal"
@@ -64,7 +65,8 @@ function PhotosTitle(props: any) {
           <Button
             disabled={
               (props?.data?.requested_quotes_on_business?.length > 0 ||
-                props?.data?.request_quotes?.length > 0) ??
+                props?.data?.request_quotes?.length > 0 ||
+                props.page_key !== "customer") ??
               false
             }
             onClick={() => setShowQuoteModal(!showQuoteModal)}
@@ -89,12 +91,13 @@ function PhotosTitle(props: any) {
           />
         ) : (
           <Button
+            disabled={props.page_key !== "customer"}
             onClick={() => setShowModal(!showModal)}
             variant="filled"
             color="primary"
             size="normal"
             children="Show interest"
-            buttonClassName="!px-4 py-2 text-sm tracking-wide "
+            buttonClassName="!px-4 py-2 text-sm tracking-wide disabled:text-white "
           />
         )}
       </div>

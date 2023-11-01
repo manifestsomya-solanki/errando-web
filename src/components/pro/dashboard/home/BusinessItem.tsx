@@ -1,6 +1,8 @@
 import HomeCard from "./HomeCard";
 import NoImage from "../../../../assets/no-photo.png";
 import Edit from "../../../../assets/edit.svg";
+import Delete from "../../../../assets/delete.svg";
+
 import Heading from "../../../UI/Heading";
 import GoldStar from "../../../../assets/GoldStar.svg";
 import Star from "../../../../assets/Star.svg";
@@ -9,6 +11,7 @@ import { Service } from "../../../../models/home";
 import { useState } from "react";
 import { NavLink } from "react-router-dom";
 import EditBusinessModal from "../../../../layout/pro-models/EditBusinessLayout";
+import DeleteBusinessModal from "../../../../layout/pro-models/DeleteBusinessModal";
 
 function DangerousHTML({
   dangerouslySetInnerHTML,
@@ -36,6 +39,7 @@ function BusinessItem(props: {
 }) {
   const [show, setShow] = useState(false);
   const [openModal, setOpenModal] = useState(false);
+  const [openDeleteModal, setOpenDeleteModal] = useState(false);
 
   const disableEmailsAndLinks = (text: any) => {
     const emailRegex = /\S+@\S+\.\S+/g;
@@ -64,6 +68,12 @@ function BusinessItem(props: {
           {openModal && (
             <EditBusinessModal
               onCancel={() => setOpenModal(false)}
+              id={props.id}
+            />
+          )}
+          {openDeleteModal && (
+            <DeleteBusinessModal
+              onCancel={() => setOpenDeleteModal(false)}
               id={props.id}
             />
           )}
@@ -98,6 +108,12 @@ function BusinessItem(props: {
                 className="dark:hover:bg-slate-700 hover:bg-slate-100 w-10 h-10 flex items-center justify-center rounded-full"
               >
                 <img src={Edit} />
+              </div>
+              <div
+                onClick={() => setOpenDeleteModal(true)}
+                className="dark:hover:bg-slate-700 hover:bg-slate-100 w-10 h-10 flex items-center justify-center rounded-full"
+              >
+                <img src={Delete} className="w-5 h-5" />
               </div>
             </div>
             <div className="flex  mt-5  mb-3 gap-1 break-words flex-wrap">

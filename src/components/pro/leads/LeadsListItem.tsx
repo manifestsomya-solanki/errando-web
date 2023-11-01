@@ -3,8 +3,12 @@ import HomeCard from "../dashboard/home/HomeCard";
 import { NavLink } from "react-router-dom";
 import LocationIcon from "../../../assets/LocationIcon";
 import Outright from "../../../assets/outright.svg";
-import Credit from "../../../assets/Credit.png";
+import EmailVerified from "../../../assets/email_verified.jpeg";
+import MobileVerified from "../../../assets/phone_verified.jpeg";
 
+import Credit from "../../../assets/Credit.png";
+import GreenRoundTick from "../../../assets/GreenRoundTick.svg";
+import BlackRoundTick from "../../../assets/BlackRoundTick.svg";
 import { useTheme } from "../../../store/theme-context";
 import Dustbin from "../../../assets/Dustbin";
 import DeleteLeadModal from "../../../layout/pro-models/DeleteLeadModal";
@@ -47,6 +51,8 @@ function LeadsListItem(props: {
   interested: boolean;
   is_read: boolean;
   is_messaged: boolean;
+  is_email_verified: boolean;
+  is_mobile_verified: boolean;
 }) {
   const { theme } = useTheme();
   const [openMenu, setOpenMenu] = useState(false);
@@ -83,110 +89,146 @@ function LeadsListItem(props: {
             variant="subTitle"
             headingclassname="!font-bold capitalize !text-base mx-1 tracking-wide dark:text-white"
           />
+          <div className="flex flex-col justify-between">
+            <div className="flex items-center gap-4">
+              <Heading
+                text={timeDifferenceString}
+                variant="subHeader"
+                headingclassname="!font-medium !text-xs mx-1 text-primaryBlue tracking-wide dark:text-slate-400"
+              />
+              <button onClick={() => setOpenMenu(!openMenu)}>
+                {theme === "light" && <Dustbin color="black" />}
 
-          <div className="flex items-center gap-4">
-            <Heading
-              text={timeDifferenceString}
-              variant="subHeader"
-              headingclassname="!font-medium !text-xs mx-1 text-primaryBlue tracking-wide dark:text-slate-400"
-            />
-            <button onClick={() => setOpenMenu(!openMenu)}>
-              {theme === "light" && <Dustbin color="black" />}
-
-              {theme === "dark" && <Dustbin color="white" />}
-            </button>
+                {theme === "dark" && <Dustbin color="white" />}
+              </button>
+            </div>
           </div>
         </div>
-        <div className="flex flex-col mt-3 gap-2">
-          <div className="flex flex-wrap">
-            <Heading
-              text={`${props.business.replace(".", "")} - `}
-              variant="smallTitle"
-              headingclassname="!font-semibold !text-md tracking-wide mr-1 text-textColor"
-            />
-            <Heading
-              text={` ${props.service}`}
-              variant="smallTitle"
-              headingclassname="!font-semibold !text-md tracking-wide  text-textColor "
-            />
-          </div>
-          <div className="flex flex-wrap">
-            {props.answers.map((item, key) => {
-              return (
-                <div className="flex">
-                  <Heading
-                    text={`${item}`}
-                    variant="smallTitle"
-                    headingclassname="!font-light !text-xs   tracking-wide dark:text-slate-400 text-textColor"
-                  />
-                  {key !== props.answers.length - 1 && (
+        <div className="flex w-full justify-between items-center">
+          <div className="flex flex-col mt-3 gap-3">
+            <div className="flex flex-wrap">
+              <Heading
+                text={`${props.business.replace(".", "")} - `}
+                variant="smallTitle"
+                headingclassname="!font-semibold !text-md tracking-wide mr-1 text-textColor dark:text-white"
+              />
+              <Heading
+                text={` ${props.service}`}
+                variant="smallTitle"
+                headingclassname="!font-semibold !text-md tracking-wide  text-textColor dark:text-white "
+              />
+            </div>
+            <div className="flex flex-wrap">
+              {props.answers.map((item, key) => {
+                return (
+                  <div className="flex">
                     <Heading
-                      text={`-`}
+                      text={`${item}`}
                       variant="smallTitle"
-                      headingclassname="font-light !text-xs mx-2 tracking-wide dark:text-slate-400 text-textColor"
+                      headingclassname="!font-light !text-xs   tracking-wide dark:text-slate-400 text-textColor"
                     />
-                  )}
-                </div>
-              );
-            })}
-          </div>
-          <div className="flex items-center my-1 gap-2">
-            {theme === "light" && (
-              <div children={<LocationIcon color="black" />} />
-            )}
+                    {key !== props.answers.length - 1 && (
+                      <Heading
+                        text={`-`}
+                        variant="smallTitle"
+                        headingclassname="font-light !text-xs mx-2 tracking-wide dark:text-slate-400 text-textColor"
+                      />
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+            <div className="flex items-center my-1 gap-2">
+              {theme === "light" && (
+                <div children={<LocationIcon color="black" />} />
+              )}
 
-            {theme === "dark" && (
-              <div children={<LocationIcon color="white" />} />
-            )}
-            <Heading
-              text={`${props.location}`}
-              variant="smallTitle"
-              headingclassname="!font-extralight text-slate-400 !text-xs  tracking-wide dark:text-white "
-            />
+              {theme === "dark" && (
+                <div children={<LocationIcon color="white" />} />
+              )}
+              <Heading
+                text={`${props.location}`}
+                variant="smallTitle"
+                headingclassname="!font-extralight text-slate-400 !text-xs  tracking-wide dark:text-white "
+              />
+            </div>
           </div>
-          <div className="flex justify-between w-full items-center ">
-            <div className="flex gap-2 ">
+          <div className="flex flex-col gap-5">
+            {props.is_email_verified && (
+              <div className="flex gap-2">
+                <img className="w-4 h-4" src={EmailVerified} />
+                <Heading
+                  text={` Email Verified`}
+                  variant="smallTitle"
+                  headingclassname="!font-medium !text-xs tracking-wide  text-textColor dark:text-white"
+                />
+              </div>
+            )}
+            {props.is_mobile_verified && (
+              <div className="flex gap-2">
+                <img className="w-4 h-4" src={MobileVerified} />
+                <Heading
+                  text={`Mobile Verified`}
+                  variant="smallTitle"
+                  headingclassname="!font-medium !text-xs tracking-wide  text-textColor dark:text-white"
+                />
+              </div>
+            )}
+          </div>
+        </div>
+        <div className="flex justify-between w-full items-center mt-5">
+          <div className="flex gap-2 ">
+            {(props.leads_count === 0 || props.leads_count === 4) && (
               <div className="  w-5 h-5 mt-1 rounded-full">
                 <img src={Outright} />
               </div>
-              <Heading
-                text={
-                  props?.leads_count === 4
-                    ? "Sold out"
-                    : props.leads_count > 0
-                    ? "Buy Lead"
-                    : `Buy Outright`
-                }
-                variant="smallTitle"
-                headingclassname="!font-semibold !text-xs   tracking-wide text-primaryGreen dark:text-primaryGreen"
-              />
-              {props.leads_count < 4 && (
-                <div className="flex gap-1 ">
-                  <div className="  w-5 h-5  rounded-full">
-                    <img src={Credit} />
+            )}
+            <Heading
+              text={
+                props?.leads_count === 4 ? (
+                  "Sold out"
+                ) : props.leads_count > 0 ? (
+                  <div className="flex gap-2 my-1 ml-1">
+                    {Array.from({ length: props?.leads_count }, () => (
+                      <img src={GreenRoundTick} />
+                    ))}
+                    {Array.from({ length: 4 - props?.leads_count }, () => (
+                      <img src={BlackRoundTick} />
+                    ))}
                   </div>
-                  <Heading
-                    text={`${6} Credits`}
-                    variant="smallTitle"
-                    headingclassname="!font-semibold !text-xs   tracking-wide dark:text-white text-textColor"
-                  />
-                </div>
-              )}
-            </div>
-
-            {props.leads_count < 4 && (
+                ) : (
+                  `Buy Outright`
+                )
+              }
+              variant="smallTitle"
+              headingclassname="!font-semibold !text-xs   tracking-wide text-primaryGreen dark:text-primaryGreen"
+            />
+            {props.leads_count === 0 && (
               <div className="flex gap-1 ">
                 <div className="  w-5 h-5  rounded-full">
                   <img src={Credit} />
                 </div>
                 <Heading
-                  text={`${3} Credits`}
+                  text={`${6} Credits`}
                   variant="smallTitle"
                   headingclassname="!font-semibold !text-xs   tracking-wide dark:text-white text-textColor"
                 />
               </div>
             )}
           </div>
+
+          {props.leads_count < 4 && (
+            <div className="flex gap-1 ">
+              <div className="  w-5 h-5  rounded-full">
+                <img src={Credit} />
+              </div>
+              <Heading
+                text={`${3} Credits`}
+                variant="smallTitle"
+                headingclassname="!font-semibold !text-xs   tracking-wide dark:text-white text-textColor"
+              />
+            </div>
+          )}
         </div>
         <div className="flex">
           {props.is_messaged && (

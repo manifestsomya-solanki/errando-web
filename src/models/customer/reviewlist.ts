@@ -20,6 +20,7 @@ export interface ReviewData {
   created_at: string;
   updated_at: string;
   user_bussiness: Userbussiness;
+  is_flagged: number;
   service: Service;
   user: UserData;
 }

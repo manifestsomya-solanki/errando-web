@@ -115,135 +115,134 @@ function ResponsesListItem(props: {
   const timeDifferenceString = getTimeDifferenceString(props?.time);
 
   return (
-    <HomeCard className="px-3 pt-5 pb-3">
-      {openMenu && (
-        <DeleteChatModal
-          onCancel={() => {
-            setOpenMenu(false);
-          }}
-          user_id={+user.uid}
-        />
-      )}
+    <NavLink
+      to={`/pro/responses/${props?.id}`}
+      style={({ isActive }) =>
+        isActive ? { color: "#DF994F" } : { color: "black" }
+      }
+      // onClick={handleSelect}
+    >
+      <HomeCard className="px-3 pt-5 pb-3">
+        {openMenu && (
+          <DeleteChatModal
+            onCancel={() => {
+              setOpenMenu(false);
+            }}
+            user_id={+user.uid}
+          />
+        )}
 
-      <div className="flex w-full justify-between items-center">
-        <NavLink
-          to={`/pro/responses/${props?.id}`}
-          style={({ isActive }) =>
-            isActive ? { color: "#DF994F" } : { color: "black" }
-          }
-          // onClick={handleSelect}
-        >
+        <div className="flex w-full justify-between items-center">
           <Heading
             text={props.title ?? "--"}
             variant="subTitle"
             headingclassname="!font-bold  !text-base mx-1 tracking-wide dark:text-white"
           />
-        </NavLink>
 
-        <div className="flex items-center gap-4">
-          <Heading
-            text={timeDifferenceString}
-            variant="subHeader"
-            headingclassname="!font-medium !text-xs mx-1 text-primaryBlue tracking-wide dark:text-slate-400"
-          />
-          <button onClick={() => setOpenMenu(!openMenu)}>
-            {theme === "light" && <Dustbin color="black" />}
+          <div className="flex items-center gap-4">
+            <Heading
+              text={timeDifferenceString}
+              variant="subHeader"
+              headingclassname="!font-medium !text-xs mx-1 text-primaryBlue tracking-wide dark:text-slate-400"
+            />
+            <button onClick={() => setOpenMenu(!openMenu)}>
+              {theme === "light" && <Dustbin color="black" />}
 
-            {theme === "dark" && <Dustbin color="white" />}
-          </button>
+              {theme === "dark" && <Dustbin color="white" />}
+            </button>
+          </div>
         </div>
-      </div>
-      <div className="flex flex-col mt-3 gap-2">
-        <div className="flex flex-wrap">
-          <Heading
-            text={`${props.business.replace(".", "")} - `}
-            variant="smallTitle"
-            headingclassname="!font-semibold !text-md tracking-wide "
-          />
-          <NavLink className={"flex "} to={`/pro/responses/${props?.id}`}>
+        <div className="flex flex-col mt-3 gap-2">
+          <div className="flex flex-wrap">
+            <Heading
+              text={`${props.business.replace(".", "")} - `}
+              variant="smallTitle"
+              headingclassname="!font-semibold !text-md tracking-wide text-textColor dark:text-white"
+            />
+
             <Heading
               text={`${props.service}`}
               variant="smallTitle"
-              headingclassname="!font-semibold !text-md tracking-wide  ml-1"
+              headingclassname="!font-semibold !text-md tracking-wide  ml-1 text-textColor dark:text-white"
             />
-          </NavLink>
-        </div>
-        <div className="flex flex-wrap">
-          {props.answers.map((item, key) => {
-            return (
-              <div className="flex">
-                <Heading
-                  text={`${item} `}
-                  variant="smallTitle"
-                  headingclassname="!font-light !text-xs   tracking-wide dark:text-slate-400 text-textColor"
-                />
-                {key !== props.answers.length - 1 && (
-                  <Heading
-                    text={`-`}
-                    variant="smallTitle"
-                    headingclassname="font-light !text-xs mx-2 tracking-wide dark:text-slate-400 text-textColor"
-                  />
-                )}
-              </div>
-            );
-          })}
-        </div>
-        <div className="flex items-center my-1 gap-2">
-          {theme === "light" && (
-            <div children={<LocationIcon color="black" />} />
-          )}
-
-          {theme === "dark" && (
-            <div children={<LocationIcon color="white" />} />
-          )}
-          <Heading
-            text={`${props.location}`}
-            variant="smallTitle"
-            headingclassname="!font-extralight text-slate-400 !text-xs  tracking-wide dark:text-white "
-          />
-        </div>
-        {props.is_outright && (
-          <div className="flex justify-between w-full items-center">
-            <div className="flex gap-1 ">
-              <div className="  w-5 h-5 mt-1 rounded-full">
-                <img src={Outright} />
-              </div>
-              <Heading
-                text={props.is_outright ? `Bought Outright` : ""}
-                variant="smallTitle"
-                headingclassname="!font-semibold !text-xs   tracking-wide text-primaryGreen dark:text-primaryGreen"
-              />
-            </div>
           </div>
-        )}
-        <div className="flex">
-          {props.quoteRequested && (
-            <div className="w-full  text-transparent  border-t-[0.5px] border-t-slate-200 mt-2 flex items-center gap-5 justify-start">
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-green-500 text-transparent rounded-full"></div>
+          <div className="flex flex-wrap">
+            {props.answers.map((item, key) => {
+              return (
+                <div className="flex">
+                  <Heading
+                    text={`${item} `}
+                    variant="smallTitle"
+                    headingclassname="!font-light !text-xs   tracking-wide dark:text-slate-400 text-textColor"
+                  />
+                  {key !== props.answers.length - 1 && (
+                    <Heading
+                      text={`-`}
+                      variant="smallTitle"
+                      headingclassname="font-light !text-xs mx-2 tracking-wide dark:text-slate-400 text-textColor"
+                    />
+                  )}
+                </div>
+              );
+            })}
+          </div>
+          <div className="flex items-center my-1 gap-2">
+            {theme === "light" && (
+              <div children={<LocationIcon color="black" />} />
+            )}
+
+            {theme === "dark" && (
+              <div children={<LocationIcon color="white" />} />
+            )}
+            <Heading
+              text={`${props.location}`}
+              variant="smallTitle"
+              headingclassname="!font-extralight text-slate-400 !text-xs  tracking-wide dark:text-white "
+            />
+          </div>
+          {props.is_outright && (
+            <div className="flex justify-between w-full items-center mt-2">
+              <div className="flex gap-1 ">
+                <div className="  w-5 h-5 mt-1 rounded-full">
+                  <img src={Outright} />
+                </div>
                 <Heading
-                  text={`Requested quote`}
+                  text={props.is_outright ? `Bought Outright` : ""}
                   variant="smallTitle"
-                  headingclassname="!font-semibold !text-xs tracking-wide dark:text-green-500 text-green-500 py-2 rounded-lg"
+                  headingclassname="!font-semibold !text-xs   tracking-wide text-primaryGreen dark:text-primaryGreen"
                 />
               </div>
             </div>
           )}
-          {props.interested && (
-            <div className="w-full  text-transparent  border-t-[0.5px] border-t-slate-200 mt-2 flex items-center gap-5 justify-end">
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-green-500 text-transparent rounded-full"></div>
-                <Heading
-                  text={`Interest shown`}
-                  variant="smallTitle"
-                  headingclassname="!font-semibold !text-xs tracking-wide dark:text-green-500 text-green-500 py-2 rounded-lg"
-                />
+          <div className="flex">
+            {props.quoteRequested && (
+              <div className="w-full  text-transparent  border-t-[0.5px] border-t-slate-200 flex items-center gap-5 justify-start">
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-green-500 text-transparent rounded-full"></div>
+                  <Heading
+                    text={`Requested quote`}
+                    variant="smallTitle"
+                    headingclassname="!font-semibold !text-xs tracking-wide dark:text-green-500 text-green-500 py-2 rounded-lg"
+                  />
+                </div>
               </div>
-            </div>
-          )}
+            )}
+            {props.interested && (
+              <div className="w-full  text-transparent  border-t-[0.5px] border-t-slate-200 flex items-center gap-5 justify-end">
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-green-500 text-transparent rounded-full"></div>
+                  <Heading
+                    text={`Interest shown`}
+                    variant="smallTitle"
+                    headingclassname="!font-semibold !text-xs tracking-wide dark:text-green-500 text-green-500 py-2 rounded-lg"
+                  />
+                </div>
+              </div>
+            )}
+          </div>
         </div>
-      </div>
-    </HomeCard>
+      </HomeCard>
+    </NavLink>
   );
 }
 

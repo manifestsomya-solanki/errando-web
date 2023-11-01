@@ -38,6 +38,12 @@ function LeadsList() {
               quoteRequested={item?.quote_requests?.length > 0 ? true : false}
               is_read={item?.is_read == false}
               is_messaged={item?.is_messaged ?? false}
+              is_email_verified={
+                item?.user?.is_email_verified == "1" ? true : false
+              }
+              is_mobile_verified={
+                item?.user?.is_mobile_verified == "1" ? true : false
+              }
             />
           );
         })

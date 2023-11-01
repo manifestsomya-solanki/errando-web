@@ -3,11 +3,14 @@ import GoldStar from "../../../../../assets/GoldStar.svg";
 import Star from "../../../../../assets/Star.svg";
 import ResponseSection from "./ResponseSection";
 import Flag from "../../../../../assets/flag-svgrepo-com.svg";
+import FlagFill from "../../../../../assets/flag-fill.svg";
+
 import Reply from "../../../../../assets/reply.svg";
 import { useState } from "react";
 import ResponseModal from "../../../../../layout/pro-models/ResponseModal";
 
 import DeleteReviewModal from "../../../../../layout/pro-models/DeleteReviewModal";
+import FlagReviewModal from "../../../../../layout/pro-models/FlagReviewModal";
 
 function CommentItem(props: {
   reviewId: number;
@@ -20,16 +23,17 @@ function CommentItem(props: {
   date: string;
   ratingCount: number;
   comment: string;
+  is_flagged?: number;
 }) {
   const [response, setResponse] = useState(false);
-  const [reviewId, setReviewId] = useState(false);
 
+  const [flagModal, setFlagModal] = useState(false);
   return (
     <>
-      {reviewId && (
-        <DeleteReviewModal
+      {flagModal && (
+        <FlagReviewModal
           onCancel={() => {
-            setReviewId(false);
+            setFlagModal(false);
           }}
           reviewId={props.reviewId}
         />
@@ -51,8 +55,12 @@ function CommentItem(props: {
             variant="subTitle"
             headingclassname="text-textColor !font-bold tracking-wide text-md dark:text-darktextColor"
           />
-          <div>
-            <img src={Flag} className="" />
+          <div onClick={() => setFlagModal(true)}>
+            {props.is_flagged ? (
+              <img src={FlagFill} className="" />
+            ) : (
+              <img src={Flag} className="" />
+            )}
           </div>
         </div>
         <div className=" flex gap-1 text-gray-500 !font-normal tracking-wide !text-xs">

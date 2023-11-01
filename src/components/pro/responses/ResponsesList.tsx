@@ -36,7 +36,7 @@ function ResponsesList() {
                 item?.postcode?.name ?? "--"
               }`}
               id={item?.id}
-              is_outright={item.leads[0].is_outright ? true : false}
+              is_outright={item?.leads[0]?.is_outright ? true : false}
               interested={item?.intrests?.length > 0 ? true : false}
               quoteRequested={item?.quote_requests?.length > 0 ? true : false}
             />

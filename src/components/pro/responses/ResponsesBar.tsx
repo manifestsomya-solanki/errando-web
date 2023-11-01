@@ -10,6 +10,8 @@ import useSWR from "swr";
 import { fetcher } from "../../../store/customer/home-context";
 import { useState } from "react";
 import FilterLeadsModal from "../../../layout/pro-models/FilterLeads";
+import Search from "../../../assets/search";
+import SearchLeadsModal from "../../../layout/pro-models/SearchLeadsModal";
 
 function ResponsesBar() {
   const { isLoading } = useLeadResponse();
@@ -18,6 +20,7 @@ function ResponsesBar() {
   count = count?.data;
   const { total } = useLeadResponse();
   const [openModal, setOpenModal] = useState(false);
+  const [openSearchModal, setOpenSearchModal] = useState(false);
 
   return (
     <div>
@@ -26,6 +29,9 @@ function ResponsesBar() {
           onCancel={() => setOpenModal(false)}
           filterKey="response"
         />
+      )}
+      {openSearchModal && (
+        <SearchLeadsModal onCancel={() => setOpenSearchModal(false)} />
       )}
       {isLoading ? (
         <LeadsSideSkeleton limit={1} />
@@ -49,6 +55,14 @@ function ResponsesBar() {
                     setOpenModal(true);
                   }}
                 />
+              </div>
+              <div
+                onClick={() => {
+                  setOpenSearchModal(true);
+                }}
+                className=" hover:bg-slate-100 dark:hover:bg-slate-700 w-8 h-8 flex items-center justify-center rounded-full "
+              >
+                <Search color="#0003FF" />
               </div>
             </HomeCard>
             <HomeCard className="rounded-md py-3 w-full flex justify-center gap-2 items-center my-3">

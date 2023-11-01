@@ -85,7 +85,10 @@ function App() {
         <Route path="/signup-pro" element={<SignUpPage />} />
         <Route path="/signup-customer" element={<SignUpCustomer />} />
         <Route path="/sign-in" element={<SignInPage />} />
-
+        <Route
+          path="/services/dealer-detail/:id"
+          element={<DealerDetail />}
+        ></Route>
         {isLoggedIn && role === "customer" && (
           <Route>
             <Route path="/settings" element={<Settings />}>
@@ -121,10 +124,6 @@ function App() {
               <Route
                 path="/services/service-detail/:id"
                 element={<ServiceDetail />}
-              ></Route>
-              <Route
-                path="/services/dealer-detail/:id"
-                element={<DealerDetail />}
               ></Route>
             </Route>
             <Route path="/messages" element={<Messages />}></Route>

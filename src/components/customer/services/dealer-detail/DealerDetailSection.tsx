@@ -52,7 +52,7 @@ function DealerDetailSection(props: {
   quote: number | string;
   quoteType: string;
   service: string;
-
+  page_key: string;
   requestId: number;
 }) {
   const { theme } = useTheme();
@@ -172,12 +172,13 @@ function DealerDetailSection(props: {
             }}
           >
             <Button
+              disabled={props.page_key !== "customer"}
               variant="filled"
               color="primary"
               size="normal"
               children="Messages"
               centerClassName="flex items-center justify-center"
-              buttonClassName="!px-4  text-sm tracking-wide py-[0.7rem] xs:hidden lg:inline !absolute top-0 right-0"
+              buttonClassName="!px-4  text-sm tracking-wide py-[0.7rem] xs:hidden lg:inline !absolute top-0 right-0 disabled:text-white"
               onClick={() => {
                 handleSelect();
               }}

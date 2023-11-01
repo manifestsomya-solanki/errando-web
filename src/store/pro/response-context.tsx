@@ -20,6 +20,8 @@ type LeadsResponseType = {
   page: number;
   total: number;
   isNoteLoading: boolean;
+  search: (key: string) => void;
+
   setPage: React.Dispatch<React.SetStateAction<number>>;
 };
 
@@ -39,6 +41,9 @@ export const LeadResponseContext = createContext<LeadsResponseType>({
   handleNextPage: () => {
     console.log();
   },
+  search: (d) => {
+    console.log(d);
+  },
   handlePrevPage: () => {
     console.log();
   },
@@ -56,14 +61,18 @@ export const LeadResponseContext = createContext<LeadsResponseType>({
 });
 
 const LeadsResponseProvider = (props: { children: React.ReactNode }) => {
-  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const perPage = 10;
   const [currentPage, setCurrentPage] = useState(1);
   const [url, setUrl] = useState(
     `https://erranddo.kodecreators.com/api/v1/user-requests?page=${currentPage}&per_page=${perPage}&for_pro=1&with_leads=1`
   );
-  // /user-requests?for_pro=1&with_leads=1&page=${currentPage}&per_page=${perPage}
+
+  const search = (key: string) => {
+    const params = new URLSearchParams(url);
+    params.set("search", key);
+    setUrl(decodeURIComponent(params.toString()));
+  };
   const filter = (ids: number[]) => {
     const params = new URLSearchParams(url);
     params.set("page", `${1}`);
@@ -95,7 +104,8 @@ const LeadsResponseProvider = (props: { children: React.ReactNode }) => {
   let datarender: UserResponseList[] = [];
   const { data, isLoading: isRequestLoading } = useSWR(url, fetcher);
   datarender = data?.data || dummy_data;
-  const total = data?.total;
+  console.log(datarender);
+  const total = datarender?.filter((item) => item?.is_outright).length;
 
   const [isQuoteLoading, setIsQuoteLoading] = useState(false);
 
@@ -239,6 +249,7 @@ const LeadsResponseProvider = (props: { children: React.ReactNode }) => {
         error: error,
         page: currentPage,
         total: total,
+        search: search,
         setPage: setCurrentPage,
       }}
     >

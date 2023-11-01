@@ -55,6 +55,7 @@ function InterestFilterModal({ onCancel }: { onCancel: () => void }) {
                     search(key);
                     onCancel();
                   }}
+                  page_key="lead"
                 />
               </div>
               <div className="py-1 flex items-center gap-2">

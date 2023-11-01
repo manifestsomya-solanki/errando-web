@@ -1,5 +1,6 @@
 import HomeCard from "./HomeCard";
 import Location from "../../../../assets/LocationIcon.tsx";
+import Delete from "../../../../assets/delete.svg";
 
 import Edit from "../../../../assets/edit.svg";
 import Heading from "../../../UI/Heading";
@@ -8,6 +9,7 @@ import { useState } from "react";
 import EditServiceModal from "../../../../layout/pro-models/EditServiceModal.tsx";
 import { PostCode } from "../../../../models/home.ts";
 import { Postcode2 } from "../../../../models/pro/business.ts";
+import DeleteBusinessServiceModal from "../../../../layout/pro-models/DeleteBusinessServiceModal.tsx";
 
 function ServiceItem(props: {
   serviceId: number;
@@ -26,12 +28,20 @@ function ServiceItem(props: {
 }) {
   const { theme } = useTheme();
   const [openEditModal, setOpenEditModal] = useState(false);
+  const [openDeleteModal, setOpenDeleteModal] = useState(false);
+
   return (
     <>
       {openEditModal && (
         <EditServiceModal
           onCancel={() => setOpenEditModal(false)}
           serviceId={props?.serviceId}
+        />
+      )}
+      {openDeleteModal && (
+        <DeleteBusinessServiceModal
+          onCancel={() => setOpenDeleteModal(false)}
+          id={props?.serviceId}
         />
       )}
       <HomeCard
@@ -52,10 +62,17 @@ function ServiceItem(props: {
                     headingclassname="!font-medium text-primaryYellow tracking-wide text-sm "
                   />
                 </div>
-                <div className=" hover:bg-slate-100 dark:hover:bg-slate-700 w-10 h-10 flex items-center justify-center rounded-full">
-                  <button onClick={() => setOpenEditModal(true)}>
-                    <img src={Edit} />
-                  </button>
+                <div className="flex gap-0">
+                  <div className=" hover:bg-slate-100 dark:hover:bg-slate-700 w-10 h-10 flex items-center justify-center rounded-full">
+                    <button onClick={() => setOpenEditModal(true)}>
+                      <img src={Edit} />
+                    </button>
+                  </div>
+                  <div className=" hover:bg-slate-100 dark:hover:bg-slate-700 w-10 h-10 flex items-center justify-center rounded-full">
+                    <button onClick={() => setOpenDeleteModal(true)}>
+                      <img src={Delete} className="w-h h-5" />
+                    </button>
+                  </div>
                 </div>
               </div>
               {props?.location &&

@@ -7,6 +7,7 @@ const SearchBar = (props: {
   onChange: (key: string) => void;
   searchkey: string;
   className?: string;
+  page_key?: string;
 }) => {
   const [searchKey, setSearchKey] = useState("");
   const searchHandler = (
@@ -60,7 +61,9 @@ const SearchBar = (props: {
           color="primary"
           size="normal"
           children="Search"
-          buttonClassName="!px-7 !py-3 text-sm xs:hidden lg:flex"
+          buttonClassName={`!px-7 !py-3 text-sm ${
+            !props.page_key && "xs:hidden lg:flex"
+          }`}
           onClick={searchHandler}
         />
       </div>
