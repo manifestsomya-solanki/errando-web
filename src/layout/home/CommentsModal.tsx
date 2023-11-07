@@ -18,8 +18,10 @@ function CommentsModal(props: {
   onCancel: () => void;
   open: boolean;
   onCancelAll: () => void;
+  requestId?: number;
 }) {
-  const { isLoading, error, addRequest, setError } = useAuth();
+  const isLoggedIn = localStorage.getItem("isLoggedIn");
+  const { isLoading, error, addRequest, setError, editRequest } = useAuth();
   const formik = useFormik<{ comment: string; img: File | undefined }>({
     initialValues: {
       comment: "",
@@ -34,38 +36,42 @@ function CommentsModal(props: {
       return errors;
     },
     onSubmit: async (values) => {
-      console.log(values.img);
-      console.log("here");
-      const formData = new FormData();
-      const id = JSON.parse(localStorage.getItem("data") ?? "").id;
+      if (isLoggedIn) {
+        const formData = new FormData();
+        const id = JSON.parse(localStorage.getItem("data") ?? "").id;
 
-      const serviceid = JSON.parse(localStorage.getItem("service") ?? "").id;
+        const serviceid = JSON.parse(localStorage.getItem("service") ?? "").id;
 
-      const postCodeid = localStorage.getItem("post_code");
+        const postCodeid = localStorage.getItem("post_code");
 
-      const questions: { question: number; answer: "" }[] = JSON.parse(
-        localStorage.getItem("question") ?? ""
-      );
-      console.log(values.img);
-      console.log(id, serviceid, postCodeid, questions);
-      formData.set("user_id", id);
-      formData.set("postcode_id", postCodeid?.toString() ?? "");
-      formData.set("service_id", serviceid?.toString() ?? "");
-      if (values?.img) formData.set("file", values?.img);
-      formData.set("comment", values.comment);
-      for (let i = 0; i < questions.length; i++) {
-        formData.set(
-          `data[${i}][question_id]`,
-          (questions[i].question + 1).toString()
+        const questions: { question: number; answer: "" }[] = JSON.parse(
+          localStorage.getItem("question") ?? ""
         );
-        formData.set(`data[${i}][answer]`, questions[i].answer.toString());
+
+        formData.set("user_id", id);
+        formData.set("postcode_id", postCodeid?.toString() ?? "");
+        formData.set("service_id", serviceid?.toString() ?? "");
+        if (values?.img) formData.set("file", values?.img);
+        formData.set("comment", values.comment);
+        for (let i = 0; i < questions.length; i++) {
+          formData.set(
+            `data[${i}][question_id]`,
+            (questions[i].question + 1).toString()
+          );
+          formData.set(`data[${i}][answer]`, questions[i].answer.toString());
+        }
+
+        await addRequest(formData);
+      } else {
+        console.log(props.requestId, "id of request");
+        const formData = new FormData();
+
+        if (values?.img) formData.set("file", values?.img);
+        formData.set("comment", values.comment);
+
+        await editRequest(formData, props.requestId?.toString() ?? "");
       }
-      // await addRequest(formData);
-      // await mutate();
-      // props.onCancelAll();
-      await addRequest(formData);
       props.onCancelAll();
-      // await mutate();
     },
   });
   useEffect(() => {

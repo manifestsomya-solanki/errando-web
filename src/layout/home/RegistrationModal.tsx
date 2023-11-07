@@ -51,7 +51,27 @@ function RegistrationModal(props: {
       }
       localStorage.setItem("email", values.email);
       localStorage.setItem("mobile_number", values.mobile_number);
-      sendOtp(formData);
+      const requestFormData = new FormData(); //initialize formdata
+      const serviceid = JSON.parse(localStorage.getItem("service") ?? "").id;
+
+      const postCodeid = localStorage.getItem("post_code");
+
+      const questions: { question: number; answer: "" }[] = JSON.parse(
+        localStorage.getItem("question") ?? ""
+      );
+      requestFormData.set("postcode_id", postCodeid?.toString() ?? "");
+      requestFormData.set("service_id", serviceid?.toString() ?? "");
+      for (let i = 0; i < questions.length; i++) {
+        requestFormData.set(
+          `data[${i}][question_id]`,
+          (questions[i].question + 1).toString()
+        );
+        requestFormData.set(
+          `data[${i}][answer]`,
+          questions[i].answer.toString()
+        );
+      }
+      sendOtp(formData, "registration", requestFormData);
       if (error.length === 0) {
         setTimeout(() => {
           setOpenMenu(true);

@@ -1,3 +1,5 @@
+import { User } from "./pro/leadslist";
+
 export interface UserData {
   available_credits: number;
   token: string;
@@ -58,6 +60,8 @@ export interface OtpValues {
 }
 
 export interface SendOtp {
+  token: string;
+  data: User;
   message: string;
   status: string;
 }

@@ -14,6 +14,7 @@ import Button from "../../components/UI/Button";
 import { useTheme } from "../../store/theme-context";
 import NearlyThere from "./NearlyThere.tsx";
 import Input from "../../components/UI/Input.tsx";
+import { useAuth } from "../../store/customer/auth-context.tsx";
 
 let ids: { question: number; answer: string; custom: boolean }[] = JSON.parse(
   localStorage.getItem("question") ?? "[]"
@@ -21,13 +22,14 @@ let ids: { question: number; answer: string; custom: boolean }[] = JSON.parse(
 
 function QuestionsModal(props: {
   onCancel: () => void;
+
   open: boolean;
   onCancelAll: () => void;
 }) {
+  const { requestData } = useAuth();
   const service = localStorage.getItem("service")
     ? JSON.parse(localStorage.getItem("service") ?? "").id
     : "";
-  console.log("ids", ids);
   const postCode = localStorage.getItem("post_code");
   const token = localStorage.getItem("token");
   const businessUrl = `https://erranddo.kodecreators.com/api/v1/businesses?post_code_id=${postCode}&service_id=${service}`;
@@ -70,11 +72,11 @@ function QuestionsModal(props: {
   const [inputValue, setInputValue] = useState(
     ids.length > 0
       ? ids.map((d) => {
-        if (d.question === questionNumber && d.custom === true) {
-          console.log("answer", d.answer);
-          return d.answer;
-        }
-      })
+          if (d.question === questionNumber && d.custom === true) {
+            console.log("answer", d.answer);
+            return d.answer;
+          }
+        })
       : ""
   );
   useEffect(() => {
@@ -86,7 +88,6 @@ function QuestionsModal(props: {
       return matchingAnswers;
     });
   }, [ids, questionNumber]);
-  console.log("input value", inputValue);
 
   const newAnswerHandler = (e: string) => {
     setInputValue(e);
@@ -112,6 +113,7 @@ function QuestionsModal(props: {
     <>
       {openModal && token ? (
         <CommentsModal
+          requestId={requestData?.data?.user_requests?.id}
           open={openModal}
           onCancel={() => {
             setOpenModal(false);

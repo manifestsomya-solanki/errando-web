@@ -19,7 +19,6 @@ const ServiceRequestModal = (props: {
   const [openMenu, setOpenMenu] = useState(false);
   const [openSearch, setOpenSearch] = useState(false);
   const [openServiceModal, setOpenServiceModal] = useState(false);
-  console.log(datarender);
 
   const list = datarender;
   const { theme } = useTheme();

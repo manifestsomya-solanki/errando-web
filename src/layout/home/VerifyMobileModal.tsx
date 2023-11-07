@@ -19,7 +19,8 @@ function VerifyMobileModal(props: {
   onCancelAll: () => void;
   mobile_number: string;
 }) {
-  const { verifyOtp, isLoading, error, sendOtp, manageLoading } = useAuth();
+  const { verifyOtp, isLoading, error, sendOtp, manageLoading, requestData } =
+    useAuth();
 
   const formik = useFormik({
     initialValues: {
@@ -47,12 +48,13 @@ function VerifyMobileModal(props: {
     },
   });
   const [openMenu, setOpenMenu] = useState(false);
-
+  console.log("here", requestData?.data?.user_requests?.id);
   const { theme } = useTheme();
   return (
     <>
       {openMenu && (
         <CommentsModal
+          requestId={requestData?.data?.user_requests?.id}
           open={openMenu}
           onCancel={() => {
             setOpenMenu(false);

@@ -20,7 +20,6 @@ function PostCodeModal(props: {
       postCode: "",
     },
     validate: (values) => {
-      console.log(values);
       const errors: any = {};
       if (values.postCode.toString().length === 0) {
         errors.postCode = "Required";
@@ -33,7 +32,6 @@ function PostCodeModal(props: {
       setOpenModal(true);
     },
   });
-  console.log(formik.values.postCode, "post");
   useEffect(() => {
     return () => {
       formik.setFieldValue("postCode", "");

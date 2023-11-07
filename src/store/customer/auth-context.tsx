@@ -5,15 +5,19 @@ import { RegisterUser, SendOtp, UserData, VerifyOtp } from "../../models/user";
 import { toast } from "react-toastify";
 import useSWR, { KeyedMutator } from "swr";
 import { fetcher } from "./home-context";
-import { mutate } from "swr";
 
 //auth response type declaration
 type AuthResponseType = {
   data?: UserData;
+  requestData: RegisterUser;
   userData?: UserData;
   login: (formData: FormData) => void;
   loginPro: (formData: FormData) => void;
-  sendOtp: (formData: FormData) => void;
+  sendOtp: (
+    formData: FormData,
+    key?: string,
+    requestFormData?: FormData
+  ) => void;
   register: (formData: FormData) => Promise<number>;
   setError: React.Dispatch<React.SetStateAction<string>>;
   verifyOtp: (
@@ -29,7 +33,9 @@ type AuthResponseType = {
   isLoginCustomerLoading: boolean;
   logout: () => void;
   forgotPassword: (formData: FormData) => Promise<void>;
-  addRequest: (formData: FormData) => Promise<void>;
+  addRequest: (formData: FormData, tokenFromApi?: string) => Promise<void>;
+  editRequest: (formData: FormData, id: string) => Promise<void>;
+
   manageLoading: (boolean: boolean) => Promise<void>;
   resetPassword: (formData: FormData) => void;
   profileHandler: (formData: FormData) => void;
@@ -48,14 +54,17 @@ export const AuthContext = createContext<AuthResponseType>({
   loginPro: (data) => {
     console.log(data);
   },
-  sendOtp: (data) => {
-    console.log(data);
+  sendOtp: (data, key, requestData) => {
+    console.log(data, key, requestData);
   },
   register: async (data) => {
     return 0;
   },
   addRequest: async (data) => {
     console.log(data);
+  },
+  editRequest: async (data, id) => {
+    console.log(data, id);
   },
   verifyOtp: async (data, key) => {
     console.log(data, key);
@@ -70,7 +79,7 @@ export const AuthContext = createContext<AuthResponseType>({
   },
   isLoggedIn: false,
   isDetailLoading: false,
-
+  requestData: {} as RegisterUser,
   isLoading: false,
   isLoginProLoading: false,
   isLoginCustomerLoading: false,
@@ -97,6 +106,9 @@ export const AuthContext = createContext<AuthResponseType>({
 const AuthContextProvider = (props: { children: React.ReactNode }) => {
   const initialToken = localStorage.getItem("data");
   const [data, setData] = useState(
+    initialToken ? JSON.parse(initialToken) : undefined
+  );
+  const [requestData, setrequestData] = useState(
     initialToken ? JSON.parse(initialToken) : undefined
   );
   const [isLoading, setIsLoading] = useState(false);
@@ -198,7 +210,11 @@ const AuthContextProvider = (props: { children: React.ReactNode }) => {
   };
 
   //sendotp
-  const sendOtp = async (formData: FormData) => {
+  const sendOtp = async (
+    formData: FormData,
+    key?: string,
+    requestFormData?: FormData
+  ) => {
     setIsLoading(true);
     setError("");
     const res = await fetch(
@@ -217,7 +233,12 @@ const AuthContextProvider = (props: { children: React.ReactNode }) => {
         setError(data.message);
       } else {
         setIsLoading(false);
+        console.log(data);
         setError("");
+        if (key && requestFormData) {
+          requestFormData.set("user_id", data.data.id.toString());
+          addRequest(requestFormData, data?.token);
+        }
       }
     } else {
       const data: any = await res.json();
@@ -507,13 +528,53 @@ const AuthContextProvider = (props: { children: React.ReactNode }) => {
     }
   };
 
-  const addRequest = async (formData: FormData) => {
+  const addRequest = async (formData: FormData, tokenFromApi?: string) => {
+    setIsLoading(true);
+    setError("");
+    const token = localStorage.getItem("token") ?? tokenFromApi;
+
+    const res = await fetch(
+      "https://erranddo.kodecreators.com/api/v1/user-requests/add",
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        method: "POST",
+        body: formData,
+      }
+    );
+
+    if (res.status === 200) {
+      setIsLoading(false);
+      setrequestData(await res.json());
+      if (requestData.status === "0") {
+        setError(requestData.message);
+      } else {
+        if (!tokenFromApi) {
+          setIsLoggedIn(true);
+          localStorage.setItem("role", "customer");
+          localStorage.setItem("isLoggedIn", "true");
+          localStorage.removeItem("service");
+          localStorage.removeItem("post_code");
+          localStorage.removeItem("question");
+          navigate("/projects");
+          await mutate("project_contect_api");
+        }
+      }
+    } else {
+      setIsLoading(false);
+      const data: any = await res.json();
+      setError(data.message);
+    }
+  };
+  console.log(requestData);
+  const editRequest = async (formData: FormData, id: string) => {
     setIsLoading(true);
     setError("");
     const token = localStorage.getItem("token");
 
     const res = await fetch(
-      "https://erranddo.kodecreators.com/api/v1/user-requests/add",
+      `https://erranddo.kodecreators.com/api/v1/user-requests/${id}/edit`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -551,6 +612,7 @@ const AuthContextProvider = (props: { children: React.ReactNode }) => {
       value={{
         data: data,
         userData: userData,
+        requestData: requestData,
         login: login,
         loginPro: loginPro,
         logout: logoutHandler,
@@ -570,6 +632,7 @@ const AuthContextProvider = (props: { children: React.ReactNode }) => {
         verifyOtp: verifyOtp,
         error: error,
         edit: edit,
+        editRequest: editRequest,
         addRequest: addRequest,
         setError: setError,
         mutate: mutate,
