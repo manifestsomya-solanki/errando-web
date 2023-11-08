@@ -7,10 +7,9 @@ import Close from "../../assets/close";
 import Button from "../../components/UI/Button";
 import { useLead } from "../../store/pro/lead-context";
 import SearchBar from "../../components/customer/home/SearchBar";
-import { validate } from "uuid";
 
 function InterestFilterModal({ onCancel }: { onCancel: () => void }) {
-  const { filterByInterest, search } = useLead();
+  const { filterByInterest, search, reset } = useLead();
   const { theme } = useTheme();
 
   return (
@@ -24,7 +23,17 @@ function InterestFilterModal({ onCancel }: { onCancel: () => void }) {
         {theme === "light" && <div children={<Close color="black" />} />}
         {theme === "dark" && <div children={<Close color="white" />} />}
       </button>
-      <Label className="my-3 !font-semibold" label="Filter" />
+      <div className="w-[80%] mt-2 flex justify-between">
+        <Label className="my-3 !font-semibold" label="Filter" />
+        <div
+          onClick={() => {
+            reset();
+            onCancel();
+          }}
+        >
+          <Label className="my-3 !font-semibold" label="Reset" />
+        </div>
+      </div>
       <Formik
         initialValues={{
           interests: false,

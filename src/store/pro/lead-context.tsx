@@ -20,6 +20,8 @@ type LeadResponeType = {
   isBuyOutrightLoading: boolean;
   error: string;
   handleNextPage: () => void;
+  reset: () => void;
+
   handlePrevPage: () => void;
   filter: (ids: number[]) => void;
   filterByInterest: (filters: { [key: string]: boolean }) => void;
@@ -41,6 +43,9 @@ export const LeadContext = createContext<LeadResponeType>({
   isBuyOutrightLoading: false,
   error: "",
   handleNextPage: () => {
+    console.log();
+  },
+  reset: () => {
     console.log();
   },
   handlePrevPage: () => {
@@ -108,6 +113,12 @@ const LeadContextProProvider = (props: { children: React.ReactNode }) => {
     params.set("page", `${currentPage + 1}`);
     params.set("per_page", `${perPage}`);
     setUrl(decodeURIComponent(params.toString()));
+  };
+
+  const reset = () => {
+    setUrl(
+      `https://erranddo.kodecreators.com/api/v1/user-requests?for_pro=1&page=${currentPage}&per_page=${perPage}`
+    );
   };
 
   const handlePreviousPage = () => {
@@ -237,6 +248,7 @@ const LeadContextProProvider = (props: { children: React.ReactNode }) => {
         isBuyOutrightLoading: isBuyOutrightLoading,
         isDeleteLoading: isLoading,
         buyLead: buyLead,
+        reset: reset,
         handleNextPage: handleNextPage,
         handlePrevPage: handlePreviousPage,
         filter: filter,

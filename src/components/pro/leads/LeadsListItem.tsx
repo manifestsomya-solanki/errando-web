@@ -156,9 +156,9 @@ function LeadsListItem(props: {
           <div className="flex flex-col gap-5">
             {props.is_email_verified && (
               <div className="flex gap-2">
-                <img className="w-4 h-4" src={EmailVerified} />
+                <img className="w-4 h-4 object-contain" src={EmailVerified} />
                 <Heading
-                  text={` Email Verified`}
+                  text={` Verified Email `}
                   variant="smallTitle"
                   headingclassname="!font-medium !text-xs tracking-wide  text-textColor dark:text-white"
                 />
@@ -166,9 +166,9 @@ function LeadsListItem(props: {
             )}
             {props.is_mobile_verified && (
               <div className="flex gap-2">
-                <img className="w-4 h-4" src={MobileVerified} />
+                <img className="w-4 h-4 object-contain" src={MobileVerified} />
                 <Heading
-                  text={`Mobile Verified`}
+                  text={` Verified Number`}
                   variant="smallTitle"
                   headingclassname="!font-medium !text-xs tracking-wide  text-textColor dark:text-white"
                 />
