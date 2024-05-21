@@ -57,7 +57,7 @@ function DealerDetailSection(props: {
 }) {
   const { theme } = useTheme();
   const { userData } = useAuth();
-  const anotherUserDetailUrl = `https://erranddo.kodecreators.com/api/v1/user/detail?user_id=${props?.userBusinessId}`;
+  const anotherUserDetailUrl = `https://erranddo.com/admin/api/v1/user/detail?user_id=${props?.userBusinessId}`;
   const { data: userdata } = useSWR(anotherUserDetailUrl, fetcher);
   const anotherUserDetail: UserData = userdata?.data;
   const user = {

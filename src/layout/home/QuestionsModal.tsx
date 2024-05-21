@@ -32,7 +32,7 @@ function QuestionsModal(props: {
     : "";
   const postCode = localStorage.getItem("post_code");
   const token = localStorage.getItem("token");
-  const businessUrl = `https://erranddo.kodecreators.com/api/v1/businesses?post_code_id=${postCode}&service_id=${service}`;
+  const businessUrl = `https://erranddo.com/admin/api/v1/businesses?post_code_id=${postCode}&service_id=${service}`;
   let datarenderForBusiness: BusinessData[] = [];
   const { data: BusinessData, isLoading: businessLoading } = useSWR(
     businessUrl,
@@ -43,7 +43,7 @@ function QuestionsModal(props: {
   if (datarenderForBusiness?.length === 0) {
     error = "No services";
   }
-  const url = `https://erranddo.kodecreators.com/api/v1/questions?service_id=${service}&post_code_id=${postCode}&page=1&per_page=10`;
+  const url = `https://erranddo.com/admin/api/v1/questions?service_id=${service}&post_code_id=${postCode}&page=1&per_page=10`;
   const dummy_data: Question[] = [];
   let datarender: QuestionData[] = [];
   const {

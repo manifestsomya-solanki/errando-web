@@ -17,12 +17,12 @@ export const HomeServiceContext = React.createContext<HomeServiceDetailsType>({
 
 const HomeServiceContextProvider = (props: { children: ReactNode }) => {
   const [url, setUrl] = useState(
-    "https://erranddo.kodecreators.com/api/v1/services"
+    "https://erranddo.com/admin/api/v1/services"
   );
 
   //search handler
   const searchHandler = (key: string) => {
-    setUrl(`https://erranddo.kodecreators.com/api/v1/services?search=${key}`);
+    setUrl(`https://erranddo.com/admin/api/v1/services?search=${key}`);
   };
 
   const dummy_data: Service[] = [];

@@ -64,7 +64,7 @@ const MessagesDetailMainPage = () => {
   const [pageSize, setPageSize] = useState(initialPageSize);
 
   const { userData } = useAuth();
-  const anotherUserDetailUrl = `https://erranddo.kodecreators.com/api/v1/user/detail?user_id=${businessUserId}`;
+  const anotherUserDetailUrl = `https://erranddo.com/admin/api/v1/user/detail?user_id=${businessUserId}`;
   const { data: userdata } = useSWR(anotherUserDetailUrl, fetcher);
   const anotherUserDetail: UserData = userdata?.data;
 
@@ -303,7 +303,7 @@ const MessagesDetailMainPage = () => {
                     <img
                       src={
                         user?.photoURL
-                          ? `https://erranddo.kodecreators.com/storage/${user?.photoURL}`
+                          ? `https://erranddo.com/admin/storage/${user?.photoURL}`
                           : NoImage
                       }
                       className="w-8 h-8 rounded-full object-cover"

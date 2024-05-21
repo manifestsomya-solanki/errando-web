@@ -54,11 +54,11 @@ const ProjectContextProvider = (props: { children: React.ReactNode }) => {
   const [completePage, setCompletePage] = useState(1);
 
   const [url, setUrl] = useState(
-    `https://erranddo.kodecreators.com/api/v1/user-requests?page=${currentPage}&per_page=${perPage}&status=PENDING&user_id=${id}`
+    `https://erranddo.com/admin/api/v1/user-requests?page=${currentPage}&per_page=${perPage}&status=PENDING&user_id=${id}`
   );
 
   const [completeurl, setCompleteUrl] = useState(
-    `https://erranddo.kodecreators.com/api/v1/user-requests?page=${completePage}&per_page=${perPage}&status=COMPLETED&user_id=${id}`
+    `https://erranddo.com/admin/api/v1/user-requests?page=${completePage}&per_page=${perPage}&status=COMPLETED&user_id=${id}`
   );
 
   const dummy_data: Request[] = [];

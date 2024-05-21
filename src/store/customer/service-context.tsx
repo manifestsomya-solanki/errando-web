@@ -51,7 +51,7 @@ export const ServiceContext = React.createContext<ServiceDetailsType>({
 
 const ServiceContextProvider = (props: { children: ReactNode }) => {
   const [url, setUrl] = useState(
-    `https://erranddo.kodecreators.com/api/v1/businesses?page=1&per_page=100`
+    `https://erranddo.com/admin/api/v1/businesses?page=1&per_page=100`
   );
 
   const businessListHandler = async (
@@ -62,11 +62,11 @@ const ServiceContextProvider = (props: { children: ReactNode }) => {
   ) => {
     if (link === "all") {
       setUrl(
-        `https://erranddo.kodecreators.com/api/v1/businesses?service_id=${key}&user_request_id=${requestId}`
+        `https://erranddo.com/admin/api/v1/businesses?service_id=${key}&user_request_id=${requestId}`
       );
     } else if (link === "response") {
       setUrl(
-        `https://erranddo.kodecreators.com/api/v1/businesses?service_id=${key}&user_request_id=${requestId}&only_responded=1`
+        `https://erranddo.com/admin/api/v1/businesses?service_id=${key}&user_request_id=${requestId}&only_responded=1`
       );
     }
   };
@@ -74,15 +74,15 @@ const ServiceContextProvider = (props: { children: ReactNode }) => {
   const sortHandler = async (orderBy: string, key: number) => {
     if (orderBy === "reviews_avg_rating") {
       setUrl(
-        `https://erranddo.kodecreators.com/api/v1/businesses?service_id=${key}&sort_field=reviews_avg_rating&sort_order=desc`
+        `https://erranddo.com/admin/api/v1/businesses?service_id=${key}&sort_field=reviews_avg_rating&sort_order=desc`
       );
     } else if (orderBy === "created_at") {
       setUrl(
-        `https://erranddo.kodecreators.com/api/v1/businesses?service_id=${key}&sort_field=created_at&sort_order=desc`
+        `https://erranddo.com/admin/api/v1/businesses?service_id=${key}&sort_field=created_at&sort_order=desc`
       );
     } else if (orderBy === "highest_rating") {
       setUrl(
-        `https://erranddo.kodecreators.com/api/v1/businesses?service_id=${key}&sort_field=highest_rating&sort_order=desc`
+        `https://erranddo.com/admin/api/v1/businesses?service_id=${key}&sort_field=highest_rating&sort_order=desc`
       );
     }
   };
@@ -98,7 +98,7 @@ const ServiceContextProvider = (props: { children: ReactNode }) => {
       : true;
 
   const userRequestId = useParams().id;
-  const counturl = `https://erranddo.kodecreators.com/api/v1/businesses/count?user_request_id=${userRequestId}`;
+  const counturl = `https://erranddo.com/admin/api/v1/businesses/count?user_request_id=${userRequestId}`;
   const { mutate: countMutate } = useSWR(counturl, fetcher);
 
   const [error, setError] = useState("");
@@ -111,7 +111,7 @@ const ServiceContextProvider = (props: { children: ReactNode }) => {
 
     try {
       const res = await fetch(
-        "https://erranddo.kodecreators.com/api/v1/user-requests/show-interest",
+        "https://erranddo.com/admin/api/v1/user-requests/show-interest",
         {
           method: "POST",
           headers: {
@@ -158,7 +158,7 @@ const ServiceContextProvider = (props: { children: ReactNode }) => {
 
     try {
       const res = await fetch(
-        "https://erranddo.kodecreators.com/api/v1/user-requests/show-interest-all",
+        "https://erranddo.com/admin/api/v1/user-requests/show-interest-all",
         {
           method: "POST",
           headers: {
@@ -198,7 +198,7 @@ const ServiceContextProvider = (props: { children: ReactNode }) => {
 
     try {
       const res = await fetch(
-        "https://erranddo.kodecreators.com/api/v1/user-requests/request-quote",
+        "https://erranddo.com/admin/api/v1/user-requests/request-quote",
         {
           method: "POST",
           headers: {

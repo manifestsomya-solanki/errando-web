@@ -16,7 +16,7 @@ import { useState } from "react";
 
 function PhotosSection() {
   const { id } = useParams();
-  const url = `https://erranddo.kodecreators.com/api/v1/businesses/${id}/detail`;
+  const url = `https://erranddo.com/admin/api/v1/businesses/${id}/detail`;
   const { data, error } = useSWR(url, fetcher);
   const photoData: Business = data?.data;
   const isLoading = !data && !error;
@@ -97,12 +97,12 @@ function PhotosSection() {
                   loop={true}
                   preload="auto"
                   autoPlay={true}
-                  src={`https://erranddo.kodecreators.com/storage/${photoData.files[currentImageIndex].file_path}`}
+                  src={`https://erranddo.com/admin/storage/${photoData.files[currentImageIndex].file_path}`}
                   className="w-[100%] lg:max-h-[40rem] xs:max-h-[30rem] object-cover"
                 />
               ) : (
                 <img
-                  src={`https://erranddo.kodecreators.com/storage/${photoData.files[currentImageIndex].file_path}`}
+                  src={`https://erranddo.com/admin/storage/${photoData.files[currentImageIndex].file_path}`}
                   alt={"image"}
                   className="w-[100%] lg:max-h-[40rem] xs:max-h-[30rem] object-cover"
                 />
@@ -123,7 +123,7 @@ function PhotosSection() {
                     setCurrentImageIndex(index);
                     setimgShow(true);
                   }}
-                  src={`https://erranddo.kodecreators.com/storage/${photo.file_path}`}
+                  src={`https://erranddo.com/admin/storage/${photo.file_path}`}
                   className="lg:h-60 md:h-36 xs:h-44 w-full object-cover"
                 />
               ) : (
@@ -133,7 +133,7 @@ function PhotosSection() {
 
                     setimgShow(true);
                   }}
-                  src={`https://erranddo.kodecreators.com/storage/${photo.file_path}`}
+                  src={`https://erranddo.com/admin/storage/${photo.file_path}`}
                   alt={`Photo`}
                   className="lg:h-60 md:h-36 xs:h-44 w-full object-cover"
                 />

@@ -21,7 +21,7 @@ function NotesDetail({ onCancel }: { onCancel: () => void }) {
   const loginUser = JSON.parse(localStorage.getItem("data") || "{}");
   console.log(loginUser?.id, "loginUser");
 
-  const url = `https://erranddo.kodecreators.com/api/v1/note?user_request_id=${requestId?.id}&user_id=${loginUser?.id}`;
+  const url = `https://erranddo.com/admin/api/v1/note?user_request_id=${requestId?.id}&user_id=${loginUser?.id}`;
   const { data, isLoading } = useSWR(url, fetcher);
   const notesDetail: NotesList[] = data?.data ?? "";
   console.log(requestId, "reqid");

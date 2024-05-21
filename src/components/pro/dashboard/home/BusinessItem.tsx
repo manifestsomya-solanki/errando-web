@@ -87,7 +87,7 @@ function BusinessItem(props: {
                 <div className="flex gap-2 items-center w-full">
                   {props.image ? (
                     <img
-                      src={`https://erranddo.kodecreators.com/storage/${props.image}`}
+                      src={`https://erranddo.com/admin/storage/${props.image}`}
                       className="w-16 h-16 rounded-full object-cover dark:border-[0.5px] dark:border-white border-[0.5px] border-textColor"
                     />
                   ) : (

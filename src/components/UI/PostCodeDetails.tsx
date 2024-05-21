@@ -8,14 +8,14 @@ import { useDetectClickOutside } from "react-detect-click-outside";
 const PostCodeDetails = ({ ...props }) => {
   const postCodeId = props?.initialValue;
   const [url, setUrl] = useState("");
-  const postCodeUrl = `https://erranddo.kodecreators.com/api/v1/postcodes?search=${postCodeId}`;
+  const postCodeUrl = `https://erranddo.com/admin/api/v1/postcodes?search=${postCodeId}`;
   const { data: postCodeData } = useSWR(postCodeUrl, fetcher);
   const post_code = postCodeData?.data[0]?.name;
   //search handler
   const searchHandler = (key: string) => {
-    setUrl(`https://erranddo.kodecreators.com/api/v1/postcodes?search=${key}`);
+    setUrl(`https://erranddo.com/admin/api/v1/postcodes?search=${key}`);
     if (key === "") {
-      setUrl(`https://erranddo.kodecreators.com/api/v1/postcodes`);
+      setUrl(`https://erranddo.com/admin/api/v1/postcodes`);
     }
   };
   const dummy_data: PostCode[] = [];

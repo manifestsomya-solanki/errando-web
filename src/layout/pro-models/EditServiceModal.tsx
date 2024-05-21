@@ -29,7 +29,7 @@ function EditServiceModal({
   onCancel: () => void;
   serviceId: number;
 }) {
-  const serviceDataUrl = `https://erranddo.kodecreators.com/api/v1/business-services/${serviceId}/detail`;
+  const serviceDataUrl = `https://erranddo.com/admin/api/v1/business-services/${serviceId}/detail`;
   const { data: oldData, isLoading: isDetailLoading } = useSWR(
     serviceDataUrl,
     fetcher

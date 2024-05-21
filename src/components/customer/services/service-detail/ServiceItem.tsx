@@ -64,7 +64,7 @@ function ServiceCard(props: any) {
 
   const { theme } = useTheme();
   const { userData } = useAuth();
-  const anotherUserDetailUrl = `https://erranddo.kodecreators.com/api/v1/user/detail?user_id=${props?.userId}`;
+  const anotherUserDetailUrl = `https://erranddo.com/admin/api/v1/user/detail?user_id=${props?.userId}`;
   const { data: userdata } = useSWR(anotherUserDetailUrl, fetcher);
   const anotherUserDetail: UserData = userdata?.data;
   const user = {
@@ -205,7 +205,7 @@ function ServiceCard(props: any) {
             <div className="w-16 h-16">
               {props.icon ? (
                 <img
-                  src={`https://erranddo.kodecreators.com/storage/${props?.icon}`}
+                  src={`https://erranddo.com/admin/storage/${props?.icon}`}
                   className="w-full h-full rounded-full object-cover"
                 />
               ) : (

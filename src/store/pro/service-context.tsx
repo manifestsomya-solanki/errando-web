@@ -53,11 +53,11 @@ const ServiceContextProvider = (props: { children: React.ReactNode }) => {
   const perPage = 8;
   const [currentPage, setCurrentPage] = useState(1);
   const [url, setUrl] = useState(
-    `https://erranddo.kodecreators.com/api/v1/business-services?page=${currentPage}&per_page=${perPage}&user_id=${id}`
+    `https://erranddo.com/admin/api/v1/business-services?page=${currentPage}&per_page=${perPage}&user_id=${id}`
   );
   const getAllServies = (perPage: number) => {
     setUrl(
-      `https://erranddo.kodecreators.com/api/v1/business-services?page=1&per_page=${perPage}`
+      `https://erranddo.com/admin/api/v1/business-services?page=1&per_page=${perPage}`
     );
   };
 
@@ -92,7 +92,7 @@ const ServiceContextProvider = (props: { children: React.ReactNode }) => {
     setIsLoading(true);
     setError("");
     const res = await fetch(
-      "https://erranddo.kodecreators.com/api/v1/businesses/create",
+      "https://erranddo.com/admin/api/v1/businesses/create",
       {
         method: "POST",
         headers: {

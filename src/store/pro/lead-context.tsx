@@ -79,7 +79,7 @@ const LeadContextProProvider = (props: { children: React.ReactNode }) => {
   const perPage = 10;
   const [currentPage, setCurrentPage] = useState(1);
   const [url, setUrl] = useState(
-    `https://erranddo.kodecreators.com/api/v1/user-requests?for_pro=1&page=${currentPage}&per_page=${perPage}`
+    `https://erranddo.com/admin/api/v1/user-requests?for_pro=1&page=${currentPage}&per_page=${perPage}`
   );
 
   const search = (key: string) => {
@@ -117,7 +117,7 @@ const LeadContextProProvider = (props: { children: React.ReactNode }) => {
 
   const reset = () => {
     setUrl(
-      `https://erranddo.kodecreators.com/api/v1/user-requests?for_pro=1&page=${currentPage}&per_page=${perPage}`
+      `https://erranddo.com/admin/api/v1/user-requests?for_pro=1&page=${currentPage}&per_page=${perPage}`
     );
   };
 
@@ -140,14 +140,14 @@ const LeadContextProProvider = (props: { children: React.ReactNode }) => {
   //
 
   //business
-  const businessurl = `https://erranddo.kodecreators.com/api/v1/businesses?user_id=${id}`;
+  const businessurl = `https://erranddo.com/admin/api/v1/businesses?user_id=${id}`;
   const dummy_business: BusinessData[] = [];
   let datarenderOfBusiness: BusinessData[] = [];
   const { data: businessData } = useSWR(businessurl, fetcher);
   datarenderOfBusiness = businessData?.data || dummy_business;
 
   //service
-  const serviceurl = `https://erranddo.kodecreators.com/api/v1/business-services?user_id=${id}}`;
+  const serviceurl = `https://erranddo.com/admin/api/v1/business-services?user_id=${id}}`;
   const dummy_service: ServiceData[] = [];
   let datarenderOfService: ServiceData[] = [];
   const { data: serviceData } = useSWR(serviceurl, fetcher);
@@ -167,7 +167,7 @@ const LeadContextProProvider = (props: { children: React.ReactNode }) => {
     }
     setError("");
     const res = await fetch(
-      `https://erranddo.kodecreators.com/api/v1/user-requests/show-interest`,
+      `https://erranddo.com/admin/api/v1/user-requests/show-interest`,
       {
         method: "POST",
         headers: {
@@ -211,7 +211,7 @@ const LeadContextProProvider = (props: { children: React.ReactNode }) => {
     const token = localStorage.getItem("token");
 
     const res = await fetch(
-      `https://erranddo.kodecreators.com/api/v1/user-requests/${id}/lead-delete`,
+      `https://erranddo.com/admin/api/v1/user-requests/${id}/lead-delete`,
       {
         method: "POST",
         headers: {

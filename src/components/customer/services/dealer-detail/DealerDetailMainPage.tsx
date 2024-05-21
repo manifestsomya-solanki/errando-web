@@ -22,12 +22,12 @@ function DealerDetailMainPage() {
   const serviceName = useLocation()?.state?.serviceName;
   const userRequestId = useLocation()?.state?.userRequestId;
   const distance = useLocation()?.state?.distance;
-  const url = `https://erranddo.kodecreators.com/api/v1/businesses/${businessId?.id}/detail?user_request_id=${userRequestId}`;
+  const url = `https://erranddo.com/admin/api/v1/businesses/${businessId?.id}/detail?user_request_id=${userRequestId}`;
 
   const { data, isLoading, mutate } = useSWR(url, fetcher);
   const serviceData: Business = data?.data;
 
-  const displayPhoto = `https://erranddo.kodecreators.com/storage/${serviceData?.image}`;
+  const displayPhoto = `https://erranddo.com/admin/storage/${serviceData?.image}`;
 
   const subTitle = serviceData?.services?.map((d) => d.name).toString();
 

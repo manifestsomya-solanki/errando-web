@@ -43,11 +43,11 @@ const ReviewContextProProvider = (props: { children: React.ReactNode }) => {
 
   const [error, setError] = useState("");
   const [url, setUrl] = useState(
-    `https://erranddo.kodecreators.com/api/v1/reviews`
+    `https://erranddo.com/admin/api/v1/reviews`
   );
   const getBusinessReviews = (id?: number) => {
     setUrl(
-      `https://erranddo.kodecreators.com/api/v1/reviews?user_business_id=${id}`
+      `https://erranddo.com/admin/api/v1/reviews?user_business_id=${id}`
     );
   };
   const dummy_data: ReviewData[] = [];
@@ -62,7 +62,7 @@ const ReviewContextProProvider = (props: { children: React.ReactNode }) => {
     setIsLoading(true);
     setError("");
     const res = await fetch(
-      `https://erranddo.kodecreators.com/api/v1/reviews/${id}/addresponse`,
+      `https://erranddo.com/admin/api/v1/reviews/${id}/addresponse`,
       {
         method: "POST",
         headers: {
@@ -97,7 +97,7 @@ const ReviewContextProProvider = (props: { children: React.ReactNode }) => {
     console.log(id, "reviewid");
 
     const res = await fetch(
-      `https://erranddo.kodecreators.com/api/v1/reviews/${id}/delete`,
+      `https://erranddo.com/admin/api/v1/reviews/${id}/delete`,
       {
         method: "DELETE",
         headers: {
@@ -128,7 +128,7 @@ const ReviewContextProProvider = (props: { children: React.ReactNode }) => {
     setIsDeleteReviewLoading(true);
 
     const res = await fetch(
-      `https://erranddo.kodecreators.com/api/v1/reviews/${id}/flag`,
+      `https://erranddo.com/admin/api/v1/reviews/${id}/flag`,
       {
         method: "POST",
         headers: {

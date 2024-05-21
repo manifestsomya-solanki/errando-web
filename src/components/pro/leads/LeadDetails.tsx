@@ -15,12 +15,12 @@ import { useState } from "react";
 
 function LeadDetails() {
   const leadsId = useParams();
-  const dealerdetailurl = `https://erranddo.kodecreators.com/api/v1/user-requests/${leadsId.id}/detail`;
+  const dealerdetailurl = `https://erranddo.com/admin/api/v1/user-requests/${leadsId.id}/detail`;
   const { data: leadsDetailData, isLoading } = useSWR(dealerdetailurl, fetcher);
   const leadsDetail: UserRequestList = leadsDetailData?.data;
   const { userData } = useAuthPro();
   const { buyLead, page, isBuyLeadLoading, isBuyOutrightLoading } = useLead();
-  const baseUrl = `https://erranddo.kodecreators.com/api/v1/user-requests?for_pro=1&page=${page}&per_page=5`;
+  const baseUrl = `https://erranddo.com/admin/api/v1/user-requests?for_pro=1&page=${page}&per_page=5`;
   const { mutate } = useSWR(baseUrl, fetcher);
 
   const navigate = useNavigate();
@@ -99,7 +99,7 @@ function LeadDetails() {
               <img
                 src={
                   leadsDetail?.file
-                    ? `https://erranddo.kodecreators.com/storage/${leadsDetail?.file}`
+                    ? `https://erranddo.com/admin/storage/${leadsDetail?.file}`
                     : NoImage
                 }
                 className="lg:h-60 md:h-36 xs:h-28 w-full object-cover"

@@ -23,7 +23,7 @@ const CloseRequestProvider = (props: { children: ReactNode }) => {
     setError("");
     setIsLoading(true);
     const res = await fetch(
-      `https://erranddo.kodecreators.com/api/v1/user-requests/${requestId}/close`,
+      `https://erranddo.com/admin/api/v1/user-requests/${requestId}/close`,
       {
         method: "POST",
         headers: {

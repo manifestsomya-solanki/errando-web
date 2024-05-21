@@ -35,7 +35,7 @@ function AddServiceModal({
     setError,
   } = useBusiness();
   //handling service dropdown
-  const url = `https://erranddo.kodecreators.com/api/v1/business-services`;
+  const url = `https://erranddo.com/admin/api/v1/business-services`;
   const dummy_data: ServiceData[] = [];
   let datarender: ServiceData[] = [];
   const { data: dataa, isLoading: isServiceLoading } = useSWR(url, fetcher);

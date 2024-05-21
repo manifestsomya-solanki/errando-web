@@ -65,7 +65,7 @@ const LeadsResponseProvider = (props: { children: React.ReactNode }) => {
   const perPage = 10;
   const [currentPage, setCurrentPage] = useState(1);
   const [url, setUrl] = useState(
-    `https://erranddo.kodecreators.com/api/v1/user-requests?page=${currentPage}&per_page=${perPage}&for_pro=1&with_leads=1`
+    `https://erranddo.com/admin/api/v1/user-requests?page=${currentPage}&per_page=${perPage}&for_pro=1&with_leads=1`
   );
 
   const search = (key: string) => {
@@ -114,7 +114,7 @@ const LeadsResponseProvider = (props: { children: React.ReactNode }) => {
     setIsQuoteLoading(true);
     setError("");
     const res = await fetch(
-      `https://erranddo.kodecreators.com/api/v1/quotes/create`,
+      `https://erranddo.com/admin/api/v1/quotes/create`,
       {
         method: "POST",
         headers: {
@@ -155,7 +155,7 @@ const LeadsResponseProvider = (props: { children: React.ReactNode }) => {
     setIsQuoteLoading(true);
     setError("");
     const res = await fetch(
-      `https://erranddo.kodecreators.com/api/v1/quotes/${quoteId}/edit`,
+      `https://erranddo.com/admin/api/v1/quotes/${quoteId}/edit`,
       {
         method: "POST",
         headers: {
@@ -198,7 +198,7 @@ const LeadsResponseProvider = (props: { children: React.ReactNode }) => {
     setError("");
 
     const res = await fetch(
-      `https://erranddo.kodecreators.com/api/v1/note/add`,
+      `https://erranddo.com/admin/api/v1/note/add`,
       {
         method: "POST",
         headers: {

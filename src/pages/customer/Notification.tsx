@@ -8,7 +8,7 @@ function Notification() {
   const role = localStorage.getItem("role");
   useEffect(() => {
     setUrl(
-      `https://erranddo.kodecreators.com/api/v1/notification?user_id=${userId}&is_for_${role}=1&page=${1}&per_page=${13}`
+      `https://erranddo.com/admin/api/v1/notification?user_id=${userId}&is_for_${role}=1&page=${1}&per_page=${13}`
     );
   }, []);
   return (

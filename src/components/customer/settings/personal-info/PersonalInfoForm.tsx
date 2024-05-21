@@ -18,7 +18,7 @@ function PersonalInfoForm() {
     userData = JSON.parse(token);
   }
 
-  const url = `https://erranddo.kodecreators.com/api/v1/user/detail?user_id=${userData?.id}`;
+  const url = `https://erranddo.com/admin/api/v1/user/detail?user_id=${userData?.id}`;
   const { data, error } = useSWR(url, fetcher);
   const profileData: UserData = data?.data ?? "";
 
