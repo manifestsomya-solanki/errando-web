@@ -66,7 +66,7 @@ function DealerDetailSection(props: {
             <div className="rounded-full xs:float-left   lg:w-40 xs:w-20 border-slate-200 border-[0.5px] mr-5 ">
               {props.icon ? (
                 <img
-                  src={`https://erranddo.com/admin/storage/${props?.icon}`}
+                  src={`https://erranddo.s3.eu-west-2.amazonaws.com/${props?.icon}`}
                   className=" object-cover object-center rounded-full w-40  lg:h-40 xs:h-20"
                 />
               ) : (

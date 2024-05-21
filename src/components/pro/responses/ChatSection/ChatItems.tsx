@@ -283,7 +283,7 @@ function ChatItems() {
                       <img
                         src={
                           currentUser?.photoURL
-                            ? `https://erranddo.com/admin/storage/${currentUser?.photoURL}`
+                            ? `https://erranddo.s3.eu-west-2.amazonaws.com/${currentUser?.photoURL}`
                             : NoImage
                         }
                         className="w-8 h-8 rounded-full object-cover"
@@ -351,7 +351,7 @@ function ChatItems() {
                       <img
                         src={
                           user?.photoURL
-                            ? `https://erranddo.com/admin/storage/${user?.photoURL}`
+                            ? `https://erranddo.s3.eu-west-2.amazonaws.com/${user?.photoURL}`
                             : NoImage
                         }
                         className="w-8 h-8 rounded-full object-cover"

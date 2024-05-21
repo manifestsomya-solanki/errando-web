@@ -21,7 +21,7 @@ function PersonalInfo() {
   const url = `https://erranddo.com/admin/api/v1/user/detail?user_id=${userData?.id}`;
   const { data } = useSWR(url, fetcher);
   const profileData: UserData = data?.data ?? "";
-  const profilePhoto = `https://erranddo.com/admin/storage/${profileData?.img_avatar}`;
+  const profilePhoto = `https://erranddo.s3.eu-west-2.amazonaws.com/${profileData?.img_avatar}`;
   const [deleteImageHandler, setDeleteImageHandler] = useState(false);
 
   return (

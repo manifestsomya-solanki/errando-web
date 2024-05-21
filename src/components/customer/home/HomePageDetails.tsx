@@ -138,7 +138,7 @@ const HomePageDetails = () => {
                     <Card
                       image={`${
                         d.image
-                          ? `https://erranddo.com/admin/storage/${d?.image}`
+                          ? `https://erranddo.s3.eu-west-2.amazonaws.com/${d?.image}`
                           : NoImage
                       }   `}
                       desc={d?.name}
@@ -159,7 +159,7 @@ const HomePageDetails = () => {
               <Card
                 image={
                   d?.image
-                    ? `https://erranddo.com/admin/storage/${d?.image}`
+                    ? `https://erranddo.s3.eu-west-2.amazonaws.com/${d?.image}`
                     : NoImage
                 }
                 desc={d?.name}

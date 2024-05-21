@@ -205,7 +205,7 @@ function ServiceCard(props: any) {
             <div className="w-16 h-16">
               {props.icon ? (
                 <img
-                  src={`https://erranddo.com/admin/storage/${props?.icon}`}
+                  src={`https://erranddo.s3.eu-west-2.amazonaws.com/${props?.icon}`}
                   className="w-full h-full rounded-full object-cover"
                 />
               ) : (

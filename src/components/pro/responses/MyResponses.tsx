@@ -297,7 +297,7 @@ function MyResponses() {
             <div className="flex items-center gap-2">
               {leadsDetail?.user?.img_avatar ? (
                 <img
-                  src={`https://erranddo.com/admin/storage/${leadsDetail?.user?.img_avatar}`}
+                  src={`https://erranddo.s3.eu-west-2.amazonaws.com/${leadsDetail?.user?.img_avatar}`}
                   className="w-20 h-20 rounded-full object-cover"
                 />
               ) : (

@@ -303,7 +303,7 @@ const MessagesDetailMainPage = () => {
                     <img
                       src={
                         user?.photoURL
-                          ? `https://erranddo.com/admin/storage/${user?.photoURL}`
+                          ? `https://erranddo.s3.eu-west-2.amazonaws.com/${user?.photoURL}`
                           : NoImage
                       }
                       className="w-8 h-8 rounded-full object-cover"

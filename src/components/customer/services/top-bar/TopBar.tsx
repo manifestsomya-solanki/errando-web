@@ -39,7 +39,7 @@ function TopBar(props: {
   const url = `https://erranddo.com/admin/api/v1/user/detail?user_id=${userData?.id}`;
   const { data, error, isLoading } = useSWR(url, fetcher);
   const profileData: UserData = data?.data ?? "";
-  const profilePhoto = `https://erranddo.com/admin/storage/${profileData?.img_avatar}`;
+  const profilePhoto = `https://erranddo.s3.eu-west-2.amazonaws.com/${profileData?.img_avatar}`;
   const topbarClassName =
     "bg-white dark:bg-black fixed top-0 py-4 xl:px-36 lg:px-20 xs:px-5 flex shadow-md justify-between w-screen items-center xl:h-[8.651474530831099vh] lg:h-[9.651474530831099vh] xs:h-[9.051474530831099vh] z-[100]";
   return (

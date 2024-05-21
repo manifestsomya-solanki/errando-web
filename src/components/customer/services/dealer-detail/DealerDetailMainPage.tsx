@@ -27,7 +27,7 @@ function DealerDetailMainPage() {
   const { data, isLoading, mutate } = useSWR(url, fetcher);
   const serviceData: Business = data?.data;
 
-  const displayPhoto = `https://erranddo.com/admin/storage/${serviceData?.image}`;
+  const displayPhoto = `https://erranddo.s3.eu-west-2.amazonaws.com/${serviceData?.image}`;
 
   const subTitle = serviceData?.services?.map((d) => d.name).toString();
 

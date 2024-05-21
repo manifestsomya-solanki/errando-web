@@ -74,7 +74,7 @@ function ResponsesDetail() {
               <img
                 src={
                   leadsDetail?.file
-                    ? `https://erranddo.com/admin/storage/${leadsDetail?.file}`
+                    ? `https://erranddo.s3.eu-west-2.amazonaws.com/${leadsDetail?.file}`
                     : NoImage
                 }
                 className="lg:h-60 md:h-36 xs:h-28 w-full object-cover"
