@@ -20,7 +20,7 @@ function DeleteReviewModal({
   console.log(reviewId);
   const businessId = useParams();
 
-  const url = `https://erranddo.kodecreators.com/api/v1/reviews?page=1&per_page=10&user_business_id=${businessId?.id}`;
+  const url = `https://erranddo.com/admin/api/v1/reviews?page=1&per_page=10&user_business_id=${businessId?.id}`;
   const { mutate } = useSWR(url, fetcher);
 
   return (

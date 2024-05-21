@@ -12,7 +12,7 @@ import { fetcher } from "../../../../store/customer/home-context";
 
 function FilterSection(props: any) {
   const { businessListHandler, to_show_interest } = useServices();
-  const url = `https://erranddo.kodecreators.com/api/v1/businesses/count?user_request_id=${props.userRequestId}`;
+  const url = `https://erranddo.com/admin/api/v1/businesses/count?user_request_id=${props.userRequestId}`;
   const { data } = useSWR(url, fetcher);
 
   const dropDownOne = [

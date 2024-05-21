@@ -21,7 +21,7 @@ function SeviceDetailMainPage() {
   const requestId = useParams();
   console.log(requestId?.id, "hygvhui");
 
-  const url = `https://erranddo.kodecreators.com/api/v1/user-requests/${requestId?.id}/detail`;
+  const url = `https://erranddo.com/admin/api/v1/user-requests/${requestId?.id}/detail`;
   const { data, isLoading } = useSWR(url, fetcher);
 
   const serviceRequestData = data?.data;

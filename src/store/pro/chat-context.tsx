@@ -21,7 +21,7 @@ const ChatContextProvider = (props: { children: React.ReactNode }) => {
     //     message: message,
     // }
     const res = await fetch(
-      `https://erranddo.kodecreators.com/api/v1/chat/send-notification?user_id=${user_id}&message=${message}`,
+      `https://erranddo.com/admin/api/v1/chat/send-notification?user_id=${user_id}&message=${message}`,
       {
         method: "POST",
         headers: {
@@ -38,7 +38,7 @@ const ChatContextProvider = (props: { children: React.ReactNode }) => {
   const DeleteChat = async (user_id: number) => {
     const token = localStorage.getItem("token") ?? "{}";
     const res = await fetch(
-      `https://erranddo.kodecreators.com/api/v1/chat/${user_id}/delete`,
+      `https://erranddo.com/admin/api/v1/chat/${user_id}/delete`,
       {
         method: "DELETE",
         headers: {

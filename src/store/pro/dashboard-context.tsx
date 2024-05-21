@@ -74,7 +74,7 @@ const BusinessContextProvider = (props: { children: React.ReactNode }) => {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [businessDetailUrl, setBusinessDetailUrl] = useState("");
-  const url = `https://erranddo.kodecreators.com/api/v1/businesses?user_id=${id}`;
+  const url = `https://erranddo.com/admin/api/v1/businesses?user_id=${id}`;
 
   const dummy_data: BusinessData[] = [];
   let datarender: BusinessData[] = [];
@@ -84,7 +84,7 @@ const BusinessContextProvider = (props: { children: React.ReactNode }) => {
   //detail  business
   const DetailBusiness = async (id?: number) => {
     setBusinessDetailUrl(
-      `https://erranddo.kodecreators.com/api/v1/businesses/${id}/detail`
+      `https://erranddo.com/admin/api/v1/businesses/${id}/detail`
     );
   };
 
@@ -104,7 +104,7 @@ const BusinessContextProvider = (props: { children: React.ReactNode }) => {
     setIsLoading(true);
     setError("");
     const res = await fetch(
-      "https://erranddo.kodecreators.com/api/v1/businesses/create",
+      "https://erranddo.com/admin/api/v1/businesses/create",
       {
         method: "POST",
         headers: {
@@ -143,7 +143,7 @@ const BusinessContextProvider = (props: { children: React.ReactNode }) => {
     setIsLoading(true);
     setError("");
     const res = await fetch(
-      "https://erranddo.kodecreators.com/api/v1/business-services/create",
+      "https://erranddo.com/admin/api/v1/business-services/create",
       {
         method: "POST",
         headers: {
@@ -189,7 +189,7 @@ const BusinessContextProvider = (props: { children: React.ReactNode }) => {
     console.log("herr");
     setError("");
     const res = await fetch(
-      `https://erranddo.kodecreators.com/api/v1/businesses/${businessId}/edit`,
+      `https://erranddo.com/admin/api/v1/businesses/${businessId}/edit`,
       {
         method: "POST",
         headers: {
@@ -233,7 +233,7 @@ const BusinessContextProvider = (props: { children: React.ReactNode }) => {
     const token = localStorage.getItem("token");
 
     const res = await fetch(
-      `https://erranddo.kodecreators.com/api/v1/businesses/${id}/delete`,
+      `https://erranddo.com/admin/api/v1/businesses/${id}/delete`,
       {
         method: "DELETE",
         headers: {
@@ -272,7 +272,7 @@ const BusinessContextProvider = (props: { children: React.ReactNode }) => {
   };
   const { page } = useService();
 
-  const serviceUrl = `https://erranddo.kodecreators.com/api/v1/business-services?page=${page}&per_page=${8}&user_id=${id}`;
+  const serviceUrl = `https://erranddo.com/admin/api/v1/business-services?page=${page}&per_page=${8}&user_id=${id}`;
   const { mutate: serviceMutate } = useSWR(serviceUrl, fetcher);
   //edit service business
   const EditServiceBusiness = async (formData: FormData, serviceId: number) => {
@@ -280,7 +280,7 @@ const BusinessContextProvider = (props: { children: React.ReactNode }) => {
     setIsLoading(true);
     setError("");
     const res = await fetch(
-      `https://erranddo.kodecreators.com/api/v1/business-services/${serviceId}/edit`,
+      `https://erranddo.com/admin/api/v1/business-services/${serviceId}/edit`,
       {
         method: "POST",
         headers: {
@@ -321,7 +321,7 @@ const BusinessContextProvider = (props: { children: React.ReactNode }) => {
     const token = localStorage.getItem("token");
 
     const res = await fetch(
-      `https://erranddo.kodecreators.com/api/v1/business-services/${id}/delete`,
+      `https://erranddo.com/admin/api/v1/business-services/${id}/delete`,
       {
         method: "DELETE",
         headers: {
@@ -364,7 +364,7 @@ const BusinessContextProvider = (props: { children: React.ReactNode }) => {
     console.log(id, "imageIdhvbnkoihugvbnkmlkjbh");
 
     const res = await fetch(
-      `https://erranddo.kodecreators.com/api/v1/businesses/${id}/delete-service-image`,
+      `https://erranddo.com/admin/api/v1/businesses/${id}/delete-service-image`,
       {
         method: "DELETE",
         headers: {

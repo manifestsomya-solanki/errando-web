@@ -59,7 +59,7 @@ function getTimeDifferenceString(time: any) {
 function MyResponses() {
   const navigate = useNavigate();
   const leadsId = useParams();
-  const dealerdetailurl = `https://erranddo.kodecreators.com/api/v1/user-requests/${leadsId.id}/detail`;
+  const dealerdetailurl = `https://erranddo.com/admin/api/v1/user-requests/${leadsId.id}/detail`;
   const {
     data: leadsDetailData,
     isLoading,
@@ -297,7 +297,7 @@ function MyResponses() {
             <div className="flex items-center gap-2">
               {leadsDetail?.user?.img_avatar ? (
                 <img
-                  src={`https://erranddo.kodecreators.com/storage/${leadsDetail?.user?.img_avatar}`}
+                  src={`https://erranddo.com/admin/storage/${leadsDetail?.user?.img_avatar}`}
                   className="w-20 h-20 rounded-full object-cover"
                 />
               ) : (

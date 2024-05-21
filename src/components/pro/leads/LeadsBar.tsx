@@ -16,7 +16,7 @@ import InterestFilterModal from "../../../layout/pro-models/InterestFilterModal"
 
 function LeadsBar() {
   const { isLoading } = useLead();
-  const url = `https://erranddo.kodecreators.com/api/v1/user-requests?for_pro=1&show_only_count=1`;
+  const url = `https://erranddo.com/admin/api/v1/user-requests?for_pro=1&show_only_count=1`;
 
   let { data: count } = useSWR(url, fetcher);
   const [openModal, setOpenModal] = useState(false);

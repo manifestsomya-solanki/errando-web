@@ -17,10 +17,10 @@ function PersonalInfoPro() {
     userData = JSON.parse(token);
   }
 
-  const url = `https://erranddo.kodecreators.com/api/v1/user/detail?user_id=${userData?.id}`;
+  const url = `https://erranddo.com/admin/api/v1/user/detail?user_id=${userData?.id}`;
   const { data, error, isLoading, mutate } = useSWR(url, fetcher);
   const profileData: UserData = data?.data ?? "";
-  const profilePhoto = `https://erranddo.kodecreators.com/storage/${profileData?.img_avatar}`;
+  const profilePhoto = `https://erranddo.com/admin/storage/${profileData?.img_avatar}`;
   const [deleteImageHandler, setDeleteImageHandler] = useState(false);
 
   return (

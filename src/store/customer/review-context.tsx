@@ -53,12 +53,12 @@ const ReviewContextProvider = (props: { children: React.ReactNode }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [url, setUrl] = useState(
-    `https://erranddo.kodecreators.com/api/v1/reviews?page=1&per_page=100&user_business_id=${businessId?.id}`
+    `https://erranddo.com/admin/api/v1/reviews?page=1&per_page=100&user_business_id=${businessId?.id}`
   );
 
   const filter = (key: string, order?: string) => {
     setUrl(
-      `https://erranddo.kodecreators.com/api/v1/reviews?page=1&per_page=100&user_business_id=${businessId?.id}&sort_field=${key}&sort_order=${order}`
+      `https://erranddo.com/admin/api/v1/reviews?page=1&per_page=100&user_business_id=${businessId?.id}&sort_field=${key}&sort_order=${order}`
     );
   };
   const { data, isLoading: isReviewLoading, mutate } = useSWR(url, fetcher);
@@ -69,7 +69,7 @@ const ReviewContextProvider = (props: { children: React.ReactNode }) => {
     setIsLoading(true);
 
     const res = await fetch(
-      "https://erranddo.kodecreators.com/api/v1/reviews/create",
+      "https://erranddo.com/admin/api/v1/reviews/create",
       {
         method: "POST",
         headers: {
@@ -103,7 +103,7 @@ const ReviewContextProvider = (props: { children: React.ReactNode }) => {
     setIsLoading(true);
 
     const res = await fetch(
-      `https://erranddo.kodecreators.com/api/v1/reviews/${id}/edit`,
+      `https://erranddo.com/admin/api/v1/reviews/${id}/edit`,
       {
         method: "POST",
         headers: {
@@ -144,7 +144,7 @@ const ReviewContextProvider = (props: { children: React.ReactNode }) => {
     console.log(...formData);
 
     const res = await fetch(
-      "https://erranddo.kodecreators.com/api/v1/reviews/create",
+      "https://erranddo.com/admin/api/v1/reviews/create",
       {
         method: "POST",
         headers: {
@@ -179,7 +179,7 @@ const ReviewContextProvider = (props: { children: React.ReactNode }) => {
     console.log(id, "reviewid");
 
     const res = await fetch(
-      `https://erranddo.kodecreators.com/api/v1/reviews/${id}/delete`,
+      `https://erranddo.com/admin/api/v1/reviews/${id}/delete`,
       {
         method: "DELETE",
         headers: {

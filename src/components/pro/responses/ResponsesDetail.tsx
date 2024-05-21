@@ -11,7 +11,7 @@ import { UserRequestList } from "../../../models/pro/userrequestlist";
 
 function ResponsesDetail() {
   const leadsId = useParams();
-  const dealerdetailurl = `https://erranddo.kodecreators.com/api/v1/user-requests/${leadsId.id}/detail`;
+  const dealerdetailurl = `https://erranddo.com/admin/api/v1/user-requests/${leadsId.id}/detail`;
   const { data: leadsDetailData, isLoading } = useSWR(dealerdetailurl, fetcher);
   const leadsDetail: UserRequestList = leadsDetailData?.data;
 
@@ -74,7 +74,7 @@ function ResponsesDetail() {
               <img
                 src={
                   leadsDetail?.file
-                    ? `https://erranddo.kodecreators.com/storage/${leadsDetail?.file}`
+                    ? `https://erranddo.com/admin/storage/${leadsDetail?.file}`
                     : NoImage
                 }
                 className="lg:h-60 md:h-36 xs:h-28 w-full object-cover"

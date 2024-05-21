@@ -38,7 +38,7 @@ const ContactContextProvider = (props: { children: React.ReactNode }) => {
     setIsLoading(true);
 
     const res = await fetch(
-      "https://erranddo.kodecreators.com/api/v1/user/send-otp",
+      "https://erranddo.com/admin/api/v1/user/send-otp",
       {
         method: "POST",
         headers: {
@@ -75,7 +75,7 @@ const ContactContextProvider = (props: { children: React.ReactNode }) => {
     const token = await JSON.parse(localStorage.getItem("token") ?? "{}").token;
 
     const res = await fetch(
-      "https://erranddo.kodecreators.com/api/v1/settings/change-password",
+      "https://erranddo.com/admin/api/v1/settings/change-password",
       {
         method: "POST",
         headers: {

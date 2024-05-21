@@ -101,14 +101,14 @@ const AuthProContextProvider = (props: { children: React.ReactNode }) => {
   if (initialToken) {
     id = JSON.parse(initialToken).id;
   }
-  const userDetailUrl = `https://erranddo.kodecreators.com/api/v1/user/detail?user_id=${id}`;
+  const userDetailUrl = `https://erranddo.com/admin/api/v1/user/detail?user_id=${id}`;
   const {
     data: userdata,
     isLoading: detailLoading,
     mutate,
   } = useSWR(userDetailUrl, fetcher);
 
-  // const url = `https://erranddo.kodecreators.com/api/v1/user-requests?page=${currentPage}&per_page=${perPage}&status=PENDING&user_id=${id}`;
+  // const url = `https://erranddo.com/admin/api/v1/user-requests?page=${currentPage}&per_page=${perPage}&status=PENDING&user_id=${id}`;
   const userData: UserData = userdata?.data;
 
   //login
@@ -116,7 +116,7 @@ const AuthProContextProvider = (props: { children: React.ReactNode }) => {
     setIsCustomerLoading(true);
     setError("");
     const res = await fetch(
-      "https://erranddo.kodecreators.com/api/v1/user/login",
+      "https://erranddo.com/admin/api/v1/user/login",
       {
         method: "POST",
         body: formData,
@@ -153,7 +153,7 @@ const AuthProContextProvider = (props: { children: React.ReactNode }) => {
     setIsProLoading(true);
     setError("");
     const res = await fetch(
-      "https://erranddo.kodecreators.com/api/v1/user/login",
+      "https://erranddo.com/admin/api/v1/user/login",
       {
         method: "POST",
         body: formData,
@@ -188,7 +188,7 @@ const AuthProContextProvider = (props: { children: React.ReactNode }) => {
     setIsLoading(true);
     setError("");
     const res = await fetch(
-      "https://erranddo.kodecreators.com/api/v1/user/send-otp",
+      "https://erranddo.com/admin/api/v1/user/send-otp",
       {
         method: "POST",
         body: formData,
@@ -220,7 +220,7 @@ const AuthProContextProvider = (props: { children: React.ReactNode }) => {
     setError("");
     console.log("here");
     const res = await fetch(
-      "https://erranddo.kodecreators.com/api/v1/user/verify-otp",
+      "https://erranddo.com/admin/api/v1/user/verify-otp",
       {
         method: "POST",
         body: formData,
@@ -248,7 +248,7 @@ const AuthProContextProvider = (props: { children: React.ReactNode }) => {
         }
         localStorage.setItem("token", data.token);
         const res = await fetch(
-          "https://erranddo.kodecreators.com/api/v1/user/register",
+          "https://erranddo.com/admin/api/v1/user/register",
           {
             method: "POST",
             body: registerFormData,
@@ -322,7 +322,7 @@ const AuthProContextProvider = (props: { children: React.ReactNode }) => {
     const token = localStorage.getItem("token");
 
     const res = await fetch(
-      "https://erranddo.kodecreators.com/api/v1/settings/change-password",
+      "https://erranddo.com/admin/api/v1/settings/change-password",
       {
         method: "POST",
         headers: {
@@ -368,7 +368,7 @@ const AuthProContextProvider = (props: { children: React.ReactNode }) => {
     const token = localStorage.getItem("token");
 
     const res = await fetch(
-      "https://erranddo.kodecreators.com/api/v1/user/logout",
+      "https://erranddo.com/admin/api/v1/user/logout",
       {
         method: "POST",
         headers: {
@@ -405,7 +405,7 @@ const AuthProContextProvider = (props: { children: React.ReactNode }) => {
     const token = localStorage.getItem("token");
 
     const res = await fetch(
-      "https://erranddo.kodecreators.com/api/v1/user/edit",
+      "https://erranddo.com/admin/api/v1/user/edit",
       {
         method: "POST",
         headers: {
@@ -460,7 +460,7 @@ const AuthProContextProvider = (props: { children: React.ReactNode }) => {
     const token = localStorage.getItem("token");
 
     const res = await fetch(
-      `https://erranddo.kodecreators.com/api/v1/user/delete-profile`,
+      `https://erranddo.com/admin/api/v1/user/delete-profile`,
       {
         method: "DELETE",
         headers: {
@@ -494,7 +494,7 @@ const AuthProContextProvider = (props: { children: React.ReactNode }) => {
     const token = localStorage.getItem("token");
 
     const res = await fetch(
-      `https://erranddo.kodecreators.com/api/v1/user/${id}/delete`,
+      `https://erranddo.com/admin/api/v1/user/${id}/delete`,
       {
         method: "DELETE",
         headers: {

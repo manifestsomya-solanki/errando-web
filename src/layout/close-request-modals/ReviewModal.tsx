@@ -24,7 +24,7 @@ function ReviewModal(props: {
   const { closeRequestReview } = useReview();
   const [starRating, setStarRating] = useState("");
   const [checked, setChecked] = useState(false);
-  const url = `https://erranddo.kodecreators.com/api/v1/businesses/${props?.businessId}/detail`;
+  const url = `https://erranddo.com/admin/api/v1/businesses/${props?.businessId}/detail`;
   const { data, isLoading } = useSWR(url, fetcher);
   const serviceData: ServiceList = data?.data;
 

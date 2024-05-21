@@ -23,13 +23,13 @@ function LeaveReviewModal(props: {
 }) {
   const dealerId = useParams();
 
-  const url = `https://erranddo.kodecreators.com/api/v1/businesses/${
+  const url = `https://erranddo.com/admin/api/v1/businesses/${
     props.dealerId ?? dealerId?.id
   }/detail`;
   const { data } = useSWR(url, fetcher);
   const serviceData: ServiceList = data?.data;
 
-  const detailUrl = `https://erranddo.kodecreators.com/api/v1/reviews/${props.id}/detail`;
+  const detailUrl = `https://erranddo.com/admin/api/v1/reviews/${props.id}/detail`;
   const { data: reviewData } = useSWR(props.id ? detailUrl : null, fetcher);
   const { state } = useLocation();
   const [checked, setChecked] = useState(false);

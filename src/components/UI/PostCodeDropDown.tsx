@@ -10,7 +10,7 @@ function PostCodeDropDown(props: {
   value?: { label: string; value: string };
   menuClassName?: string;
 }) {
-  const postCodeUrl = `https://erranddo.kodecreators.com/api/v1/postcodes`;
+  const postCodeUrl = `https://erranddo.com/admin/api/v1/postcodes`;
   const { data: postCodeData, isLoading: isPostcodeLoading } = useSWR(
     postCodeUrl,
     fetcher

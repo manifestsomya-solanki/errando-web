@@ -13,7 +13,7 @@ function ShowInterestModal(props: any) {
 
   const requestId = useParams()?.id;
   const { handleShowInterest, isLoading } = useServices();
-  const url = `https://erranddo.kodecreators.com/api/v1/businesses/${props?.id}/detail`;
+  const url = `https://erranddo.com/admin/api/v1/businesses/${props?.id}/detail`;
   const { mutate } = useSWR(url, fetcher);
   const handleShowInterestAsync = async () => {
     const formData = new FormData();

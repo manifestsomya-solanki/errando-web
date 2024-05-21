@@ -53,7 +53,7 @@ const NotificationContextProvider = (props: { children: ReactNode }) => {
   }
   const [currentPage, setCurrentPage] = useState(1);
   const [url, setUrl] = useState(
-    `https://erranddo.kodecreators.com/api/v1/notification?user_id=${
+    `https://erranddo.com/admin/api/v1/notification?user_id=${
       userId ?? ""
     }&is_for_${role}=1&page=${currentPage}&per_page=${perPage}`
   );
@@ -78,7 +78,7 @@ const NotificationContextProvider = (props: { children: ReactNode }) => {
     setError("");
     const token = localStorage.getItem("token");
     const res = await fetch(
-      "https://erranddo.kodecreators.com/api/v1/notification/create",
+      "https://erranddo.com/admin/api/v1/notification/create",
       {
         method: "POST",
         headers: {
@@ -107,7 +107,7 @@ const NotificationContextProvider = (props: { children: ReactNode }) => {
     setError("");
     const token = localStorage.getItem("token");
     const res = await fetch(
-      "https://erranddo.kodecreators.com/api/v1/notification/edit",
+      "https://erranddo.com/admin/api/v1/notification/edit",
       {
         method: "POST",
         headers: {
