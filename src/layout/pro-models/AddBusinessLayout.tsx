@@ -27,8 +27,8 @@ function AddBusinessModal({ onCancel }: { onCancel: () => void }) {
     if (!values.description) {
       errors.description = "Please include a description";
     }
-    if (!values.postcode_id) {
-      errors.postcode_id = "Please include a postcode";
+    if (!values.postcode) {
+      errors.postcode = "Please include a postcode";
     }
     if (values.service_images && values.service_images?.length > 6) {
       errors.service_images = "Please include max six service images";
@@ -64,6 +64,7 @@ function AddBusinessModal({ onCancel }: { onCancel: () => void }) {
             description: "",
             service_images: undefined,
             postcode_id: 0,
+            postcode: "",
           }}
           enableReinitialize={true}
           onSubmit={async (values) => {
@@ -75,6 +76,9 @@ function AddBusinessModal({ onCancel }: { onCancel: () => void }) {
             formData.set("name", values.name);
             formData.set("postcode_id", values.postcode_id.toString());
 
+            formData.set("postcode", values.postcode);
+            formData.set("business_postcode", values.postcode);
+
             formData.set("description", values.description);
             if (values.profile_picture)
               formData.set("image", values.profile_picture);
@@ -82,7 +86,9 @@ function AddBusinessModal({ onCancel }: { onCancel: () => void }) {
               formData.set(`service_images[${i}]`, file);
             });
 
-            addBusiness(formData);
+            const val = await addBusiness(formData);
+            
+            if (val === 0) return;
             setTimeout(() => onCancel(), 1000);
           }}
           validate={validate}
@@ -168,17 +174,14 @@ function AddBusinessModal({ onCancel }: { onCancel: () => void }) {
               </div>
               <div className="py-3">
                 <Label required label="Enter Business Postcode " />
-                <PostCodeDetails
-                  inputClass="border-gray-200"
-                  type="text"
-                  id="postcode_id"
-                  name="postcode_id"
-                  onChange={(ev: any) => {
-                    props.setFieldValue("postcode_id", ev);
-                  }}
+                <Input
+                  id="postcode"
+                  name="postcode"
+                  value={props.values.postcode}
+                  onChange={props.handleChange}
                 />
-                {props?.touched?.postcode_id && props?.errors?.postcode_id ? (
-                  <Error error={props?.errors?.postcode_id} className="mt-2" />
+                {props?.touched?.postcode && props?.errors?.postcode ? (
+                  <Error error={props?.errors?.postcode} className="mt-2" />
                 ) : null}
               </div>
 

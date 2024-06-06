@@ -12,7 +12,6 @@ import { useBusiness } from "../../store/pro/dashboard-context";
 import { useTheme } from "../../store/theme-context";
 import { useEffect, useState } from "react";
 import TextArea from "../../components/UI/TextArea.tsx";
-import PostCodeDetails from "../../components/UI/PostCodeDetails.tsx";
 
 function EditBusinessModal({
   onCancel,
@@ -74,6 +73,7 @@ function EditBusinessModal({
             description: businessDetail?.description ?? "",
             service_images: undefined,
             postcode_id: 0,
+            postcode: businessDetail?.business_postcode?.name ?? "",
           }}
           enableReinitialize={true}
           onSubmit={async (values) => {
@@ -85,6 +85,8 @@ function EditBusinessModal({
             formData.set("name", values.name);
             formData.set("postcode_id", values.postcode_id.toString());
 
+            formData.set("postcode", values.postcode);
+
             formData.set("description", values.description);
             if (values.profile_picture)
               formData.set("image", values.profile_picture);
@@ -94,7 +96,9 @@ function EditBusinessModal({
                 formData.set(`service_images[${i}]`, file);
               });
             }
-            editBusiness(formData, id.toString() ?? "");
+            const val = await editBusiness(formData, id.toString() ?? "");
+            if (val === 0) return;
+
             setTimeout(() => onCancel(), 1000);
             console.log(...formData);
           }}
@@ -106,7 +110,7 @@ function EditBusinessModal({
                 <Label required label="Upload Business Logo" />
                 <label className=" relative flex justify-center w-full h-32 px-4  mt-3 transition border-2 border-gray-300 border-dashed rounded-md appearance-none cursor-pointer hover:border-gray-400 focus:outline-none dark:bg-black ">
                   {(businessDetail && businessDetail.image && !deleteImage) ||
-                  props.values.profile_picture ? (
+                    props.values.profile_picture ? (
                     <div className="flex flex-col items-center space-x-2 dark:text-white justify-center">
                       {"1 File Selected"}
                       <span className="text-xs text-primaryBlue">
@@ -166,7 +170,7 @@ function EditBusinessModal({
                 </label>
 
                 {props?.touched?.profile_picture &&
-                props?.errors?.profile_picture ? (
+                  props?.errors?.profile_picture ? (
                   <Error
                     error={props?.errors?.profile_picture}
                     className="mt-2"
@@ -188,18 +192,14 @@ function EditBusinessModal({
               </div>
               <div className="py-3">
                 <Label required label="Enter Business Postcode " />
-                <PostCodeDetails
-                  initialValue={props?.values?.postcode_id}
-                  inputClass="border-gray-200"
-                  type="text"
-                  id="postcode_id"
-                  name="postcode_id"
-                  onChange={(ev: any) => {
-                    props.setFieldValue("postcode_id", ev);
-                  }}
+                <Input
+                  id="postcode"
+                  name="postcode"
+                  value={props.values.postcode}
+                  onChange={props.handleChange}
                 />
-                {props?.touched?.postcode_id && props?.errors?.postcode_id ? (
-                  <Error error={props?.errors?.postcode_id} className="mt-2" />
+                {props?.touched?.postcode && props?.errors?.postcode ? (
+                  <Error error={props?.errors?.postcode} className="mt-2" />
                 ) : null}
               </div>
               <div className="py-3">
@@ -223,7 +223,7 @@ function EditBusinessModal({
                   {(businessDetail &&
                     businessDetail?.files?.length > 0 &&
                     !deleteServiceImage) ||
-                  props?.values?.service_images ? (
+                    props?.values?.service_images ? (
                     <div className="flex justify-center  items-center flex-col space-x-2 dark:text-slate-400">
                       {(props.values.service_images?.length ??
                         businessDetail?.files?.length) + " items selected"}
@@ -284,7 +284,7 @@ function EditBusinessModal({
                 </label>
 
                 {props?.touched?.service_images &&
-                props?.errors?.service_images ? (
+                  props?.errors?.service_images ? (
                   <Error
                     error={props?.errors?.service_images}
                     className="mt-2"

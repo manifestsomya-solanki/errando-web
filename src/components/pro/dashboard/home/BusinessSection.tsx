@@ -9,7 +9,6 @@ import { useTheme } from "../../../../store/theme-context";
 import { useBusiness } from "../../../../store/pro/dashboard-context.tsx";
 import { useState } from "react";
 import AddBusinessModal from "../../../../layout/pro-models/AddBusinessLayout.tsx";
-import { NavLink } from "react-router-dom";
 
 function BusinessSection() {
   const { theme } = useTheme();

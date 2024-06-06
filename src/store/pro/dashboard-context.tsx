@@ -11,12 +11,12 @@ import { useService } from "./service-context";
 type BusinessResponseType = {
   data?: BusinessData[];
   isBussinessLoading: boolean;
-  addBusiness: (formData: FormData) => void;
+  addBusiness: (formData: FormData) => Promise<number | void>;
   addServiceBusiness: (formData: FormData) => Promise<number>;
   businessDetail?: Business;
   isBussinessDetailLoading: boolean;
   detailBusiness: (id?: number) => void;
-  editBusiness: (formData: FormData, serviceId: string) => void;
+  editBusiness: (formData: FormData, serviceId: string) => Promise<number | void>;
   deleteBusiness: (businessId: string) => void;
   deleteServiceBusiness: (businessId: string) => void;
 
@@ -33,7 +33,7 @@ export const BusinessContext = createContext<BusinessResponseType>({
   isLoading: false,
   isBussinessLoading: false,
   isBussinessDetailLoading: false,
-  addBusiness: (data) => {
+  addBusiness: async (data) => {
     console.log(data);
   },
   deleteBusiness: (data) => {
@@ -54,7 +54,7 @@ export const BusinessContext = createContext<BusinessResponseType>({
   },
   setError: {} as React.Dispatch<React.SetStateAction<string>>,
 
-  editBusiness: (data) => {
+  editBusiness: async (data) => {
     console.log(data);
   },
   data: [] as BusinessData[],
@@ -122,6 +122,7 @@ const BusinessContextProvider = (props: { children: React.ReactNode }) => {
           hideProgressBar: false,
           position: "bottom-left",
         });
+        return 0;
       } else {
         setError("");
         toast.success("Business added successfully !", {
@@ -208,6 +209,7 @@ const BusinessContextProvider = (props: { children: React.ReactNode }) => {
           hideProgressBar: false,
           position: "bottom-left",
         });
+        return 0;
       } else {
         setError("");
         mutate();

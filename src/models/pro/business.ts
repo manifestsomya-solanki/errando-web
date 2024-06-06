@@ -27,9 +27,20 @@ export interface Business {
   twitter_url: string;
   instagram_url: string;
   profile_percentage: string;
+  business_postcode?: Businesspostcode;
   files: File[];
   services: Service[];
 }
+
+export interface Businesspostcode {
+  id: number;
+  name: string;
+  latitude?: any;
+  longitude?: any;
+  created_at: string;
+  updated_at: string;
+}
+
 
 export interface AddBusiness {
   name: string;
@@ -37,6 +48,7 @@ export interface AddBusiness {
   profile_picture: undefined;
   service_images: FileList | undefined;
   postcode_id: number;
+  postcode: string;
 }
 
 export interface AddBusinessService {

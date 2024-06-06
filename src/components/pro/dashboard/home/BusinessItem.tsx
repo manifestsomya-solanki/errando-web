@@ -8,9 +8,9 @@ import GoldStar from "../../../../assets/GoldStar.svg";
 import Star from "../../../../assets/Star.svg";
 import ProgressBar from "../../../UI/ProgressBar";
 import { Service } from "../../../../models/home";
-import { useState } from "react";
+import React, { Suspense, useState } from "react";
 import { NavLink } from "react-router-dom";
-import EditBusinessModal from "../../../../layout/pro-models/EditBusinessLayout";
+const EditBusinessModal = React.lazy(() => import("../../../../layout/pro-models/EditBusinessLayout"));
 import DeleteBusinessModal from "../../../../layout/pro-models/DeleteBusinessModal";
 
 function DangerousHTML({
@@ -65,12 +65,14 @@ function BusinessItem(props: {
       className="px-4 py-5 h-full"
       children={
         <div className="flex flex-col justify-between h-full">
-          {openModal && (
-            <EditBusinessModal
-              onCancel={() => setOpenModal(false)}
-              id={props.id}
-            />
-          )}
+          <Suspense>
+            {openModal && (
+              <EditBusinessModal
+                onCancel={() => setOpenModal(false)}
+                id={props.id}
+              />
+            )}
+          </Suspense>
           {openDeleteModal && (
             <DeleteBusinessModal
               onCancel={() => setOpenDeleteModal(false)}
@@ -141,11 +143,10 @@ function BusinessItem(props: {
             </div>
 
             <div
-              className={`${
-                !show
-                  ? "xl:h-28 lg:h-24 xs:h-28"
-                  : "xl:h-max 2xl:h-max lg:h-max md:h-max xs:h-max mb-5"
-              }`}
+              className={`${!show
+                ? "xl:h-28 lg:h-24 xs:h-28"
+                : "xl:h-max 2xl:h-max lg:h-max md:h-max xs:h-max mb-5"
+                }`}
             >
               <DangerousHTML
                 dangerouslySetInnerHTML={{
@@ -210,11 +211,10 @@ function BusinessItem(props: {
                 <Heading
                   text={props.progress}
                   variant="subHeader"
-                  headingclassname={`${
-                    +props.progress.split("%")[0] < 50
-                      ? "text-red-600 dark:text-red-600"
-                      : "text-primaryBlue "
-                  }  !font-semibold tracking-wide !text-xs  `}
+                  headingclassname={`${+props.progress.split("%")[0] < 50
+                    ? "text-red-600 dark:text-red-600"
+                    : "text-primaryBlue "
+                    }  !font-semibold tracking-wide !text-xs  `}
                 />
               </div>
               <ProgressBar width={props.progress} key={props.id} />
