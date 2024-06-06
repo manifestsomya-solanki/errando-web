@@ -134,10 +134,10 @@ function AddServiceModal({
               values.user_business_id.toString()
             );
             if (values.nation_wide || values.remote_service) {
-              formData.set(`data[0][post_code_id]`, values.postcode[0]);
+              formData.set(`data[0][post_code]`, values.postcode[0]);
             } else {
               values.postcode.map((code, i) =>
-                formData.set(`data[${i}][post_code_id]`, code)
+                formData.set(`data[${i}][post_code]`, code)
               );
               values.radius.map((code, i) =>
                 formData.set(`data[${i}][radius]`, code)
@@ -179,7 +179,7 @@ function AddServiceModal({
                   }}
                 />
                 {props?.touched?.user_business_id &&
-                props?.errors?.user_business_id ? (
+                  props?.errors?.user_business_id ? (
                   <Error
                     error={props?.errors?.user_business_id}
                     className="mt-2"
@@ -208,10 +208,11 @@ function AddServiceModal({
               {props.values.nation_wide || props.values.remote_service ? (
                 <div>
                   <Label required label="Enter Location" />
-                  <PostCodeDropDown
-                    className="my-2 !z-10 relative h-max"
-                    onChange={(newValue) => {
-                      props.setFieldValue("postcode[0]", newValue.value);
+                  <Input
+                    name="postcode"
+                    value={props.values.postcode}
+                    onChange={(e) => {
+                      props.setFieldValue("postcode[0]", e.currentTarget.value);
                     }}
                   />
                   {props?.touched?.postcode && props?.errors?.postcode ? (
@@ -223,11 +224,11 @@ function AddServiceModal({
                   <div className="pb-3 grid xl:grid-cols-2 xs:gap-5">
                     <div>
                       <Label required label="Postcode" />
-                      <PostCodeDropDown
-                        className="my-2 !z-10 relative"
-                        onChange={(newValue) => {
-                          console.log("here");
-                          props.setFieldValue("postcode[0]", newValue.value);
+                      <Input
+                        name="postcode"
+                        value={props.values.postcode}
+                        onChange={(e) => {
+                          props.setFieldValue("postcode[0]", e.currentTarget.value);
                         }}
                       />
                       {props?.touched?.postcode && props?.errors?.postcode ? (
@@ -258,12 +259,13 @@ function AddServiceModal({
                   <div className="pb-3 grid xl:grid-cols-2 xs:gap-5">
                     <div>
                       <Label label="Postcode" />
-                      <PostCodeDropDown
-                        className="my-2 !z-5 relative"
-                        onChange={(newValue) => {
+                      <Input
+                        name="postcode"
+                        value={props.values.postcode[locationNumber - 1]}
+                        onChange={(e) => {
                           props.setFieldValue(
                             `postcode[${locationNumber - 1}]`,
-                            newValue.value
+                            e.currentTarget.value
                           );
                         }}
                       />
@@ -303,7 +305,6 @@ function AddServiceModal({
                     className="border-none !w-fit  !px-0"
                     placeholder="Enter radius around the postcode you cover"
                     name="nation_wide"
-                    value={props.values.nation_wide}
                     onChange={props.handleChange}
                   />
                 </div>
@@ -315,7 +316,6 @@ function AddServiceModal({
                     placeholder="Enter radius around the postcode you cover"
                     name="remote_service"
                     id="remote_service"
-                    value={props.values.remote_service}
                     onChange={props.handleChange}
                   />
                 </div>

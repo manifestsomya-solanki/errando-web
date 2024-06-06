@@ -37,6 +37,8 @@ function EditServiceModal({
   const oldServiceData: ServiceDataDetail = oldData?.data;
   const oldPostCodeData: { label: string; value: string }[] = [];
   const oldRadiusData: string[] = [];
+  console.log("oldServiceData", oldServiceData?.post_codes);
+
   if (oldServiceData) {
     oldServiceData?.post_codes?.map((d) =>
       oldPostCodeData.push({
@@ -137,7 +139,7 @@ function EditServiceModal({
                 );
               } else {
                 values.postcode.map((code, i) =>
-                  formData.set(`data[${i}][post_code_id]`, code.value)
+                  formData.set(`data[${i}][post_code]`, code.value)
                 );
                 values.radius.map((code, i) =>
                   formData.set(`data[${i}][radius]`, code)
@@ -149,9 +151,10 @@ function EditServiceModal({
               formData.set("businesses_service_id", serviceId.toString());
 
               console.log(...formData);
-              editServiceBusiness(formData, serviceId);
-
-              onCancel();
+              const res = await editServiceBusiness(formData, serviceId);
+              if (res !== 0) {
+                onCancel();
+              }
             }}
             validate={validate}
           >
@@ -187,7 +190,7 @@ function EditServiceModal({
                     }}
                   />
                   {props?.touched?.user_business_id &&
-                  props?.errors?.user_business_id ? (
+                    props?.errors?.user_business_id ? (
                     <Error
                       error={props?.errors?.user_business_id}
                       className="mt-2"
@@ -202,9 +205,9 @@ function EditServiceModal({
                       value={
                         props?.values?.postcode[0]
                           ? {
-                              label: props?.values?.postcode[0].label,
-                              value: props?.values?.postcode[0].value,
-                            }
+                            label: props?.values?.postcode[0].label,
+                            value: props?.values?.postcode[0].value,
+                          }
                           : undefined
                       }
                       className="my-2 !z-20 relative h-max"
@@ -228,22 +231,16 @@ function EditServiceModal({
                         <div className="pb-3 grid xl:grid-cols-2 xs:gap-5">
                           <div className="">
                             <Label label="Update Postcode " />
-                            <PostCodeDropDown
-                              value={
-                                props?.values?.postcode[index]
-                                  ? {
-                                      label:
-                                        props?.values?.postcode[index].label,
-                                      value:
-                                        props?.values?.postcode[index].value,
-                                    }
-                                  : undefined
+                            <Input
+                              name="postcode"
+                              value={props?.values?.postcode[index]
+                                ? props?.values?.postcode[index].label
+                                : undefined
                               }
-                              className="my-2 !z-10 h-min relative"
-                              onChange={(newValue) => {
+                              onChange={(e) => {
                                 props.setFieldValue(`postcode[${index}]`, {
-                                  label: newValue?.label,
-                                  value: newValue?.value,
+                                  label: e.currentTarget.value,
+                                  value: e.currentTarget.value,
                                 });
                               }}
                             />
@@ -283,7 +280,6 @@ function EditServiceModal({
                       className="border-none !w-fit !px-0"
                       name="nation_wide"
                       checked={props.values.nation_wide}
-                      value={props.values.nation_wide}
                       onChange={props.handleChange}
                     />
                   </div>
@@ -294,7 +290,6 @@ function EditServiceModal({
                       className="border-none !w-fit !px-0 "
                       name="remote_service"
                       checked={props.values.remote_service}
-                      value={props.values.remote_service}
                       onChange={props.handleChange}
                     />
                   </div>

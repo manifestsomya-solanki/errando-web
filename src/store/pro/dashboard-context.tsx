@@ -23,7 +23,7 @@ type BusinessResponseType = {
   mutate: KeyedMutator<any>;
 
   setError: React.Dispatch<React.SetStateAction<string>>;
-  editServiceBusiness: (formData: FormData, serviceId: number) => void;
+  editServiceBusiness: (formData: FormData, serviceId: number) => Promise<void | number>;
   deleteImage: (id: number) => Promise<void>;
   isLoading: boolean;
   error: string;
@@ -49,7 +49,7 @@ export const BusinessContext = createContext<BusinessResponseType>({
     console.log(data);
     return 0;
   },
-  editServiceBusiness: (data) => {
+  editServiceBusiness: async (data) => {
     console.log(data);
   },
   setError: {} as React.Dispatch<React.SetStateAction<string>>,
@@ -301,6 +301,7 @@ const BusinessContextProvider = (props: { children: React.ReactNode }) => {
           hideProgressBar: false,
           position: "bottom-left",
         });
+        return 0;
       } else {
         setError("");
         toast.success("Service updated successfully !", {
