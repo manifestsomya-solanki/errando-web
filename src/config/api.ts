@@ -4,9 +4,9 @@ const NODE_ENV = import.meta.env.VITE_NODE_ENV ;
 
 // API Base URLs from environment variables
 const API_BASE_URLS = {
-  development: import.meta.env.VITE_API_BASE_URL_DEVELOPMENT || 'http://127.0.0.1:8000/admin/api/v1',
-  production: import.meta.env.VITE_API_BASE_URL_PRODUCTION || 'https://erranddo.com/admin/api/v1',
-  staging: import.meta.env.VITE_API_BASE_URL_STAGING || ''
+  development: import.meta.env.VITE_API_BASE_URL_DEVELOPMENT,
+  production: import.meta.env.VITE_API_BASE_URL_PRODUCTION,
+  staging: import.meta.env.VITE_API_BASE_URL_STAGING
 };
 
 // Current API Base URL based on environment
