@@ -1,21 +1,22 @@
 import Modal from "../../layout/home/Modal";
 import Close from "../../assets/close.tsx";
 import Heading from "../../components/UI/Heading";
-import { useAuthPro } from "../../store/pro/auth-pro-context";
+import { useAuth } from "../../store/pro/auth-pro-context";
 
 import { useTheme } from "../../store/theme-context";
 import useSWR from "swr";
 import { fetcher } from "../../store/customer/home-context.tsx";
 import Button from "../../components/UI/Button.tsx";
+import { API_BASE_URL, buildApiUrl, API_ENDPOINTS } from "../../config/api";
 
 function DeleteImageModal(props: { onCancel: () => void }) {
-  const { deleteImageHandler, isLoading } = useAuthPro();
+  const { deleteImageHandler, isLoading } = useAuth();
   const token = localStorage.getItem("data");
   let userData: any;
   if (token) {
     userData = JSON.parse(token);
   }
-  const url = `https://erranddo.com/admin/api/v1/user/detail?user_id=${userData?.id}`;
+  const url = buildApiUrl(`${API_ENDPOINTS.USER_DETAIL}?user_id=${userData?.id}`);
   const { mutate } = useSWR(url, fetcher);
   const deleteUserHandler = async (event: React.MouseEvent) => {
     await deleteImageHandler();

@@ -8,6 +8,7 @@ import { ServiceData } from "../../models/pro/business";
 import { UserRequestList } from "../../models/pro/userrequestlist";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router";
+import { API_BASE_URL, buildApiUrl, API_ENDPOINTS } from "../../config/api";
 
 type LeadResponeType = {
   leads?: UserRequestList[];
@@ -79,7 +80,7 @@ const LeadContextProProvider = (props: { children: React.ReactNode }) => {
   const perPage = 10;
   const [currentPage, setCurrentPage] = useState(1);
   const [url, setUrl] = useState(
-    `https://erranddo.com/admin/api/v1/user-requests?for_pro=1&page=${currentPage}&per_page=${perPage}`
+    buildApiUrl(`${API_ENDPOINTS.USER_REQUESTS}?for_pro=1&page=${currentPage}&per_page=${perPage}`)
   );
 
   const search = (key: string) => {
@@ -117,7 +118,7 @@ const LeadContextProProvider = (props: { children: React.ReactNode }) => {
 
   const reset = () => {
     setUrl(
-      `https://erranddo.com/admin/api/v1/user-requests?for_pro=1&page=${currentPage}&per_page=${perPage}`
+      buildApiUrl(`${API_ENDPOINTS.USER_REQUESTS}?for_pro=1&page=${currentPage}&per_page=${perPage}`)
     );
   };
 
@@ -140,14 +141,14 @@ const LeadContextProProvider = (props: { children: React.ReactNode }) => {
   //
 
   //business
-  const businessurl = `https://erranddo.com/admin/api/v1/businesses?user_id=${id}`;
+  const businessurl = buildApiUrl(`${API_ENDPOINTS.BUSINESSES}?user_id=${id}`);
   const dummy_business: BusinessData[] = [];
   let datarenderOfBusiness: BusinessData[] = [];
   const { data: businessData } = useSWR(businessurl, fetcher);
   datarenderOfBusiness = businessData?.data || dummy_business;
 
   //service
-  const serviceurl = `https://erranddo.com/admin/api/v1/business-services?user_id=${id}}`;
+  const serviceurl = buildApiUrl(`${API_ENDPOINTS.BUSINESS_SERVICES}?user_id=${id}}`);
   const dummy_service: ServiceData[] = [];
   let datarenderOfService: ServiceData[] = [];
   const { data: serviceData } = useSWR(serviceurl, fetcher);
@@ -167,7 +168,7 @@ const LeadContextProProvider = (props: { children: React.ReactNode }) => {
     }
     setError("");
     const res = await fetch(
-      `https://erranddo.com/admin/api/v1/user-requests/show-interest`,
+      buildApiUrl(API_ENDPOINTS.USER_REQUESTS_SHOW_INTEREST),
       {
         method: "POST",
         headers: {
@@ -211,7 +212,7 @@ const LeadContextProProvider = (props: { children: React.ReactNode }) => {
     const token = localStorage.getItem("token");
 
     const res = await fetch(
-      `https://erranddo.com/admin/api/v1/user-requests/${id}/lead-delete`,
+      buildApiUrl(`${API_ENDPOINTS.USER_REQUESTS_LEAD_DELETE}/${id}`),
       {
         method: "POST",
         headers: {

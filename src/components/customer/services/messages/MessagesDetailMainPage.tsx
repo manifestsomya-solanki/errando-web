@@ -42,6 +42,7 @@ import { fetcher } from "../../../../store/customer/home-context";
 import { UserData } from "../../../../models/user";
 import BackArrow from "../../../../assets/BackArrow";
 import { useNotification } from "../../../../store/customer/notification-context";
+import { API_BASE_URL, buildApiUrl, API_ENDPOINTS } from "../../../../config/api";
 
 const initialPageSize = 12;
 const MessagesDetailMainPage = () => {
@@ -64,7 +65,7 @@ const MessagesDetailMainPage = () => {
   const [pageSize, setPageSize] = useState(initialPageSize);
 
   const { userData } = useAuth();
-  const anotherUserDetailUrl = `https://erranddo.com/admin/api/v1/user/detail?user_id=${businessUserId}`;
+  const anotherUserDetailUrl = buildApiUrl(`${API_ENDPOINTS.USER_DETAIL}?user_id=${businessUserId}`);
   const { data: userdata } = useSWR(anotherUserDetailUrl, fetcher);
   const anotherUserDetail: UserData = userdata?.data;
 

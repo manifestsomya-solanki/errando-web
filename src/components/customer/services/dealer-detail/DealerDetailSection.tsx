@@ -25,6 +25,7 @@ import { useAuth } from "../../../../store/customer/auth-context";
 import useSWR, { KeyedMutator } from "swr";
 import { fetcher } from "../../../../store/customer/home-context";
 import { UserData } from "../../../../models/user";
+import { API_BASE_URL, buildApiUrl, API_ENDPOINTS } from "../../../../config/api";
 
 function DangerousHTML({
   dangerouslySetInnerHTML,
@@ -57,7 +58,7 @@ function DealerDetailSection(props: {
 }) {
   const { theme } = useTheme();
   const { userData } = useAuth();
-  const anotherUserDetailUrl = `https://erranddo.com/admin/api/v1/user/detail?user_id=${props?.userBusinessId}`;
+  const anotherUserDetailUrl = buildApiUrl(`${API_ENDPOINTS.USER_DETAIL}?user_id=${props?.userBusinessId}`);
   const { data: userdata } = useSWR(anotherUserDetailUrl, fetcher);
   const anotherUserDetail: UserData = userdata?.data;
   const user = {

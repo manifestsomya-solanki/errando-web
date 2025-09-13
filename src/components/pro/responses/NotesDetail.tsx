@@ -13,6 +13,7 @@ import { NotesList } from "../../../models/pro/noteslist";
 import FullPageLoading from "../../UI/FullPageLoading";
 import BackArrow from "../../../assets/BackArrow";
 import { useTheme } from "../../../store/theme-context";
+import { API_BASE_URL, buildApiUrl, API_ENDPOINTS } from "../../../config/api";
 
 function NotesDetail({ onCancel }: { onCancel: () => void }) {
   const requestId = useParams();
@@ -21,7 +22,7 @@ function NotesDetail({ onCancel }: { onCancel: () => void }) {
   const loginUser = JSON.parse(localStorage.getItem("data") || "{}");
   console.log(loginUser?.id, "loginUser");
 
-  const url = `https://erranddo.com/admin/api/v1/note?user_request_id=${requestId?.id}&user_id=${loginUser?.id}`;
+  const url = buildApiUrl(`${API_ENDPOINTS.NOTE}?user_request_id=${requestId?.id}&user_id=${loginUser?.id}`);
   const { data, isLoading } = useSWR(url, fetcher);
   const notesDetail: NotesList[] = data?.data ?? "";
   console.log(requestId, "reqid");

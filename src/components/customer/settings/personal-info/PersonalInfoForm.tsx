@@ -9,6 +9,7 @@ import useSWR from "swr";
 import { fetcher } from "../../../../store/customer/home-context";
 import { UserData } from "../../../../models/user";
 import PostCodeDetails from "../../../UI/PostCodeDetails";
+import { API_BASE_URL, buildApiUrl, API_ENDPOINTS } from "../../../../config/api";
 
 function PersonalInfoForm() {
   const navigate = useNavigate();
@@ -18,7 +19,7 @@ function PersonalInfoForm() {
     userData = JSON.parse(token);
   }
 
-  const url = `https://erranddo.com/admin/api/v1/user/detail?user_id=${userData?.id}`;
+  const url = buildApiUrl(`${API_ENDPOINTS.USER_DETAIL}?user_id=${userData?.id}`);
   const { data, error } = useSWR(url, fetcher);
   const profileData: UserData = data?.data ?? "";
 

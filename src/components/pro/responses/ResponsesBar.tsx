@@ -12,10 +12,11 @@ import { useState } from "react";
 import FilterLeadsModal from "../../../layout/pro-models/FilterLeads";
 import Search from "../../../assets/search";
 import SearchLeadsModal from "../../../layout/pro-models/SearchLeadsModal";
+import { API_BASE_URL, buildApiUrl, API_ENDPOINTS } from "../../../config/api";
 
 function ResponsesBar() {
   const { isLoading } = useLeadResponse();
-  const url = `https://erranddo.com/admin/api/v1/user-requests?for_pro=1&show_only_count=1`;
+  const url = buildApiUrl(`${API_ENDPOINTS.USER_REQUESTS}?for_pro=1&show_only_count=1`);
   let { data: count } = useSWR(url, fetcher);
   count = count?.data;
   const { total } = useLeadResponse();

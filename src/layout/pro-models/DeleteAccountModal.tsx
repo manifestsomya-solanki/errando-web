@@ -1,12 +1,12 @@
 import Modal from "../../layout/home/Modal";
 import Close from "../../assets/close.tsx";
 import Heading from "../../components/UI/Heading";
-import { useAuthPro } from "../../store/pro/auth-pro-context";
+import { useAuth } from "../../store/pro/auth-pro-context";
 import { useNavigate } from "react-router-dom";
 import { useTheme } from "../../store/theme-context";
 
 function DeleteAccountModal(props: { onCancel: () => void; id: number }) {
-  const { deleteHandler } = useAuthPro();
+  const { deleteHandler } = useAuth();
   const navigate = useNavigate();
   const deleteUserHandler = async (event: React.MouseEvent) => {
     deleteHandler(props.id.toString());

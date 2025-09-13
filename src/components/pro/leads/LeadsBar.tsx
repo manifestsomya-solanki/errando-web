@@ -13,10 +13,11 @@ import FilterLeadsModal from "../../../layout/pro-models/FilterLeads";
 import useSWR from "swr";
 import { fetcher } from "../../../store/customer/home-context";
 import InterestFilterModal from "../../../layout/pro-models/InterestFilterModal";
+import { API_BASE_URL, buildApiUrl, API_ENDPOINTS } from "../../../config/api";
 
 function LeadsBar() {
   const { isLoading } = useLead();
-  const url = `https://erranddo.com/admin/api/v1/user-requests?for_pro=1&show_only_count=1`;
+  const url = buildApiUrl(`${API_ENDPOINTS.USER_REQUESTS}?for_pro=1&show_only_count=1`);
 
   let { data: count } = useSWR(url, fetcher);
   const [openModal, setOpenModal] = useState(false);

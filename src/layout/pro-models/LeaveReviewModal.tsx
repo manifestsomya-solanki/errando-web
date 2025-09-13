@@ -15,6 +15,7 @@ import {
 import { useReview } from "../../store/customer/review-context.tsx";
 import Button from "../../components/UI/Button.tsx";
 import { useMyReview } from "../../store/customer/my-review-context.tsx";
+import { API_BASE_URL, buildApiUrl, API_ENDPOINTS } from "../../config/api";
 
 function LeaveReviewModal(props: {
   onCancel: () => void;
@@ -23,13 +24,13 @@ function LeaveReviewModal(props: {
 }) {
   const dealerId = useParams();
 
-  const url = `https://erranddo.com/admin/api/v1/businesses/${
+  const url = buildApiUrl(`${API_ENDPOINTS.BUSINESSES_DETAIL}/${
     props.dealerId ?? dealerId?.id
-  }/detail`;
+  }`);
   const { data } = useSWR(url, fetcher);
   const serviceData: ServiceList = data?.data;
 
-  const detailUrl = `https://erranddo.com/admin/api/v1/reviews/${props.id}/detail`;
+  const detailUrl = buildApiUrl(`${API_ENDPOINTS.REVIEWS_DETAIL}/${props.id}`);
   const { data: reviewData } = useSWR(props.id ? detailUrl : null, fetcher);
   const { state } = useLocation();
   const [checked, setChecked] = useState(false);

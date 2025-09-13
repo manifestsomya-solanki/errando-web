@@ -12,11 +12,12 @@ import RightArrow from "../../../../assets/right-arrow.svg";
 
 import Heading from "../../../UI/Heading";
 import { useState } from "react";
+import { API_BASE_URL, buildApiUrl, API_ENDPOINTS } from "../../../../config/api";
 // import Modal from "../../../../layout/home/Modal";
 
 function PhotosSection() {
   const { id } = useParams();
-  const url = `https://erranddo.com/admin/api/v1/businesses/${id}/detail`;
+  const url = buildApiUrl(`${API_ENDPOINTS.BUSINESSES_DETAIL}/${id}`);
   const { data, error } = useSWR(url, fetcher);
   const photoData: Business = data?.data;
   const isLoading = !data && !error;

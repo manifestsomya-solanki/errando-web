@@ -3,6 +3,7 @@ import { useService } from "../../store/pro/service-context";
 import useSWR from "swr";
 import { fetcher } from "../../store/customer/home-context";
 import { Postcode } from "../../models/pro/service";
+import { API_BASE_URL, buildApiUrl, API_ENDPOINTS } from "../../config/api";
 
 function PostCodeDropDown(props: {
   onChange: (newValue: any) => void;
@@ -10,7 +11,7 @@ function PostCodeDropDown(props: {
   value?: { label: string; value: string };
   menuClassName?: string;
 }) {
-  const postCodeUrl = `https://erranddo.com/admin/api/v1/postcodes`;
+  const postCodeUrl = buildApiUrl(API_ENDPOINTS.POSTCODES);
   const { data: postCodeData, isLoading: isPostcodeLoading } = useSWR(
     postCodeUrl,
     fetcher

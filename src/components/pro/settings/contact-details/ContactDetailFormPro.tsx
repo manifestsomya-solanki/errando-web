@@ -4,14 +4,14 @@ import Error from "../../../UI/Error";
 import Button from "../../../UI/Button";
 import Label from "../../../UI/Label";
 
-import { useAuthPro } from "../../../../store/pro/auth-pro-context";
+import { useAuth } from "../../../../store/pro/auth-pro-context";
 import Heading from "../../../UI/Heading";
 import { useState } from "react";
 import EditContactModal from "../../../../layout/home/EditContactModal";
 
 function ContactDetailFormPro() {
   const { userData, profileHandler, isProfileLoading, sendOtp, mutate } =
-    useAuthPro();
+    useAuth();
   const [openModal, setOpenModal] = useState(false);
 
   //validate the logs entered in the form

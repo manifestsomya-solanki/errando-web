@@ -5,6 +5,7 @@ import { useNavigate, useParams } from "react-router";
 import useSWR, { KeyedMutator } from "swr";
 import { fetcher } from "./home-context";
 import { toast } from "react-toastify";
+import { buildApiUrl, API_ENDPOINTS } from "../../config/api";
 
 type ReviewResponseType = {
   data?: ReviewData[];
@@ -53,23 +54,23 @@ const ReviewContextProvider = (props: { children: React.ReactNode }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [url, setUrl] = useState(
-    `https://erranddo.com/admin/api/v1/reviews?page=1&per_page=100&user_business_id=${businessId?.id}`
+    buildApiUrl(`${API_ENDPOINTS.REVIEWS}?page=1&per_page=100&user_business_id=${businessId?.id}`)
   );
 
   const filter = (key: string, order?: string) => {
     setUrl(
-      `https://erranddo.com/admin/api/v1/reviews?page=1&per_page=100&user_business_id=${businessId?.id}&sort_field=${key}&sort_order=${order}`
+      buildApiUrl(`${API_ENDPOINTS.REVIEWS}?page=1&per_page=100&user_business_id=${businessId?.id}&sort_field=${key}&sort_order=${order}`)
     );
   };
   const { data, isLoading: isReviewLoading, mutate } = useSWR(url, fetcher);
   const businessReview: ReviewData[] = data?.data;
   const createReview = async (formData: FormData) => {
-    const token = localStorage.getItem("token") ?? "{}";
-    setError("");
     setIsLoading(true);
+    setError("");
+    const token = localStorage.getItem("token");
 
     const res = await fetch(
-      "https://erranddo.com/admin/api/v1/reviews/create",
+      buildApiUrl(API_ENDPOINTS.REVIEWS_CREATE),
       {
         method: "POST",
         headers: {
@@ -98,12 +99,12 @@ const ReviewContextProvider = (props: { children: React.ReactNode }) => {
   };
 
   const editReview = async (formData: FormData, id: number) => {
-    const token = localStorage.getItem("token") ?? "{}";
-    setError("");
     setIsLoading(true);
+    setError("");
+    const token = localStorage.getItem("token");
 
     const res = await fetch(
-      `https://erranddo.com/admin/api/v1/reviews/${id}/edit`,
+      buildApiUrl(`${API_ENDPOINTS.REVIEWS_EDIT}/${id}`),
       {
         method: "POST",
         headers: {
@@ -144,7 +145,7 @@ const ReviewContextProvider = (props: { children: React.ReactNode }) => {
     console.log(...formData);
 
     const res = await fetch(
-      "https://erranddo.com/admin/api/v1/reviews/create",
+      buildApiUrl(API_ENDPOINTS.REVIEWS_CREATE),
       {
         method: "POST",
         headers: {
@@ -173,13 +174,12 @@ const ReviewContextProvider = (props: { children: React.ReactNode }) => {
   };
 
   const deleteReview = async (id: number) => {
-    const token = localStorage.getItem("token") ?? "{}";
-    setError("");
     setIsLoading(true);
-    console.log(id, "reviewid");
+    setError("");
+    const token = localStorage.getItem("token");
 
     const res = await fetch(
-      `https://erranddo.com/admin/api/v1/reviews/${id}/delete`,
+      buildApiUrl(`${API_ENDPOINTS.REVIEWS_DELETE}/${id}`),
       {
         method: "DELETE",
         headers: {

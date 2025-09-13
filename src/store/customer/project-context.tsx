@@ -1,5 +1,7 @@
 import React, { useState, useContext } from "react";
 import { createContext } from "react";
+import { toast } from "react-toastify";
+import { buildApiUrl, API_ENDPOINTS } from "../../config/api";
 
 import { Request } from "../../models/customer/requestlist";
 import useSWR, { KeyedMutator, MutatorOptions, SWRResponse } from "swr";
@@ -54,11 +56,11 @@ const ProjectContextProvider = (props: { children: React.ReactNode }) => {
   const [completePage, setCompletePage] = useState(1);
 
   const [url, setUrl] = useState(
-    `https://erranddo.com/admin/api/v1/user-requests?page=${currentPage}&per_page=${perPage}&status=PENDING&user_id=${id}`
+    buildApiUrl(`${API_ENDPOINTS.USER_REQUESTS}?page=${currentPage}&per_page=${perPage}&status=PENDING&user_id=${id}`)
   );
 
   const [completeurl, setCompleteUrl] = useState(
-    `https://erranddo.com/admin/api/v1/user-requests?page=${completePage}&per_page=${perPage}&status=COMPLETED&user_id=${id}`
+    buildApiUrl(`${API_ENDPOINTS.USER_REQUESTS}?page=${completePage}&per_page=${perPage}&status=COMPLETED&user_id=${id}`)
   );
 
   const dummy_data: Request[] = [];

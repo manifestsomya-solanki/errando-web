@@ -21,6 +21,7 @@ import { useEffect, useState } from "react";
 import PostCodeDropDown from "../../components/UI/PostCodeDropDown";
 import FullPageLoading from "../../components/UI/FullPageLoading";
 import { useTheme } from "../../store/theme-context";
+import { API_BASE_URL, buildApiUrl, API_ENDPOINTS } from "../../config/api";
 
 function EditServiceModal({
   onCancel,
@@ -29,7 +30,7 @@ function EditServiceModal({
   onCancel: () => void;
   serviceId: number;
 }) {
-  const serviceDataUrl = `https://erranddo.com/admin/api/v1/business-services/${serviceId}/detail`;
+  const serviceDataUrl = buildApiUrl(`${API_ENDPOINTS.BUSINESS_SERVICES_DETAIL}/${serviceId}`);
   const { data: oldData, isLoading: isDetailLoading } = useSWR(
     serviceDataUrl,
     fetcher

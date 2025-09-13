@@ -15,6 +15,7 @@ import { useTheme } from "../../store/theme-context";
 import NearlyThere from "./NearlyThere.tsx";
 import Input from "../../components/UI/Input.tsx";
 import { useAuth } from "../../store/customer/auth-context.tsx";
+import { API_BASE_URL, buildApiUrl, API_ENDPOINTS } from "../../config/api";
 
 let ids: { question: number; answer: string; custom: boolean }[] = JSON.parse(
   localStorage.getItem("question") ?? "[]"
@@ -32,7 +33,8 @@ function QuestionsModal(props: {
     : "";
   const postCode = localStorage.getItem("post_code");
   const token = localStorage.getItem("token");
-  const businessUrl = `https://erranddo.com/admin/api/v1/businesses?post_code_id=${postCode}&service_id=${service}`;
+  const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
+  const businessUrl = buildApiUrl(`${API_ENDPOINTS.BUSINESSES}?post_code_id=${postCode}&service_id=${service}`);
   let datarenderForBusiness: BusinessData[] = [];
   const { data: BusinessData, isLoading: businessLoading } = useSWR(
     businessUrl,
@@ -43,7 +45,7 @@ function QuestionsModal(props: {
   if (datarenderForBusiness?.length === 0) {
     error = "No services";
   }
-  const url = `https://erranddo.com/admin/api/v1/questions?service_id=${service}&post_code_id=${postCode}&page=1&per_page=10`;
+  const url = buildApiUrl(`${API_ENDPOINTS.QUESTIONS}?service_id=${service}&post_code_id=${postCode}&page=1&per_page=10`);
   const dummy_data: Question[] = [];
   let datarender: QuestionData[] = [];
   const {
@@ -111,7 +113,7 @@ function QuestionsModal(props: {
 
   return (
     <>
-      {openModal && token ? (
+      {openModal && isLoggedIn ? (
         <CommentsModal
           requestId={requestData?.data?.user_requests?.id}
           open={openModal}
@@ -124,7 +126,7 @@ function QuestionsModal(props: {
             props.onCancelAll();
           }}
         />
-      ) : (
+      ) : openModal && !isLoggedIn ? (
         <NearlyThere
           open={openModal}
           onCancel={() => {
@@ -136,7 +138,7 @@ function QuestionsModal(props: {
             props.onCancelAll();
           }}
         />
-      )}
+      ) : null}
       {props.open && (
         <div>
           {!businessLoading ? (

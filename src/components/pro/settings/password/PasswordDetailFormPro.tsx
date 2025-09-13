@@ -3,13 +3,13 @@ import Input from "../../../UI/Input";
 import Error from "../../../UI/Error";
 import Label from "../../../UI/Label";
 import Button from "../../../UI/Button";
-import { useAuthPro } from "../../../../store/pro/auth-pro-context";
+import { useAuth } from "../../../../store/pro/auth-pro-context";
 import pass1 from "../../../../assets/pass1.svg";
 import pass2 from "../../../../assets/pass2.svg";
 import { useState } from "react";
 
 function PasswordDetailFormPro() {
-  const { resetPassword, error, isPasswordLoading } = useAuthPro();
+  const { resetPassword, error, isPasswordLoading } = useAuth();
 
   const [showPassword, setShowPassword] = useState(false);
   const [oldshowPassword, setOldShowPassword] = useState(false);

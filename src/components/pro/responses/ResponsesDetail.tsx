@@ -8,10 +8,11 @@ import { useParams } from "react-router";
 import useSWR from "swr";
 import { fetcher } from "../../../store/customer/home-context";
 import { UserRequestList } from "../../../models/pro/userrequestlist";
+import { API_BASE_URL, buildApiUrl, API_ENDPOINTS } from "../../../config/api";
 
 function ResponsesDetail() {
   const leadsId = useParams();
-  const dealerdetailurl = `https://erranddo.com/admin/api/v1/user-requests/${leadsId.id}/detail`;
+  const dealerdetailurl = buildApiUrl(`${API_ENDPOINTS.USER_REQUESTS_DETAIL}/${leadsId.id}`);
   const { data: leadsDetailData, isLoading } = useSWR(dealerdetailurl, fetcher);
   const leadsDetail: UserRequestList = leadsDetailData?.data;
 

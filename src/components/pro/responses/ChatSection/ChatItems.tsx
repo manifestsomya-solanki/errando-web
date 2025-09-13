@@ -31,7 +31,7 @@ import VerticalDots from "../../../../assets/VerticalDots";
 import Download from "../../../../assets/Download";
 import { useChat } from "../../../../store/pro/chat-context";
 import { useLocation, useNavigate } from "react-router";
-import { useAuthPro } from "../../../../store/pro/auth-pro-context";
+import { useAuth } from "../../../../store/pro/auth-pro-context";
 import { useNotification } from "../../../../store/customer/notification-context";
 
 const initialPageSize = 12;
@@ -47,7 +47,7 @@ function ChatItems() {
   const { addChat } = useChat();
   const [pageSize, setPageSize] = useState(initialPageSize);
 
-  const { userData } = useAuthPro();
+  const { userData } = useAuth();
   const location = useLocation();
   const state = location.state;
 

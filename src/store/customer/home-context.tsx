@@ -1,6 +1,8 @@
 import React, { ReactNode, useContext, useState } from "react";
 import { Service } from "../../models/home";
 import useSWR from "swr";
+import { API_BASE_URL, buildApiUrl, API_ENDPOINTS } from "../../config/api";
+
 
 type HomeServiceDetailsType = {
   datarender: Service[];
@@ -17,12 +19,12 @@ export const HomeServiceContext = React.createContext<HomeServiceDetailsType>({
 
 const HomeServiceContextProvider = (props: { children: ReactNode }) => {
   const [url, setUrl] = useState(
-    "https://erranddo.com/admin/api/v1/services"
+    buildApiUrl(API_ENDPOINTS.SERVICES)
   );
 
   //search handler
   const searchHandler = (key: string) => {
-    setUrl(`https://erranddo.com/admin/api/v1/services?search=${key}`);
+    setUrl(buildApiUrl(`${API_ENDPOINTS.SERVICES}?search=${key}`));
   };
 
   const dummy_data: Service[] = [];

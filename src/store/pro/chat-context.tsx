@@ -1,4 +1,6 @@
-import { createContext, useContext } from "react";
+import React, { useState, useContext } from "react";
+import { createContext } from "react";
+import { buildApiUrl, API_ENDPOINTS } from "../../config/api";
 
 type ChatResposneType = {
   addChat: (user_id: number, message: string) => void;
@@ -21,7 +23,7 @@ const ChatContextProvider = (props: { children: React.ReactNode }) => {
     //     message: message,
     // }
     const res = await fetch(
-      `https://erranddo.com/admin/api/v1/chat/send-notification?user_id=${user_id}&message=${message}`,
+      buildApiUrl(`${API_ENDPOINTS.CHAT_SEND_NOTIFICATION}?user_id=${user_id}&message=${message}`),
       {
         method: "POST",
         headers: {
@@ -38,7 +40,7 @@ const ChatContextProvider = (props: { children: React.ReactNode }) => {
   const DeleteChat = async (user_id: number) => {
     const token = localStorage.getItem("token") ?? "{}";
     const res = await fetch(
-      `https://erranddo.com/admin/api/v1/chat/${user_id}/delete`,
+      buildApiUrl(`${API_ENDPOINTS.CHAT_DELETE}/${user_id}`),
       {
         method: "DELETE",
         headers: {

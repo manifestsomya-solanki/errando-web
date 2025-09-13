@@ -5,6 +5,7 @@ import { fetcher } from "../customer/home-context";
 import { UserResponseList } from "../../models/pro/userresponselist";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import { API_BASE_URL, buildApiUrl, API_ENDPOINTS } from "../../config/api";
 
 type LeadsResponseType = {
   leadsResponse?: UserResponseList[];
@@ -65,7 +66,7 @@ const LeadsResponseProvider = (props: { children: React.ReactNode }) => {
   const perPage = 10;
   const [currentPage, setCurrentPage] = useState(1);
   const [url, setUrl] = useState(
-    `https://erranddo.com/admin/api/v1/user-requests?page=${currentPage}&per_page=${perPage}&for_pro=1&with_leads=1`
+    buildApiUrl(`${API_ENDPOINTS.USER_REQUESTS}?page=${currentPage}&per_page=${perPage}&for_pro=1&with_leads=1`)
   );
 
   const search = (key: string) => {
@@ -114,7 +115,7 @@ const LeadsResponseProvider = (props: { children: React.ReactNode }) => {
     setIsQuoteLoading(true);
     setError("");
     const res = await fetch(
-      `https://erranddo.com/admin/api/v1/quotes/create`,
+      buildApiUrl(API_ENDPOINTS.QUOTES_CREATE),
       {
         method: "POST",
         headers: {
@@ -155,7 +156,7 @@ const LeadsResponseProvider = (props: { children: React.ReactNode }) => {
     setIsQuoteLoading(true);
     setError("");
     const res = await fetch(
-      `https://erranddo.com/admin/api/v1/quotes/${quoteId}/edit`,
+      buildApiUrl(`${API_ENDPOINTS.QUOTES_EDIT}/${quoteId}`),
       {
         method: "POST",
         headers: {
@@ -198,7 +199,7 @@ const LeadsResponseProvider = (props: { children: React.ReactNode }) => {
     setError("");
 
     const res = await fetch(
-      `https://erranddo.com/admin/api/v1/note/add`,
+      buildApiUrl(API_ENDPOINTS.NOTE_ADD),
       {
         method: "POST",
         headers: {

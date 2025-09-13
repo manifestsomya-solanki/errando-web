@@ -12,6 +12,7 @@ import { Business } from "../../models/customer/businesslist.ts";
 import useSWR from "swr";
 import { fetcher } from "../../store/customer/home-context.tsx";
 import Button from "../../components/UI/Button.tsx";
+import { API_BASE_URL, buildApiUrl, API_ENDPOINTS } from "../../config/api";
 function CloseRequestModal(props: {
   serviceId: number;
   onCancel: () => void;
@@ -30,7 +31,7 @@ function CloseRequestModal(props: {
   });
   const requestId = useParams();
 
-  const url = `https://erranddo.com/admin/api/v1/businesses?service_id=${props?.serviceId}&user_request_id=${requestId?.id}&only_responded=1`;
+  const url = buildApiUrl(`${API_ENDPOINTS.BUSINESSES}?service_id=${props?.serviceId}&user_request_id=${requestId?.id}&only_responded=1`);
   const { data } = useSWR(url, fetcher);
   let datarender: Business[] = [];
   datarender = data?.data;

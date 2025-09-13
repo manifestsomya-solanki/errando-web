@@ -4,6 +4,7 @@ import { AddResponseData, ReviewData } from "../../models/customer/reviewlist";
 import useSWR, { KeyedMutator } from "swr";
 import { fetcher } from "../customer/home-context";
 import { toast } from "react-toastify";
+import { buildApiUrl, API_ENDPOINTS } from "../../config/api";
 
 type ReviewResponseType = {
   data?: ReviewData[];
@@ -43,11 +44,11 @@ const ReviewContextProProvider = (props: { children: React.ReactNode }) => {
 
   const [error, setError] = useState("");
   const [url, setUrl] = useState(
-    `https://erranddo.com/admin/api/v1/reviews`
+    buildApiUrl(API_ENDPOINTS.REVIEWS)
   );
   const getBusinessReviews = (id?: number) => {
     setUrl(
-      `https://erranddo.com/admin/api/v1/reviews?user_business_id=${id}`
+      buildApiUrl(`${API_ENDPOINTS.REVIEWS}?user_business_id=${id}`)
     );
   };
   const dummy_data: ReviewData[] = [];
@@ -62,7 +63,7 @@ const ReviewContextProProvider = (props: { children: React.ReactNode }) => {
     setIsLoading(true);
     setError("");
     const res = await fetch(
-      `https://erranddo.com/admin/api/v1/reviews/${id}/addresponse`,
+      buildApiUrl(`${API_ENDPOINTS.REVIEWS_ADD_RESPONSE}/${id}`),
       {
         method: "POST",
         headers: {
@@ -97,7 +98,7 @@ const ReviewContextProProvider = (props: { children: React.ReactNode }) => {
     console.log(id, "reviewid");
 
     const res = await fetch(
-      `https://erranddo.com/admin/api/v1/reviews/${id}/delete`,
+      buildApiUrl(`${API_ENDPOINTS.REVIEWS_DELETE}/${id}`),
       {
         method: "DELETE",
         headers: {
@@ -128,7 +129,7 @@ const ReviewContextProProvider = (props: { children: React.ReactNode }) => {
     setIsDeleteReviewLoading(true);
 
     const res = await fetch(
-      `https://erranddo.com/admin/api/v1/reviews/${id}/flag`,
+      buildApiUrl(`${API_ENDPOINTS.REVIEWS_FLAG}/${id}`),
       {
         method: "POST",
         headers: {

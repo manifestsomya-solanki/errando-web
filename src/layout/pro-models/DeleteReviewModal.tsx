@@ -7,6 +7,7 @@ import useSWR from "swr";
 import { fetcher } from "../../store/customer/home-context.tsx";
 import Button from "../../components/UI/Button.tsx";
 import { useReview } from "../../store/pro/review-context.tsx";
+import { API_BASE_URL, buildApiUrl, API_ENDPOINTS } from "../../config/api";
 
 function DeleteReviewModal({
   reviewId,
@@ -20,7 +21,7 @@ function DeleteReviewModal({
   console.log(reviewId);
   const businessId = useParams();
 
-  const url = `https://erranddo.com/admin/api/v1/reviews?page=1&per_page=10&user_business_id=${businessId?.id}`;
+  const url = buildApiUrl(`${API_ENDPOINTS.REVIEWS}?page=1&per_page=10&user_business_id=${businessId?.id}`);
   const { mutate } = useSWR(url, fetcher);
 
   return (

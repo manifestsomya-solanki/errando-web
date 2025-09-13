@@ -7,13 +7,14 @@ import Modal from "../home/Modal.tsx";
 import { useServices } from "../../store/customer/service-context.tsx";
 import useSWR, { mutate } from "swr";
 import { fetcher } from "../../store/customer/home-context.tsx";
+import { API_BASE_URL, buildApiUrl, API_ENDPOINTS } from "../../config/api";
 
 function ShowInterestModal(props: any) {
   const { theme } = useTheme();
 
   const requestId = useParams()?.id;
   const { handleShowInterest, isLoading } = useServices();
-  const url = `https://erranddo.com/admin/api/v1/businesses/${props?.id}/detail`;
+  const url = buildApiUrl(`${API_ENDPOINTS.BUSINESSES_DETAIL}/${props?.id}`);
   const { mutate } = useSWR(url, fetcher);
   const handleShowInterestAsync = async () => {
     const formData = new FormData();

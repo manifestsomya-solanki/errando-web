@@ -9,10 +9,11 @@ import { useEffect, useState } from "react";
 import ShowInterestToAllModal from "../../../../layout/customer/ShowInterestToAllModal";
 import useSWR from "swr";
 import { fetcher } from "../../../../store/customer/home-context";
+import { API_BASE_URL, buildApiUrl, API_ENDPOINTS } from "../../../../config/api";
 
 function FilterSection(props: any) {
   const { businessListHandler, to_show_interest } = useServices();
-  const url = `https://erranddo.com/admin/api/v1/businesses/count?user_request_id=${props.userRequestId}`;
+  const url = buildApiUrl(`${API_ENDPOINTS.BUSINESSES_COUNT}?user_request_id=${props.userRequestId}`);
   const { data } = useSWR(url, fetcher);
 
   const dropDownOne = [

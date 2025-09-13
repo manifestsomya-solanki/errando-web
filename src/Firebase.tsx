@@ -29,7 +29,7 @@ const messaging = (async () => {
   try {
     const isSupportedBrowser = await isSupported();
     if (isSupportedBrowser) {
-      return getMessaging(config);
+      return getMessaging(app);
     }
     console.log('Firebase not supported this browser');
     return null;

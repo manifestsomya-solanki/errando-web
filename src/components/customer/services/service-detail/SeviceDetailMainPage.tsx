@@ -16,12 +16,13 @@ import { useServices } from "../../../../store/customer/service-context";
 import Heading from "../../../UI/Heading";
 import ServiceDetailSkeleton from "../skeleton/ServiceDetailSkeleton";
 import CloseRequestModal from "../../../../layout/close-request-modals/CloseRequestModal";
+import { API_BASE_URL, buildApiUrl, API_ENDPOINTS } from "../../../../config/api";
 
 function SeviceDetailMainPage() {
   const requestId = useParams();
   console.log(requestId?.id, "hygvhui");
 
-  const url = `https://erranddo.com/admin/api/v1/user-requests/${requestId?.id}/detail`;
+  const url = buildApiUrl(`${API_ENDPOINTS.USER_REQUESTS_DETAIL}/${requestId?.id}`);
   const { data, isLoading } = useSWR(url, fetcher);
 
   const serviceRequestData = data?.data;

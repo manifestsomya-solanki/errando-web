@@ -5,10 +5,11 @@ import { Formik, FormikErrors } from "formik";
 
 import useSWR from "swr";
 import { fetcher } from "../../store/customer/home-context.tsx";
-import { useAuthPro } from "../../store/pro/auth-pro-context";
+import { useAuth } from "../../store/pro/auth-pro-context";
 import Button from "../../components/UI/Button";
 import { useTheme } from "../../store/theme-context.tsx";
 import Error from "../../components/UI/Error.tsx";
+import { API_BASE_URL, buildApiUrl, API_ENDPOINTS } from "../../config/api";
 
 function ProfileImageModal({ onCancel }: { onCancel: () => void }) {
   const validate = (values: any) => {
@@ -18,14 +19,14 @@ function ProfileImageModal({ onCancel }: { onCancel: () => void }) {
     }
     return errors;
   };
-  const { profileHandler, isProfileLoading } = useAuthPro();
+  const { profileHandler, isProfileLoading } = useAuth();
   const token = localStorage.getItem("data");
   let userData: any;
   if (token) {
     userData = JSON.parse(token);
   }
 
-  const url = `https://erranddo.com/admin/api/v1/user/detail?user_id=${userData?.id}`;
+  const url = buildApiUrl(`${API_ENDPOINTS.USER_DETAIL}?user_id=${userData?.id}`);
   const { data, error, mutate } = useSWR(url, fetcher);
   const { theme } = useTheme();
   return (

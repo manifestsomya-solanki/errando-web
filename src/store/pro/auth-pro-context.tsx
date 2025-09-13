@@ -5,75 +5,98 @@ import { RegisterUser, SendOtp, UserData, VerifyOtp } from "../../models/user";
 import { toast } from "react-toastify";
 import useSWR, { KeyedMutator } from "swr";
 import { fetcher } from "../customer/home-context";
+import { API_BASE_URL, buildApiUrl, API_ENDPOINTS } from "../../config/api";
 
 //auth response type declaration
-type AuthProResponseType = {
+type AuthResponseType = {
   data?: UserData;
+  requestData: RegisterUser;
   userData?: UserData;
   login: (formData: FormData) => void;
   loginPro: (formData: FormData) => void;
-  sendOtp: (formData: FormData) => void;
+  sendOtp: (
+    formData: FormData,
+    key?: string,
+    requestFormData?: FormData
+  ) => void;
+  register: (formData: FormData) => Promise<number>;
+  setError: React.Dispatch<React.SetStateAction<string>>;
   verifyOtp: (
     formData: FormData,
-    registerFormData: FormData,
+
     key: string
-  ) => void;
+  ) => Promise<number>;
   isLoggedIn: boolean;
   isLoading: boolean;
+  isDetailLoading: boolean;
+
   isLoginProLoading: boolean;
   isLoginCustomerLoading: boolean;
-  isDetailLoading: boolean;
-  deleteHandler: (key: string) => void;
   logout: () => void;
-  forgotPassword: (formData: FormData) => void;
+  forgotPassword: (formData: FormData) => Promise<void>;
+  addRequest: (formData: FormData, tokenFromApi?: string) => Promise<void>;
+  editRequest: (formData: FormData, id: string) => Promise<void>;
+
+  manageLoading: (boolean: boolean) => Promise<void>;
   resetPassword: (formData: FormData) => void;
-  isPasswordLoading: boolean;
-  profileHandler: (formData: FormData) => Promise<void>;
+  profileHandler: (formData: FormData) => void;
+  edit: (formData: FormData) => void;
   isProfileLoading: boolean;
+  isPasswordLoading: boolean;
   error: string;
-  deleteImageHandler: () => Promise<void>;
   mutate: KeyedMutator<any>;
 };
 
 //auth context initialization
-export const AuthProContext = createContext<AuthProResponseType>({
+export const AuthContext = createContext<AuthResponseType>({
   login: (data) => {
     console.log(data);
   },
   loginPro: (data) => {
     console.log(data);
   },
-  sendOtp: (data) => {
+  sendOtp: (data, key, requestData) => {
+    console.log(data, key, requestData);
+  },
+  register: async (data) => {
+    return 0;
+  },
+  addRequest: async (data) => {
     console.log(data);
   },
-  verifyOtp: (data, formData, key) => {
-    console.log(data, formData, key);
+  editRequest: async (data, id) => {
+    console.log(data, id);
+  },
+  verifyOtp: async (data, key) => {
+    console.log(data, key);
+    return 0;
+  },
+  setError: {} as React.Dispatch<React.SetStateAction<string>>,
+  manageLoading: async (data) => {
+    console.log();
+  },
+  edit: (formData: FormData) => {
+    console.log(formData);
   },
   isLoggedIn: false,
+  isDetailLoading: false,
+  requestData: {} as RegisterUser,
   isLoading: false,
   isLoginProLoading: false,
   isLoginCustomerLoading: false,
   isProfileLoading: false,
   isPasswordLoading: false,
-  isDetailLoading: false,
-
   logout: () => {
     console.log();
   },
-  forgotPassword: (d) => {
+  forgotPassword: async (d) => {
     console.log(d);
   },
   resetPassword: (d) => {
     console.log(d);
   },
-  profileHandler: async (d) => {
+  profileHandler: (d) => {
     console.log(d);
-  },
-  deleteHandler: (d) => {
-    console.log(d);
-  },
-  deleteImageHandler: async () => {
-    console.log();
   },
   error: "",
   mutate: async () => {
@@ -81,9 +104,12 @@ export const AuthProContext = createContext<AuthProResponseType>({
   },
 });
 
-const AuthProContextProvider = (props: { children: React.ReactNode }) => {
+const AuthContextProvider = (props: { children: React.ReactNode }) => {
   const initialToken = localStorage.getItem("data");
   const [data, setData] = useState(
+    initialToken ? JSON.parse(initialToken) : undefined
+  );
+  const [requestData, setrequestData] = useState(
     initialToken ? JSON.parse(initialToken) : undefined
   );
   const [isLoading, setIsLoading] = useState(false);
@@ -93,30 +119,32 @@ const AuthProContextProvider = (props: { children: React.ReactNode }) => {
 
   const [isLoggedIn, setIsLoggedIn] = useState(initialToken ? true : false);
   const [error, setError] = useState("");
-  const [isDeleting, setIsDeleting] = useState(false);
-
   const navigate = useNavigate();
-
   let id;
   if (initialToken) {
     id = JSON.parse(initialToken).id;
   }
-  const userDetailUrl = `https://erranddo.com/admin/api/v1/user/detail?user_id=${id}`;
+  const userDetailUrl = buildApiUrl(`${API_ENDPOINTS.USER_DETAIL}?user_id=${id}`);
   const {
     data: userdata,
     isLoading: detailLoading,
     mutate,
   } = useSWR(userDetailUrl, fetcher);
 
-  // const url = `https://erranddo.com/admin/api/v1/user-requests?page=${currentPage}&per_page=${perPage}&status=PENDING&user_id=${id}`;
+  // const url = buildApiUrl(`${API_ENDPOINTS.USER_REQUESTS}?page=${currentPage}&per_page=${perPage}&status=PENDING&user_id=${id}`);
   const userData: UserData = userdata?.data;
+
+  //Manage Loading
+  const manageLoading = async (boolean: boolean) => {
+    setIsLoading(boolean);
+  };
 
   //login
   const login = async (formData: FormData) => {
     setIsCustomerLoading(true);
     setError("");
     const res = await fetch(
-      "https://erranddo.com/admin/api/v1/user/login",
+      buildApiUrl(API_ENDPOINTS.USER_LOGIN),
       {
         method: "POST",
         body: formData,
@@ -125,7 +153,6 @@ const AuthProContextProvider = (props: { children: React.ReactNode }) => {
 
     if (res.status === 200) {
       setIsCustomerLoading(false);
-
       const data: VerifyOtp = await res.json();
 
       if (data.status === "0") {
@@ -153,7 +180,7 @@ const AuthProContextProvider = (props: { children: React.ReactNode }) => {
     setIsProLoading(true);
     setError("");
     const res = await fetch(
-      "https://erranddo.com/admin/api/v1/user/login",
+      buildApiUrl(API_ENDPOINTS.USER_LOGIN),
       {
         method: "POST",
         body: formData,
@@ -184,11 +211,15 @@ const AuthProContextProvider = (props: { children: React.ReactNode }) => {
   };
 
   //sendotp
-  const sendOtp = async (formData: FormData) => {
+  const sendOtp = async (
+    formData: FormData,
+    key?: string,
+    requestFormData?: FormData
+  ) => {
     setIsLoading(true);
     setError("");
     const res = await fetch(
-      "https://erranddo.com/admin/api/v1/user/send-otp",
+      buildApiUrl(API_ENDPOINTS.USER_SEND_OTP),
       {
         method: "POST",
         body: formData,
@@ -199,9 +230,16 @@ const AuthProContextProvider = (props: { children: React.ReactNode }) => {
       const data: SendOtp = await res.json();
 
       if (data.status === "0") {
+        setIsLoading(false);
         setError(data.message);
       } else {
+        setIsLoading(false);
+        console.log(data);
         setError("");
+        if (key && requestFormData) {
+          requestFormData.set("user_id", data.data.id.toString());
+          addRequest(requestFormData, data?.token);
+        }
       }
     } else {
       const data: any = await res.json();
@@ -211,16 +249,11 @@ const AuthProContextProvider = (props: { children: React.ReactNode }) => {
   };
 
   //verfiy otp
-  const verifyOtp = async (
-    formData: FormData,
-    registerFormData: FormData,
-    key: string
-  ) => {
+  const verifyOtp = async (formData: FormData, key: string) => {
     setIsLoading(true);
     setError("");
-    console.log("here");
     const res = await fetch(
-      "https://erranddo.com/admin/api/v1/user/verify-otp",
+      buildApiUrl(API_ENDPOINTS.USER_VERIFY_OTP),
       {
         method: "POST",
         body: formData,
@@ -228,58 +261,65 @@ const AuthProContextProvider = (props: { children: React.ReactNode }) => {
     );
     if (res.status === 200) {
       const data: VerifyOtp = await res.json();
-      console.log("edfe", data);
-      if (data.status === "0") {
-        console.log("wdwdw");
+      if (data.status == "0") {
+        setError(data.message ?? "The otp is not valid");
         setIsLoading(false);
-        setError(data?.message);
+        return 0;
       } else {
-        console.log("wwdw");
-        if (data.data.is_email_verified !== "1") {
-          setIsLoading(false);
-          setError("Please enter a correct email otp");
-        } else if (data.data.is_mobile_verified !== "1") {
-          setIsLoading(false);
-          setError("Please enter a correct mobile otp");
-        } else {
-          setIsLoading(true);
-
-          setError("");
-        }
+        setIsLoading(false);
+        setError("");
+        setData(data.data);
+        localStorage.setItem("data", JSON.stringify(data.data));
         localStorage.setItem("token", data.token);
-        const res = await fetch(
-          "https://erranddo.com/admin/api/v1/user/register",
-          {
-            method: "POST",
-            body: registerFormData,
-          }
-        );
-        if (res.status === 200) {
-          const data: RegisterUser = await res.json();
-          setIsLoading(false);
-          if (data.status === "0") {
-            setError(data.message);
-          } else {
-            setData(data.data.user);
-            setIsLoggedIn(true);
-            localStorage.setItem("data", JSON.stringify(data?.data?.user));
-            localStorage.setItem("isLoggedIn", "true");
-            if (key === "customer") {
-              localStorage.setItem("role", "customer");
-              navigate("/home");
-            } else if (key === "pro") {
-              localStorage.setItem("role", "pro");
-              navigate("/pro/dashboard");
-            }
-
-            setError("");
-          }
+        if (key === "customer") {
+          setIsLoggedIn(true);
+          localStorage.setItem("role", "customer");
+          localStorage.setItem("isLoggedIn", "true");
+          navigate("/home");
+        } else if (key === "pro") {
+          setIsLoggedIn(true);
+          localStorage.setItem("isLoggedIn", "true");
+          localStorage.setItem("role", "pro");
+          navigate("/pro/dashboard");
+        } else if (key === "register") {
+          setIsLoggedIn(false);
         }
+        return 1;
       }
     } else {
       const data: any = await res.json();
       setIsLoading(false);
       setError(data.message);
+      return 0;
+    }
+  };
+
+  const register = async (formData: FormData) => {
+    setIsLoading(true);
+    setError("");
+    const res = await fetch(
+      buildApiUrl(API_ENDPOINTS.USER_REGISTER),
+      {
+        method: "POST",
+        body: formData,
+      }
+    );
+
+    if (res.status === 200) {
+      const data: RegisterUser = await res.json();
+      setIsLoading(false);
+      if (data.status === "0") {
+        setError(data.message);
+        return 0;
+      } else {
+        setError("");
+        return 1;
+      }
+    } else {
+      const data: any = await res.json();
+      setIsLoading(false);
+      setError(data.message);
+      return 0;
     }
   };
 
@@ -288,10 +328,13 @@ const AuthProContextProvider = (props: { children: React.ReactNode }) => {
     setError("");
     setIsLoading(true);
 
-    const res = await fetch("http://127.0.0.1:8000/api/v1/forgot-password", {
-      method: "POST",
-      body: formData,
-    });
+    const res = await fetch(
+      buildApiUrl(API_ENDPOINTS.FORGOT_PASSWORD),
+      {
+        method: "POST",
+        body: formData,
+      }
+    );
     if (res.status === 200) {
       setError("");
       setTimeout(() => {
@@ -299,16 +342,14 @@ const AuthProContextProvider = (props: { children: React.ReactNode }) => {
       });
       const data: any = await res.json();
       if (data.status === "1") {
-        // toast.success("Email has been successfully sent !");
+        console.log("foogot password");
       } else {
         setError(data.message);
-        // toast.error(data.error);
       }
     } else {
       const data: any = await res.json();
       setError(data.message);
       setIsLoading(false);
-      // toast.error(data.message);
     }
   };
 
@@ -322,7 +363,7 @@ const AuthProContextProvider = (props: { children: React.ReactNode }) => {
     const token = localStorage.getItem("token");
 
     const res = await fetch(
-      "https://erranddo.com/admin/api/v1/settings/change-password",
+      buildApiUrl(API_ENDPOINTS.SETTINGS_CHANGE_PASSWORD),
       {
         method: "POST",
         headers: {
@@ -343,7 +384,7 @@ const AuthProContextProvider = (props: { children: React.ReactNode }) => {
           hideProgressBar: false,
           position: "bottom-left",
         });
-        navigate("/pro/dashboard");
+        navigate("/home");
       } else {
         setError(data?.message);
         toast.error(data.message, {
@@ -368,7 +409,7 @@ const AuthProContextProvider = (props: { children: React.ReactNode }) => {
     const token = localStorage.getItem("token");
 
     const res = await fetch(
-      "https://erranddo.com/admin/api/v1/user/logout",
+      buildApiUrl(API_ENDPOINTS.USER_LOGOUT),
       {
         method: "POST",
         headers: {
@@ -383,6 +424,9 @@ const AuthProContextProvider = (props: { children: React.ReactNode }) => {
         // on success
         setTimeout(() => {
           localStorage.removeItem("token");
+          localStorage.removeItem("role");
+          localStorage.removeItem("data");
+
           localStorage.setItem("isLoggedIn", "false");
           setIsLoggedIn(false);
           setIsLoading(false);
@@ -405,7 +449,7 @@ const AuthProContextProvider = (props: { children: React.ReactNode }) => {
     const token = localStorage.getItem("token");
 
     const res = await fetch(
-      "https://erranddo.com/admin/api/v1/user/edit",
+      buildApiUrl(API_ENDPOINTS.USER_EDIT),
       {
         method: "POST",
         headers: {
@@ -422,140 +466,185 @@ const AuthProContextProvider = (props: { children: React.ReactNode }) => {
       const data: any = await res.json();
       if (data.status === "1") {
         mutate();
-        toast.success("Profile has been updated successfully !", {
-          position: "bottom-left",
-          autoClose: 5000,
+        toast.success("Profile updated successfully !", {
           hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
+          position: "bottom-left",
         });
-        console.log("successful");
       } else {
-        toast.error("Error", {
-          position: "bottom-left",
-          autoClose: 5000,
+        toast.error(data.message, {
           hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
+          position: "bottom-left",
         });
-        console.log("ntosuccessful");
       }
     } else {
       const data: any = await res.json();
       setIsProfileLoading(false);
-      // toast.error(data.message);
+      setError(data.message);
+      toast.error("Error", {
+        position: "bottom-left",
+      });
     }
   };
 
-  const deleteImageHandler = async () => {
-    setIsDeleting(true);
+  //profile update
+  const edit = async (formData: FormData) => {
     setError("");
 
     const token = localStorage.getItem("token");
-
     const res = await fetch(
-      `https://erranddo.com/admin/api/v1/user/delete-profile`,
+      buildApiUrl(API_ENDPOINTS.NOTIFICATION_EDIT),
       {
-        method: "DELETE",
+        method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
         },
+        body: formData,
+      }
+    );
+    if (res.status === 200) {
+      setError("");
+      setTimeout(() => {
+        setIsProfileLoading(false);
+      });
+      const data: any = await res.json();
+      if (data.status === "1") {
+        // navigate("/home");
+        toast.success("Profile updated successfully !", {
+          hideProgressBar: false,
+          position: "bottom-left",
+        });
+      } else {
+        toast.error(data.message, {
+          hideProgressBar: false,
+          position: "bottom-left",
+        });
+      }
+    } else {
+      const data: any = await res.json();
+      setIsProfileLoading(false);
+      setError(data.message);
+      toast.error("Error", {
+        position: "bottom-left",
+      });
+    }
+  };
+
+  const addRequest = async (formData: FormData, tokenFromApi?: string) => {
+    setIsLoading(true);
+    setError("");
+    const token = localStorage.getItem("token") ?? tokenFromApi;
+
+    const res = await fetch(
+      buildApiUrl(API_ENDPOINTS.USER_REQUESTS_ADD),
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        method: "POST",
+        body: formData,
       }
     );
 
     if (res.status === 200) {
-      const data = await res.json();
-      setIsDeleting(false);
-
-      if (data.status === "1") {
-        // Deletion successful
-        // Perform any additional logic as needed
+      setIsLoading(false);
+      setrequestData(await res.json());
+      if (requestData.status === "0") {
+        setError(requestData.message);
       } else {
-        setError(data.message);
+        if (!tokenFromApi) {
+          setIsLoggedIn(true);
+          localStorage.setItem("role", "customer");
+          localStorage.setItem("isLoggedIn", "true");
+          localStorage.removeItem("service");
+          localStorage.removeItem("post_code");
+          localStorage.removeItem("question");
+          navigate("/projects");
+          await mutate("project_contect_api");
+        }
       }
     } else {
-      const data = await res.json();
-      setIsDeleting(false);
+      setIsLoading(false);
+      const data: any = await res.json();
       setError(data.message);
     }
   };
-
-  const deleteHandler = async (id: string) => {
+  console.log(requestData);
+  const editRequest = async (formData: FormData, id: string) => {
     setIsLoading(true);
-    setIsDeleting(true);
     setError("");
-
     const token = localStorage.getItem("token");
 
     const res = await fetch(
-      `https://erranddo.com/admin/api/v1/user/${id}/delete`,
+      buildApiUrl(`${API_ENDPOINTS.USER_REQUESTS_EDIT}/${id}`),
       {
-        method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
         },
+        method: "POST",
+        body: formData,
       }
     );
 
     if (res.status === 200) {
-      const data = await res.json();
-      setIsDeleting(false);
-
-      if (data.status === "1") {
-        localStorage.removeItem("token");
-        localStorage.setItem("isLoggedIn", "false");
-        setIsLoggedIn(false);
-        setIsLoading(false);
-        navigate("/signup-customer");
-      } else {
+      setIsLoading(false);
+      const data: RegisterUser = await res.json();
+      if (data.status === "0") {
         setError(data.message);
+      } else {
+        setIsLoggedIn(true);
+        localStorage.removeItem("service");
+        localStorage.removeItem("post_code");
+        localStorage.removeItem("question");
+        localStorage.setItem("role", "customer");
+        localStorage.setItem("isLoggedIn", "true");
+        navigate("/projects");
+        await mutate("project_contect_api");
       }
     } else {
-      const data = await res.json();
-      setIsDeleting(false);
+      setIsLoading(false);
+      const data: any = await res.json();
+
       setError(data.message);
     }
   };
 
   return (
-    <AuthProContext.Provider
+    <AuthContext.Provider
       value={{
         data: data,
         userData: userData,
+        requestData: requestData,
         login: login,
         loginPro: loginPro,
         logout: logoutHandler,
         resetPassword: resetPassword,
         forgotPassword: forgotPassword,
         profileHandler: profileHandler,
-        isDetailLoading: detailLoading,
+        isProfileLoading: isProfileLoading,
         isPasswordLoading: isPasswordLoading,
         isLoading: isLoading,
+        isDetailLoading: detailLoading,
         isLoginCustomerLoading: isCustomerLoading,
         isLoginProLoading: isProLoading,
         isLoggedIn: isLoggedIn,
-        isProfileLoading: isProfileLoading,
+        manageLoading: manageLoading,
         sendOtp: sendOtp,
+        register: register,
         verifyOtp: verifyOtp,
-        deleteHandler: deleteHandler,
-        deleteImageHandler: deleteImageHandler,
         error: error,
+        edit: edit,
+        editRequest: editRequest,
+        addRequest: addRequest,
+        setError: setError,
         mutate: mutate,
       }}
     >
       {props.children}
-    </AuthProContext.Provider>
+    </AuthContext.Provider>
   );
 };
 
-export function useAuthPro() {
-  const authProCtx = useContext(AuthProContext);
-  return authProCtx;
+export function useAuth() {
+  return useContext(AuthContext);
 }
-export default AuthProContextProvider;
+export default AuthContextProvider;

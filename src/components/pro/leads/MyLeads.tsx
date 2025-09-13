@@ -14,6 +14,7 @@ import Dustbin from "../../../assets/Dustbin";
 import { useTheme } from "../../../store/theme-context";
 import { useState } from "react";
 import DeleteLeadModal from "../../../layout/pro-models/DeleteLeadModal";
+import { API_BASE_URL, buildApiUrl, API_ENDPOINTS } from "../../../config/api";
 
 function getTimeDifferenceString(time: any) {
   const currentTime = dayjs();
@@ -38,7 +39,7 @@ function getTimeDifferenceString(time: any) {
 
 function MyLeads(props: any) {
   const leadsId = useParams();
-  const dealerdetailurl = `https://erranddo.com/admin/api/v1/user-requests/${leadsId.id}/detail`;
+  const dealerdetailurl = buildApiUrl(`${API_ENDPOINTS.USER_REQUESTS_DETAIL}/${leadsId.id}`);
   const { data: leadsDetailData, isLoading } = useSWR(dealerdetailurl, fetcher);
   const leadsDetail: UserRequestList = leadsDetailData?.data;
   const firstTwoDigits =

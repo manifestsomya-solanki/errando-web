@@ -14,7 +14,8 @@ import { fetcher } from "../../../../store/customer/home-context";
 import { UserData } from "../../../../models/user";
 import profileAvatar from "../../../../assets/avatar.svg";
 import Credit from "../../../../assets/Credit.png";
-
+import { buildApiUrl, API_ENDPOINTS } from "../../../../config/api";
+  
 function TopBar(props: {
   isSettingDisabled?: boolean;
   isNotificationDisabled?: boolean;
@@ -28,7 +29,7 @@ function TopBar(props: {
   if (token) {
     userData = JSON.parse(token);
   }
-  const url = `https://erranddo.com/admin/api/v1/user/detail?user_id=${userData?.id}`;
+  const url = buildApiUrl(`${API_ENDPOINTS.USER_DETAIL}?user_id=${userData?.id}`);
   const { data, error, isLoading } = useSWR(url, fetcher);
   const profileData: UserData = data?.data ?? "";
   const profilePhoto = `https://erranddo.s3.eu-west-2.amazonaws.com/${profileData?.img_avatar}`;

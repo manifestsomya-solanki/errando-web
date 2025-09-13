@@ -13,6 +13,7 @@ import { useEffect, useState } from "react";
 import Button from "../../components/UI/Button.tsx";
 import useSWR from "swr";
 import { fetcher } from "../../store/customer/home-context.tsx";
+import { API_BASE_URL, buildApiUrl, API_ENDPOINTS } from "../../config/api";
 
 function ReviewModal(props: {
   businessId: string;
@@ -24,7 +25,7 @@ function ReviewModal(props: {
   const { closeRequestReview } = useReview();
   const [starRating, setStarRating] = useState("");
   const [checked, setChecked] = useState(false);
-  const url = `https://erranddo.com/admin/api/v1/businesses/${props?.businessId}/detail`;
+  const url = buildApiUrl(`${API_ENDPOINTS.BUSINESSES_DETAIL}/${props?.businessId}`);
   const { data, isLoading } = useSWR(url, fetcher);
   const serviceData: ServiceList = data?.data;
 

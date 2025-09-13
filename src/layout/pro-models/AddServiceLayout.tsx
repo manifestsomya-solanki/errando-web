@@ -18,6 +18,7 @@ import PostCodeDropDown from "../../components/UI/PostCodeDropDown.tsx";
 import { BusinessData } from "../../models/home.ts";
 import { useEffect, useState } from "react";
 import { useService } from "../../store/pro/service-context.tsx";
+import { API_BASE_URL, buildApiUrl, API_ENDPOINTS } from "../../config/api";
 
 function AddServiceModal({
   onCancel,
@@ -35,7 +36,7 @@ function AddServiceModal({
     setError,
   } = useBusiness();
   //handling service dropdown
-  const url = `https://erranddo.com/admin/api/v1/business-services`;
+  const url = buildApiUrl(API_ENDPOINTS.BUSINESS_SERVICES);
   const dummy_data: ServiceData[] = [];
   let datarender: ServiceData[] = [];
   const { data: dataa, isLoading: isServiceLoading } = useSWR(url, fetcher);

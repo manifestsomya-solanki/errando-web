@@ -1,4 +1,6 @@
-import { createContext, useContext } from "react";
+import React, { useState, useContext } from "react";
+import { createContext } from "react";
+import { buildApiUrl, API_ENDPOINTS } from "../../config/api";
 
 type ChatResposneType = {
   addChat: (user_id: number, message: string) => void;
@@ -17,7 +19,7 @@ const ChatCustomerContextProvider = (props: { children: React.ReactNode }) => {
     //     message: message,
     // }
     const res = await fetch(
-      `https://erranddo.com/admin/api/v1/chat/send-notification?user_id=${user_id}&message=${message}`,
+      buildApiUrl(`${API_ENDPOINTS.CHAT_SEND_NOTIFICATION}?user_id=${user_id}&message=${message}`),
       {
         method: "POST",
         headers: {

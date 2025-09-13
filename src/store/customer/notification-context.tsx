@@ -3,6 +3,8 @@ import { toast } from "react-toastify";
 import useSWR, { KeyedMutator } from "swr";
 import { fetcher } from "./home-context";
 import { NotificationData } from "../../models/customer/notification";
+import { API_BASE_URL, buildApiUrl, API_ENDPOINTS } from "../../config/api";
+
 
 type NotificationType = {
   data: NotificationData[];
@@ -48,14 +50,24 @@ const NotificationContextProvider = (props: { children: ReactNode }) => {
   const perPage = 100;
   let role;
   if (localStorage.getItem("isLoggedIn") === "true") {
-    userId = JSON.parse(localStorage.getItem("data") ?? "").id ?? 0;
+    const userData = localStorage.getItem("data");
+    if (userData && userData !== "null" && userData !== "") {
+      try {
+        userId = JSON.parse(userData).id ?? 0;
+      } catch (error) {
+        console.error("Error parsing user data from localStorage:", error);
+        userId = 0;
+      }
+    } else {
+      userId = 0;
+    }
     role = localStorage.getItem("role") ?? "";
   }
   const [currentPage, setCurrentPage] = useState(1);
   const [url, setUrl] = useState(
-    `https://erranddo.com/admin/api/v1/notification?user_id=${
+    buildApiUrl(`${API_ENDPOINTS.NOTIFICATION}?user_id=${
       userId ?? ""
-    }&is_for_${role}=1&page=${currentPage}&per_page=${perPage}`
+    }&is_for_${role}=1&page=${currentPage}&per_page=${perPage}`)
   );
   const handleNextPage = () => {
     setCurrentPage((c) => c + 1);
@@ -78,7 +90,7 @@ const NotificationContextProvider = (props: { children: ReactNode }) => {
     setError("");
     const token = localStorage.getItem("token");
     const res = await fetch(
-      "https://erranddo.com/admin/api/v1/notification/create",
+      buildApiUrl(API_ENDPOINTS.NOTIFICATION_CREATE),
       {
         method: "POST",
         headers: {
@@ -107,7 +119,7 @@ const NotificationContextProvider = (props: { children: ReactNode }) => {
     setError("");
     const token = localStorage.getItem("token");
     const res = await fetch(
-      "https://erranddo.com/admin/api/v1/notification/edit",
+      buildApiUrl("notification/edit"),
       {
         method: "POST",
         headers: {

@@ -5,6 +5,7 @@ import { RegisterUser, SendOtp, UserData, VerifyOtp } from "../../models/user";
 import { toast } from "react-toastify";
 import useSWR, { KeyedMutator } from "swr";
 import { fetcher } from "./home-context";
+import { API_BASE_URL, buildApiUrl, API_ENDPOINTS } from "../../config/api";
 
 //auth response type declaration
 type AuthResponseType = {
@@ -123,14 +124,14 @@ const AuthContextProvider = (props: { children: React.ReactNode }) => {
   if (initialToken) {
     id = JSON.parse(initialToken).id;
   }
-  const userDetailUrl = `https://erranddo.com/admin/api/v1/user/detail?user_id=${id}`;
+  const userDetailUrl = buildApiUrl(`${API_ENDPOINTS.USER_DETAIL}?user_id=${id}`);
   const {
     data: userdata,
     isLoading: detailLoading,
     mutate,
   } = useSWR(userDetailUrl, fetcher);
 
-  // const url = `https://erranddo.com/admin/api/v1/user-requests?page=${currentPage}&per_page=${perPage}&status=PENDING&user_id=${id}`;
+  // const url = buildApiUrl(`${API_ENDPOINTS.USER_REQUESTS}?page=${currentPage}&per_page=${perPage}&status=PENDING&user_id=${id}`);
   const userData: UserData = userdata?.data;
 
   //Manage Loading
@@ -143,7 +144,7 @@ const AuthContextProvider = (props: { children: React.ReactNode }) => {
     setIsCustomerLoading(true);
     setError("");
     const res = await fetch(
-      "https://erranddo.com/admin/api/v1/user/login",
+      buildApiUrl(API_ENDPOINTS.USER_LOGIN),
       {
         method: "POST",
         body: formData,
@@ -179,7 +180,7 @@ const AuthContextProvider = (props: { children: React.ReactNode }) => {
     setIsProLoading(true);
     setError("");
     const res = await fetch(
-      "https://erranddo.com/admin/api/v1/user/login",
+      buildApiUrl(API_ENDPOINTS.USER_LOGIN),
       {
         method: "POST",
         body: formData,
@@ -218,7 +219,7 @@ const AuthContextProvider = (props: { children: React.ReactNode }) => {
     setIsLoading(true);
     setError("");
     const res = await fetch(
-      "https://erranddo.com/admin/api/v1/user/send-otp",
+      buildApiUrl(API_ENDPOINTS.USER_SEND_OTP),
       {
         method: "POST",
         body: formData,
@@ -252,7 +253,7 @@ const AuthContextProvider = (props: { children: React.ReactNode }) => {
     setIsLoading(true);
     setError("");
     const res = await fetch(
-      "https://erranddo.com/admin/api/v1/user/verify-otp",
+      buildApiUrl(API_ENDPOINTS.USER_VERIFY_OTP),
       {
         method: "POST",
         body: formData,
@@ -297,7 +298,7 @@ const AuthContextProvider = (props: { children: React.ReactNode }) => {
     setIsLoading(true);
     setError("");
     const res = await fetch(
-      "https://erranddo.com/admin/api/v1/user/register",
+      buildApiUrl(API_ENDPOINTS.USER_REGISTER),
       {
         method: "POST",
         body: formData,
@@ -328,7 +329,7 @@ const AuthContextProvider = (props: { children: React.ReactNode }) => {
     setIsLoading(true);
 
     const res = await fetch(
-      "https://erranddo.com/admin/api/v1/user/forgot-password",
+      buildApiUrl(API_ENDPOINTS.FORGOT_PASSWORD),
       {
         method: "POST",
         body: formData,
@@ -362,7 +363,7 @@ const AuthContextProvider = (props: { children: React.ReactNode }) => {
     const token = localStorage.getItem("token");
 
     const res = await fetch(
-      "https://erranddo.com/admin/api/v1/settings/change-password",
+      buildApiUrl(API_ENDPOINTS.SETTINGS_CHANGE_PASSWORD),
       {
         method: "POST",
         headers: {
@@ -408,7 +409,7 @@ const AuthContextProvider = (props: { children: React.ReactNode }) => {
     const token = localStorage.getItem("token");
 
     const res = await fetch(
-      "https://erranddo.com/admin/api/v1/user/logout",
+      buildApiUrl(API_ENDPOINTS.USER_LOGOUT),
       {
         method: "POST",
         headers: {
@@ -448,7 +449,7 @@ const AuthContextProvider = (props: { children: React.ReactNode }) => {
     const token = localStorage.getItem("token");
 
     const res = await fetch(
-      "https://erranddo.com/admin/api/v1/user/edit",
+      buildApiUrl(API_ENDPOINTS.USER_EDIT),
       {
         method: "POST",
         headers: {
@@ -491,7 +492,7 @@ const AuthContextProvider = (props: { children: React.ReactNode }) => {
 
     const token = localStorage.getItem("token");
     const res = await fetch(
-      "https://erranddo.com/admin/api/v1/notification/edit",
+      buildApiUrl(API_ENDPOINTS.NOTIFICATION_EDIT),
       {
         method: "POST",
         headers: {
@@ -534,7 +535,7 @@ const AuthContextProvider = (props: { children: React.ReactNode }) => {
     const token = localStorage.getItem("token") ?? tokenFromApi;
 
     const res = await fetch(
-      "https://erranddo.com/admin/api/v1/user-requests/add",
+      buildApiUrl(API_ENDPOINTS.USER_REQUESTS_ADD),
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -574,7 +575,7 @@ const AuthContextProvider = (props: { children: React.ReactNode }) => {
     const token = localStorage.getItem("token");
 
     const res = await fetch(
-      `https://erranddo.com/admin/api/v1/user-requests/${id}/edit`,
+      buildApiUrl(`${API_ENDPOINTS.USER_REQUESTS_EDIT}/${id}`),
       {
         headers: {
           Authorization: `Bearer ${token}`,

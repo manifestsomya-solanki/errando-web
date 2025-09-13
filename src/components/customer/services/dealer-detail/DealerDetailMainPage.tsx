@@ -14,6 +14,7 @@ import { useLocation, useParams } from "react-router";
 import ContactBar from "./ContactBar";
 import { Business } from "../../../../models/customer/businesslist";
 import TopBar from "../top-bar/TopBar";
+import { API_BASE_URL, buildApiUrl, API_ENDPOINTS } from "../../../../config/api";
 
 function DealerDetailMainPage() {
   const page_key = useLocation()?.state?.page_key;
@@ -22,7 +23,7 @@ function DealerDetailMainPage() {
   const serviceName = useLocation()?.state?.serviceName;
   const userRequestId = useLocation()?.state?.userRequestId;
   const distance = useLocation()?.state?.distance;
-  const url = `https://erranddo.com/admin/api/v1/businesses/${businessId?.id}/detail?user_request_id=${userRequestId}`;
+  const url = buildApiUrl(`${API_ENDPOINTS.BUSINESSES_DETAIL}/${businessId?.id}?user_request_id=${userRequestId}`);
 
   const { data, isLoading, mutate } = useSWR(url, fetcher);
   const serviceData: Business = data?.data;

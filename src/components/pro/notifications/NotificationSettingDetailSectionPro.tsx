@@ -1,10 +1,10 @@
 import NotificationSettingPro from "./NotificationSettingPro";
 import NotificationSettingHeadingPro from "./NotificationSettingHeadingPro";
-import { useAuthPro } from "../../../store/pro/auth-pro-context";
+import { useAuth } from "../../../store/pro/auth-pro-context";
 import FullPageLoading from "../../UI/FullPageLoading";
 
 function NotificationSettingDetailSectionPro() {
-  const { userData, isDetailLoading } = useAuthPro();
+  const { userData, isDetailLoading } = useAuth();
 
   return (
     <div>

@@ -26,6 +26,7 @@ import { useAuth } from "../../../../store/customer/auth-context";
 import useSWR from "swr";
 import { fetcher } from "../../../../store/customer/home-context";
 import { UserData } from "../../../../models/user";
+import { API_BASE_URL, buildApiUrl, API_ENDPOINTS } from "../../../../config/api";
 
 function DangerousHTML({
   dangerouslySetInnerHTML,
@@ -64,7 +65,7 @@ function ServiceCard(props: any) {
 
   const { theme } = useTheme();
   const { userData } = useAuth();
-  const anotherUserDetailUrl = `https://erranddo.com/admin/api/v1/user/detail?user_id=${props?.userId}`;
+  const anotherUserDetailUrl = buildApiUrl(`${API_ENDPOINTS.USER_DETAIL}?user_id=${props?.userId}`);
   const { data: userdata } = useSWR(anotherUserDetailUrl, fetcher);
   const anotherUserDetail: UserData = userdata?.data;
   const user = {

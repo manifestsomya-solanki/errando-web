@@ -1,5 +1,6 @@
 import React, { ReactNode, useContext, useState } from "react";
 import { toast } from "react-toastify";
+import { buildApiUrl, API_ENDPOINTS } from "../../config/api";
 
 type CloseRequestType = {
   closeRequestHandler: (formData: FormData, requestId: number) => Promise<void>;
@@ -19,17 +20,17 @@ const CloseRequestProvider = (props: { children: ReactNode }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const closeRequestHandler = async (formData: FormData, requestId: number) => {
-    const token = localStorage.getItem("token") ?? "{}";
-    setError("");
     setIsLoading(true);
+    setError("");
+    const token = localStorage.getItem("token");
+
     const res = await fetch(
-      `https://erranddo.com/admin/api/v1/user-requests/${requestId}/close`,
+      buildApiUrl(`${API_ENDPOINTS.USER_REQUESTS_CLOSE}/${requestId}`),
       {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
         },
-        body: formData,
       }
     );
     if (res.status === 200) {

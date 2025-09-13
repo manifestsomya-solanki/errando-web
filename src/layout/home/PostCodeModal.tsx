@@ -15,6 +15,11 @@ function PostCodeModal(props: {
 }) {
   const [openModal, setOpenModal] = useState(false);
   const token = localStorage.getItem("token");
+  
+  // Track the current postcode value to check API status
+  const [currentPostcode, setCurrentPostcode] = useState("");
+  const [apiStatus, setApiStatus] = useState("");
+  
   const formik = useFormik({
     initialValues: {
       postCode: "",
@@ -28,16 +33,23 @@ function PostCodeModal(props: {
     },
     onSubmit: (values) => {
       localStorage.setItem("post_code", values.postCode);
-
       setOpenModal(true);
     },
   });
+  
+  // Update current postcode when formik value changes
+  useEffect(() => {
+    setCurrentPostcode(formik.values.postCode);
+  }, [formik.values.postCode]);
+  
   useEffect(() => {
     return () => {
       formik.setFieldValue("postCode", "");
     };
   }, []);
+  
   const { theme } = useTheme();
+  
   return (
     <>
       {openModal && (
@@ -66,9 +78,9 @@ function PostCodeModal(props: {
             }}
           >
             {theme === "light" && <div children={<Close color="black" />} />}
-
             {theme === "dark" && <div children={<Close color="white" />} />}
           </button>
+          
           <div className="flex flex-col ">
             <div className="flex xl:mt-1 md:mt-2">
               <Label
@@ -77,6 +89,7 @@ function PostCodeModal(props: {
                 className="my-1 !font-semibold"
               />
             </div>
+            
             <form autoComplete="off" onSubmit={formik.handleSubmit}>
               <div className="flex gap-2 items-center w-full justify-between">
                 <PostCodeDetails
@@ -88,13 +101,17 @@ function PostCodeModal(props: {
                   onChange={(ev: any) => {
                     formik.setFieldValue("postCode", ev);
                   }}
+                  onApiResponse={(status: string) => {
+                    setApiStatus(status);
+                  }}
                 />
 
+                {/* Search button - always visible but disabled when status is "0" */}
                 <button
                   disabled={
-                    formik.errors.postCode || !formik.values.postCode
-                      ? true
-                      : false
+                    formik.errors.postCode || 
+                    !formik.values.postCode || 
+                    (apiStatus === "0")
                   }
                   type="submit"
                   className="text-white bg-[#0003FF] hover:bg-blue-800 focus:ring-4 disabled:bg-gray-300 disabled:text-slate-500 dark:text-black focus:outline-none focus:ring-blue-300 xl:text-lg md:text-sm rounded-xl xl:h-12 lg:h-10 xs:h-10 md:px-8 xs:px-5 text-center mr-3 md:mr-0 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
@@ -102,6 +119,7 @@ function PostCodeModal(props: {
                   Search
                 </button>
               </div>
+              
               {formik.errors.postCode && formik.touched.postCode ? (
                 <div className="text-red-600 my-1 font-semibold">
                   {formik.errors.postCode}

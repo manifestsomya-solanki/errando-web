@@ -30,10 +30,11 @@ import { useLeadResponse } from "../../../store/pro/response-context";
 import Error from "../../../components/UI/Error";
 import { useEffect, useState } from "react";
 import SendQuoteModal from "../../../layout/pro-models/SendQuoteModal";
-import { useAuthPro } from "../../../store/pro/auth-pro-context";
+import { useAuth } from "../../../store/pro/auth-pro-context";
 import Outright from "../../../assets/outright.svg";
 import Flagman from "../../../assets/flagman.jpg";
 import dayjs from "dayjs";
+import { API_BASE_URL, buildApiUrl, API_ENDPOINTS } from "../../../config/api";
 
 function getTimeDifferenceString(time: any) {
   const currentTime = dayjs();
@@ -59,7 +60,7 @@ function getTimeDifferenceString(time: any) {
 function MyResponses() {
   const navigate = useNavigate();
   const leadsId = useParams();
-  const dealerdetailurl = `https://erranddo.com/admin/api/v1/user-requests/${leadsId.id}/detail`;
+  const dealerdetailurl = buildApiUrl(`${API_ENDPOINTS.USER_REQUESTS_DETAIL}/${leadsId.id}`);
   const {
     data: leadsDetailData,
     isLoading,
@@ -126,7 +127,7 @@ function MyResponses() {
     },
   });
 
-  const { userData } = useAuthPro();
+  const { userData } = useAuth();
   const user = {
     uid: userData?.id,
     fullName: userData?.full_name,

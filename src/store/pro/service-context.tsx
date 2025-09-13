@@ -4,6 +4,7 @@ import { fetcher } from "../customer/home-context";
 import { AddBusinessData, ServiceData } from "../../models/pro/business";
 import { toast } from "react-toastify";
 import { Postcode } from "../../models/pro/service";
+import { API_BASE_URL, buildApiUrl, API_ENDPOINTS } from "../../config/api";
 
 //auth response type declaration
 type ServiceResponseType = {
@@ -53,11 +54,11 @@ const ServiceContextProvider = (props: { children: React.ReactNode }) => {
   const perPage = 8;
   const [currentPage, setCurrentPage] = useState(1);
   const [url, setUrl] = useState(
-    `https://erranddo.com/admin/api/v1/business-services?page=${currentPage}&per_page=${perPage}&user_id=${id}`
+    buildApiUrl(`${API_ENDPOINTS.BUSINESS_SERVICES}?page=${currentPage}&per_page=${perPage}&user_id=${id}`)
   );
   const getAllServies = (perPage: number) => {
     setUrl(
-      `https://erranddo.com/admin/api/v1/business-services?page=1&per_page=${perPage}`
+      buildApiUrl(`${API_ENDPOINTS.BUSINESS_SERVICES}?page=1&per_page=${perPage}`)
     );
   };
 
@@ -92,7 +93,7 @@ const ServiceContextProvider = (props: { children: React.ReactNode }) => {
     setIsLoading(true);
     setError("");
     const res = await fetch(
-      "https://erranddo.com/admin/api/v1/businesses/create",
+      buildApiUrl(API_ENDPOINTS.BUSINESSES_CREATE),
       {
         method: "POST",
         headers: {

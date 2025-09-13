@@ -1,6 +1,8 @@
 import React, { useState, useContext } from "react";
 import { createContext } from "react";
+import { toast } from "react-toastify";
 import { UserData } from "../../models/user";
+import { buildApiUrl, API_ENDPOINTS } from "../../config/api";
 
 //auth response type declaration
 type ContactResponseType = {
@@ -32,18 +34,13 @@ const ContactContextProvider = (props: { children: React.ReactNode }) => {
   const [error, setError] = useState("");
 
   //forgot-password
-  const contactUpdate = async (formData: FormData) => {
-    const token = await JSON.parse(localStorage.getItem("token") ?? "{}").token;
-    setError("");
+  const sendOtp = async (formData: FormData) => {
     setIsLoading(true);
-
+    setError("");
     const res = await fetch(
-      "https://erranddo.com/admin/api/v1/user/send-otp",
+      buildApiUrl(API_ENDPOINTS.USER_SEND_OTP),
       {
         method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
         body: formData,
       }
     );
@@ -68,14 +65,14 @@ const ContactContextProvider = (props: { children: React.ReactNode }) => {
   };
 
   //reset-password
-  const verification = async (formData: FormData) => {
+  const resetPassword = async (formData: FormData) => {
     setIsLoading(true);
     setError("");
 
-    const token = await JSON.parse(localStorage.getItem("token") ?? "{}").token;
+    const token = localStorage.getItem("token");
 
     const res = await fetch(
-      "https://erranddo.com/admin/api/v1/settings/change-password",
+      buildApiUrl(API_ENDPOINTS.SETTINGS_CHANGE_PASSWORD),
       {
         method: "POST",
         headers: {
@@ -108,8 +105,8 @@ const ContactContextProvider = (props: { children: React.ReactNode }) => {
       value={{
         data: data,
         isLoading: isLoading,
-        contactUpdate: contactUpdate,
-        verification: verification,
+        contactUpdate: sendOtp,
+        verification: resetPassword,
         error: error,
       }}
     >

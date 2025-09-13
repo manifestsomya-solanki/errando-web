@@ -6,6 +6,7 @@ import { AddBusinessData, Business } from "../../models/pro/business";
 import { toast } from "react-toastify";
 import { useParams } from "react-router";
 import { useService } from "./service-context";
+import { API_BASE_URL, buildApiUrl, API_ENDPOINTS } from "../../config/api";
 
 //auth response type declaration
 type BusinessResponseType = {
@@ -74,7 +75,7 @@ const BusinessContextProvider = (props: { children: React.ReactNode }) => {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [businessDetailUrl, setBusinessDetailUrl] = useState("");
-  const url = `https://erranddo.com/admin/api/v1/businesses?user_id=${id}`;
+  const url = buildApiUrl(`${API_ENDPOINTS.BUSINESSES}?user_id=${id}`);
 
   const dummy_data: BusinessData[] = [];
   let datarender: BusinessData[] = [];
@@ -84,7 +85,7 @@ const BusinessContextProvider = (props: { children: React.ReactNode }) => {
   //detail  business
   const DetailBusiness = async (id?: number) => {
     setBusinessDetailUrl(
-      `https://erranddo.com/admin/api/v1/businesses/${id}/detail`
+      buildApiUrl(`${API_ENDPOINTS.BUSINESSES_DETAIL}/${id}`)
     );
   };
 
@@ -104,7 +105,7 @@ const BusinessContextProvider = (props: { children: React.ReactNode }) => {
     setIsLoading(true);
     setError("");
     const res = await fetch(
-      "https://erranddo.com/admin/api/v1/businesses/create",
+      buildApiUrl(API_ENDPOINTS.BUSINESSES_CREATE),
       {
         method: "POST",
         headers: {
@@ -144,7 +145,7 @@ const BusinessContextProvider = (props: { children: React.ReactNode }) => {
     setIsLoading(true);
     setError("");
     const res = await fetch(
-      "https://erranddo.com/admin/api/v1/business-services/create",
+      buildApiUrl(API_ENDPOINTS.BUSINESS_SERVICES_CREATE),
       {
         method: "POST",
         headers: {
@@ -190,7 +191,7 @@ const BusinessContextProvider = (props: { children: React.ReactNode }) => {
     console.log("herr");
     setError("");
     const res = await fetch(
-      `https://erranddo.com/admin/api/v1/businesses/${businessId}/edit`,
+      buildApiUrl(`${API_ENDPOINTS.BUSINESSES_EDIT}/${businessId}`),
       {
         method: "POST",
         headers: {
@@ -235,7 +236,7 @@ const BusinessContextProvider = (props: { children: React.ReactNode }) => {
     const token = localStorage.getItem("token");
 
     const res = await fetch(
-      `https://erranddo.com/admin/api/v1/businesses/${id}/delete`,
+      buildApiUrl(`${API_ENDPOINTS.BUSINESSES_DELETE}/${id}`),
       {
         method: "DELETE",
         headers: {
@@ -274,7 +275,7 @@ const BusinessContextProvider = (props: { children: React.ReactNode }) => {
   };
   const { page } = useService();
 
-  const serviceUrl = `https://erranddo.com/admin/api/v1/business-services?page=${page}&per_page=${8}&user_id=${id}`;
+  const serviceUrl = buildApiUrl(`${API_ENDPOINTS.BUSINESS_SERVICES}?page=${page}&per_page=${8}&user_id=${id}`);
   const { mutate: serviceMutate } = useSWR(serviceUrl, fetcher);
   //edit service business
   const EditServiceBusiness = async (formData: FormData, serviceId: number) => {
@@ -282,7 +283,7 @@ const BusinessContextProvider = (props: { children: React.ReactNode }) => {
     setIsLoading(true);
     setError("");
     const res = await fetch(
-      `https://erranddo.com/admin/api/v1/business-services/${serviceId}/edit`,
+      buildApiUrl(`${API_ENDPOINTS.BUSINESS_SERVICES_EDIT}/${serviceId}`),
       {
         method: "POST",
         headers: {
@@ -324,7 +325,7 @@ const BusinessContextProvider = (props: { children: React.ReactNode }) => {
     const token = localStorage.getItem("token");
 
     const res = await fetch(
-      `https://erranddo.com/admin/api/v1/business-services/${id}/delete`,
+      buildApiUrl(`${API_ENDPOINTS.BUSINESS_SERVICES_DELETE}/${id}`),
       {
         method: "DELETE",
         headers: {
@@ -367,7 +368,7 @@ const BusinessContextProvider = (props: { children: React.ReactNode }) => {
     console.log(id, "imageIdhvbnkoihugvbnkmlkjbh");
 
     const res = await fetch(
-      `https://erranddo.com/admin/api/v1/businesses/${id}/delete-service-image`,
+      buildApiUrl(`${API_ENDPOINTS.BUSINESSES}/${id}/delete-service-image`),
       {
         method: "DELETE",
         headers: {

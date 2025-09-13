@@ -4,14 +4,14 @@ import useSWR from "swr";
 import DeleteAccountModal from "../../../../layout/pro-models/DeleteAccountModal";
 import { UserData } from "../../../../models/user";
 import { fetcher } from "../../../../store/customer/home-context";
-import { useAuthPro } from "../../../../store/pro/auth-pro-context";
+import { useAuth } from "../../../../store/pro/auth-pro-context";
 import Button from "../../../UI/Button";
 import Error from "../../../UI/Error";
 import Input from "../../../UI/Input";
 import Label from "../../../UI/Label";
 import PostCodeDetails from "../../../UI/PostCodeDetails";
 import TextArea from "../../../UI/TextArea";
-import { useAuth } from "../../../../store/customer/auth-context";
+import { API_BASE_URL, buildApiUrl, API_ENDPOINTS } from "../../../../config/api";
 
 function PersonalInfoFormPro() {
   const token = localStorage.getItem("data");
@@ -20,11 +20,11 @@ function PersonalInfoFormPro() {
   if (token) {
     userData = JSON.parse(token);
   }
-  const url = `https://erranddo.com/admin/api/v1/user/detail?user_id=${userData?.id}`;
+  const url = buildApiUrl(`${API_ENDPOINTS.USER_DETAIL}?user_id=${userData?.id}`);
   const { data, isLoading } = useSWR(url, fetcher);
   const profileData: UserData = data?.data ?? "";
 
-  const { profileHandler, isProfileLoading } = useAuthPro();
+  const { profileHandler, isProfileLoading } = useAuth();
   //validate the logs entered in the form
   const validate = (values: any) => {
     const errors: FormikErrors<any> = {};

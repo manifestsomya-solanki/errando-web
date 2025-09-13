@@ -13,11 +13,12 @@ import ServiceImageSkeleton from "../../UI/Skeletons/ServiceImageSkeleton";
 import Button from "../../UI/Button";
 import { useNavigate } from "react-router";
 import NoImage from "../../../assets/no-photo.png";
+import { buildApiUrl, API_ENDPOINTS } from "../../../config/api";
 
 const HomePageDetails = () => {
   const { datarender, searchHandler, isLoading } = useHomeServices();
   const isLoggedIn = localStorage.getItem("isLoggedIn");
-  const url = "https://erranddo.com/admin/api/v1/services";
+  const url = buildApiUrl(API_ENDPOINTS.SERVICES);
   const { data, isLoading: isServiceLoading } = useSWR(url, fetcher);
   const serviceData: Service[] = data?.data ?? "";
   // const imageStorageUrl = "https://erranddo.kodecreators.com/storage";
@@ -208,3 +209,6 @@ const HomePageDetails = () => {
 };
 
 export default HomePageDetails;
+
+
+//SG6 0TG
