@@ -10,7 +10,7 @@ const API_BASE_URLS = {
 };
 
 // Current API Base URL based on environment
-export const API_BASE_URL = API_BASE_URLS[NODE_ENV as keyof typeof API_BASE_URLS] || API_BASE_URLS.development;
+export const API_BASE_URL = API_BASE_URLS[NODE_ENV as keyof typeof API_BASE_URLS];
 
 // Helper function to build full API URLs
 export const buildApiUrl = (endpoint: string) => {
