@@ -1,15 +1,11 @@
-.sidenavlinks {
+/* .sidenavlinks {
   padding: 1.5vh 1vw;
   display: flex;
   font-weight: 400 !important;
   align-items: center;
 }
 
-.sidenavlinks:hover {
-  color: black;
-  font-size: 1.1rem;
-  font-weight: 500 !important;
-}
+
 .active {
   color: black;
   font-size: 1.1rem;
@@ -40,4 +36,4 @@ svg:hover {
   .sidenavlinks {
     padding: 1.5vh 3vw;
   }
-}
+} */

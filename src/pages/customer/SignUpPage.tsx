@@ -7,10 +7,12 @@ import Button from "../../components/UI/Button";
 import { useEffect, useState } from "react";
 import { useAuth } from "../../store/customer/auth-context";
 import OtpVerificationModal from "../../layout/otp-verification/OtpVerificationModal";
+import TermsAndConditionsModal from "../../components/UI/TermsAndConditionsModal";
 import { NavLink } from "react-router-dom";
 
 const SignUpPage = () => {
   const [openModal, setOpenModal] = useState(false);
+  const [showTermsModal, setShowTermsModal] = useState(false);
   const { register, error, isLoading, setError } = useAuth();
   console.log(error);
   const formik = useFormik({
@@ -76,6 +78,12 @@ const SignUpPage = () => {
           email={formik.values.email}
           mobile_number={formik.values.mobile_number}
           role="pro"
+        />
+      )}
+      {showTermsModal && (
+        <TermsAndConditionsModal
+          isOpen={showTermsModal}
+          onClose={() => setShowTermsModal(false)}
         />
       )}
       <SignUpTopBar />
@@ -199,11 +207,17 @@ const SignUpPage = () => {
                     text="I agree to the"
                     headingclassname="!font-medium !font-poppins-bold tracking-wide dark:text-darktextColor "
                   />
-                  <Heading
-                    variant="smallTitle"
-                    text="Terms & Conditions"
-                    headingclassname="!font-bold !font-poppins-bold tracking-wide dark:text-darktextColor "
-                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowTermsModal(true)}
+                    className="text-primaryBlue hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 underline cursor-pointer"
+                  >
+                    <Heading
+                      variant="smallTitle"
+                      text="Terms & Conditions"
+                      headingclassname="!font-bold !font-poppins-bold tracking-wide"
+                    />
+                  </button>
                 </label>
               </div>
               <div className="px-6 mt-4 w-full">
