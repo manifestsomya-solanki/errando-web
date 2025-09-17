@@ -55,6 +55,7 @@ const SignUpPage = () => {
       formData.set("email", values.email);
       formData.set("mobile_number", values.mobile_number);
       formData.set("password", values.password);
+      formData.set("role", "pro");
       const success = await register(formData);
 
       if (success) {
