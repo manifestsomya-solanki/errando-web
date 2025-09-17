@@ -36,7 +36,7 @@ function AddServiceModal({
     setError,
   } = useBusiness();
   //handling service dropdown
-  const url = buildApiUrl(API_ENDPOINTS.BUSINESS_SERVICES);
+  const url = buildApiUrl(API_ENDPOINTS.SERVICES);
   const dummy_data: ServiceData[] = [];
   let datarender: ServiceData[] = [];
   const { data: dataa, isLoading: isServiceLoading } = useSWR(url, fetcher);
@@ -44,7 +44,7 @@ function AddServiceModal({
   const [locationNumber, setlocationNumber] = useState(1);
   let service_name: { value: number; label: string }[] = [];
   datarender?.flatMap((item) =>
-    service_name.push({ value: item?.service_id, label: item?.service?.name })
+    service_name.push({ value: item?.id, label: item?.name })
   );
   service_name = service_name.filter((item, index, arr) => {
     // Check if the current item's index is the first occurrence of the name in the array
