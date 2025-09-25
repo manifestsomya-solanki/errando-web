@@ -155,9 +155,10 @@ const HomePageDetails = () => {
       </div>
       <div className="2xl:px-40 xl:px-36 md:px-28 2xl:mt-[-90px] xl:mt-[-60px] lg:mt-[-50px] lg:hidden xs:grid xs:grid-cols-2">
         {serviceData &&
-          serviceData?.map((d) => {
+          serviceData?.map((d, index) => {
             return (
               <Card
+                key={d.id || index}
                 image={
                   d?.image
                     ? `https://erranddo.s3.eu-west-2.amazonaws.com/${d?.image}`
