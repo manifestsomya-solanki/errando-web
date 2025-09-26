@@ -37,8 +37,13 @@ function QuestionsModal(props: {
   const businessUrl = buildApiUrl(`${API_ENDPOINTS.BUSINESSES}?post_code_id=${postCode}&service_id=${service}`);
   let datarenderForBusiness: BusinessData[] = [];
   const { data: BusinessData, isLoading: businessLoading } = useSWR(
-    businessUrl,
-    fetcher
+    service && postCode ? businessUrl : null,
+    fetcher,
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+      dedupingInterval: 60000, // 1 minute deduplication
+    }
   );
   datarenderForBusiness = BusinessData?.data;
   let error = "";
@@ -52,7 +57,15 @@ function QuestionsModal(props: {
     data,
     error: ApiError,
     isLoading,
-  } = useSWR(error.length === 0 ? url : null, fetcher);
+  } = useSWR(
+    error.length === 0 && service && postCode ? url : null, 
+    fetcher,
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+      dedupingInterval: 60000, // 1 minute deduplication
+    }
+  );
   datarender = data?.data || dummy_data;
 
   const formik = useFormik({
@@ -219,7 +232,8 @@ function QuestionsModal(props: {
                                               setInputValue("");
                                               setExtraAnswer(false);
                                               if (
-                                                ids[ids.length - 1].question ===
+                                                ids.length > 0 &&
+                                                ids[ids.length - 1]?.question ===
                                                 questionNumber
                                               ) {
                                                 ids.pop();
@@ -267,7 +281,8 @@ function QuestionsModal(props: {
                                       setChecked(false);
                                       setExtraAnswer(true);
                                       if (
-                                        ids[ids.length - 1].question ===
+                                        ids.length > 0 &&
+                                        ids[ids.length - 1]?.question ===
                                         questionNumber
                                       ) {
                                         ids.pop();

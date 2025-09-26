@@ -338,7 +338,7 @@ function MyResponses() {
                 headingclassname="!font-semibold text-slate-400 !text-sm  mx-1 tracking-wide dark:text-white "
               />
               {leadsDetail?.user?.city &&
-              leadsDetail?.user?.postcode_id &&
+              leadsDetail?.user?.postcode &&
               !null ? (
                 <div className="flex gap-3">
                   <Heading

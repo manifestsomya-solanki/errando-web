@@ -11,13 +11,15 @@ function CurrentProjectTable(props: { data: Request[] }) {
   return (
     <div>
       <table className="w-full py-5 dark:text-white">
-        <tr className=" border-b-[0.5px] border-b-slate-300 dark:border-b-lineColor">
-          <th className="py-5 text-left">Date</th>
-          <th className="py-5 text-left">Request Type</th>
-          <th className="py-5 text-left">Location</th>
-
-          <th className="py-5 text-left">Response</th>
-        </tr>
+        <thead>
+          <tr className=" border-b-[0.5px] border-b-slate-300 dark:border-b-lineColor">
+            <th className="py-5 text-left">Date</th>
+            <th className="py-5 text-left">Request Type</th>
+            <th className="py-5 text-left">Location</th>
+            <th className="py-5 text-left">Response</th>
+          </tr>
+        </thead>
+        <tbody>
         {requestData?.map((d, key) => {
           if (d?.status === "PENDING") {
             const date = d?.created_at;
@@ -67,6 +69,7 @@ function CurrentProjectTable(props: { data: Request[] }) {
             );
           }
         })}
+        </tbody>
       </table>
       <div className="w-full">
         <TableFooter

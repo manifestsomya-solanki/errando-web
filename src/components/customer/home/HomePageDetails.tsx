@@ -19,8 +19,15 @@ const HomePageDetails = () => {
   const { datarender, searchHandler, isLoading } = useHomeServices();
   const isLoggedIn = localStorage.getItem("isLoggedIn");
   const url = buildApiUrl(API_ENDPOINTS.SERVICES);
-  const { data, isLoading: isServiceLoading } = useSWR(url, fetcher);
-  const serviceData: Service[] = data?.data ?? "";
+  const { data, isLoading: isServiceLoading } = useSWR(url, (url) => 
+    fetch(url).then((r) => r.json()),
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+      dedupingInterval: 60000,
+    }
+  );
+  const serviceData: Service[] = data?.data ?? [];
   // const imageStorageUrl = "https://erranddo.kodecreators.com/storage";
   const [openMenu, setOpenMenu] = useState(false);
   const [openSearch, setOpenSearch] = useState(false);
@@ -135,7 +142,7 @@ const HomePageDetails = () => {
             {serviceData &&
               serviceData?.map((d, i) => {
                 return (
-                  <SwiperSlide key={i}>
+                  <SwiperSlide key={d.id || i}>
                     <Card
                       image={`${
                         d.image
@@ -155,9 +162,10 @@ const HomePageDetails = () => {
       </div>
       <div className="2xl:px-40 xl:px-36 md:px-28 2xl:mt-[-90px] xl:mt-[-60px] lg:mt-[-50px] lg:hidden xs:grid xs:grid-cols-2">
         {serviceData &&
-          serviceData?.map((d) => {
+          serviceData?.map((d, index) => {
             return (
               <Card
+                key={d.id || index}
                 image={
                   d?.image
                     ? `https://erranddo.s3.eu-west-2.amazonaws.com/${d?.image}`

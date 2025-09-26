@@ -13,7 +13,7 @@ function Leads() {
   return (
     <LeadContextProProvider>
       <div className="xl:mt-[8.651474530831099vh] lg:fixed lg:mt-[9.651474530831099vh] xs:mt-[9.051474530831099vh] lg:pl-60 xs:px-5 lg:px-0 bg-gray-100  dark:bg-black  w-screen h-full pb-20 !lg:overflow-y-hidden xs:overflow-y-scroll">
-        {(!userData?.address || !userData?.city || !userData?.postcode_id) &&
+        {(!userData?.address || !userData?.city || !userData?.postcode) &&
           !isDetailLoading && <>{<NavigateSettingsModal />}</>}
         <div className="mt-5 lg:mx-5 flex gap-5">
           <div

@@ -13,7 +13,7 @@ export interface UserResponseList {
   id: number;
   user_id: number;
   service_id: number;
-  postcode_id: number;
+  postcode: string;
   file?: string;
   comment: string;
   status: string;
@@ -99,7 +99,7 @@ export interface User {
   mobile_number?: any;
   address?: any;
   city?: any;
-  postcode_id?: any;
+  postcode?: string;
   bio?: any;
   email: string;
   is_email_verified: string;

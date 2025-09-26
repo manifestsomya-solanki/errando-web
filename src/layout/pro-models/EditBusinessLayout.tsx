@@ -72,7 +72,7 @@ function EditBusinessModal({
             profile_picture: undefined,
             description: businessDetail?.description ?? "",
             service_images: undefined,
-            postcode_id: 0,
+            postcode: "",
             postcode: businessDetail?.business_postcode?.name ?? "",
           }}
           enableReinitialize={true}
@@ -83,7 +83,7 @@ function EditBusinessModal({
 
             const formData = new FormData(); //initialize formdata
             formData.set("name", values.name);
-            formData.set("postcode_id", values.postcode_id.toString());
+            formData.set("postcode", values.postcode);
 
             formData.set("postcode", values.postcode);
 

@@ -81,7 +81,7 @@ function TopBar(props: {
         />
         {!profileData?.address ||
         !profileData?.city ||
-        !profileData?.postcode_id ? (
+        !profileData?.postcode ? (
           <Button
             variant="filled"
             color="primary"

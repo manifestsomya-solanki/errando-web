@@ -77,7 +77,7 @@ export interface UserrequestDetail {
   user_id: number;
   service_id: number;
   business_id?: any;
-  postcode_id: number;
+  postcode: string;
   file?: any;
   comment: string;
   status: string;

@@ -72,7 +72,7 @@ function PersonalInfoFormPro() {
           name: profileData?.full_name,
           address: profileData?.address,
           city: profileData?.city,
-          post_code: profileData?.postcode_id,
+          post_code: profileData?.postcode,
         }}
         enableReinitialize
         onSubmit={(values) => {
@@ -80,7 +80,7 @@ function PersonalInfoFormPro() {
           formData.set("full_name", values.name);
           formData.set("address", values.address);
           formData.set("city", values.city);
-          formData.set("postcode_id", values.post_code);
+          formData.set("postcode", values.post_code);
           mutate();
           profileHandler(formData);
         }}

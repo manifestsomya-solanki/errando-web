@@ -49,7 +49,7 @@ function CommentsModal(props: {
         );
 
         formData.set("user_id", id);
-        formData.set("postcode_id", postCodeid?.toString() ?? "");
+        formData.set("postcode", postCodeid?.toString() ?? "");
         formData.set("service_id", serviceid?.toString() ?? "");
         if (values?.img) formData.set("file", values?.img);
         formData.set("comment", values.comment);

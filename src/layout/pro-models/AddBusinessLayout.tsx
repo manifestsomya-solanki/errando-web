@@ -63,9 +63,9 @@ function AddBusinessModal({ onCancel }: { onCancel: () => void }) {
             profile_picture: undefined,
             description: "",
             service_images: undefined,
-            postcode_id: 0,
             postcode: "",
-          }}
+           
+          }} 
           enableReinitialize={true}
           onSubmit={async (values) => {
             const files = values.service_images
@@ -74,7 +74,7 @@ function AddBusinessModal({ onCancel }: { onCancel: () => void }) {
 
             const formData = new FormData(); //initialize formdata
             formData.set("name", values.name);
-            formData.set("postcode_id", values.postcode_id.toString());
+            formData.set("postcode", values.postcode);
 
             formData.set("postcode", values.postcode);
             formData.set("business_postcode", values.postcode);

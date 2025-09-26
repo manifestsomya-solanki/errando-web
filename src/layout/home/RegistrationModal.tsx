@@ -59,7 +59,7 @@ function RegistrationModal(props: {
       const questions: { question: number; answer: "" }[] = JSON.parse(
         localStorage.getItem("question") ?? ""
       );
-      requestFormData.set("postcode_id", postCodeid?.toString() ?? "");
+      requestFormData.set("postcode", postCodeid?.toString() ?? "");
       requestFormData.set("service_id", serviceid?.toString() ?? "");
       for (let i = 0; i < questions.length; i++) {
         requestFormData.set(

@@ -20,7 +20,7 @@ export interface Postcode2 {
     id: number;
     service_id: number;
     user_businesses_id: number;
-    postcode_id: number;
+    postcode: string;
     radius: string;
     created_at: string;
     updated_at: string;

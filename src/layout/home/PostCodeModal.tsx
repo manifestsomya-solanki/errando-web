@@ -26,7 +26,7 @@ function PostCodeModal(props: {
     },
     validate: (values) => {
       const errors: any = {};
-      if (values.postCode.toString().length === 0) {
+      if (!values.postCode || values.postCode.toString().length === 0) {
         errors.postCode = "Required";
       }
       return errors;

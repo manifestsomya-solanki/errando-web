@@ -15,7 +15,7 @@ export interface UserData {
   mobile_number?: any;
   address?: any;
   city?: any;
-  postcode_id?: any;
+  postcode?: string;
   bio?: any;
   otp?: any;
   email: string;
@@ -89,7 +89,7 @@ export interface Userrequests {
   user_id: number;
   service_id?: any;
   business_id?: any;
-  postcode_id?: any;
+  postcode?: string;
   file?: any;
   comment?: any;
   status: string;

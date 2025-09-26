@@ -114,7 +114,7 @@ function HomeTopBar(props: { isSettingDisabled?: boolean }) {
               }}
             />
 
-            {(!profileData?.address || !profileData?.city || !profileData?.postcode_id) ?
+            {(!profileData?.address || !profileData?.city || !profileData?.postcode) ?
               (<Button
                 variant="filled"
                 color="primary"

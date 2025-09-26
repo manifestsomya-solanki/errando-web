@@ -48,14 +48,14 @@ function PersonalInfoForm() {
     <Formik
       initialValues={{
         name: profileData?.full_name,
-        post_code: profileData?.postcode_id,
+        post_code: profileData?.postcode,
         bio: profileData?.bio,
       }}
       enableReinitialize
       onSubmit={(values) => {
         const formData = new FormData();
         formData.set("full_name", values.name);
-        formData.set("postcode_id", values.post_code);
+        formData.set("postcode", values.post_code);
         formData.set("bio", values.bio);
         profileHandler(formData);
       }}

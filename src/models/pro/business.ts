@@ -47,7 +47,7 @@ export interface AddBusiness {
   description: string;
   profile_picture: undefined;
   service_images: FileList | undefined;
-  postcode_id: number;
+  postcode: string;
   postcode: string;
 }
 
@@ -111,7 +111,7 @@ export interface Postcode2 {
   id: number;
   service_id: number;
   user_businesses_id: number;
-  postcode_id: number;
+  postcode: string;
   radius: number;
   created_at: string;
   updated_at: string;
@@ -157,7 +157,7 @@ export interface Postcode {
   id: number;
   service_id: number;
   user_businesses_id: number;
-  postcode_id: number;
+  postcode: string;
   radius: string;
   created_at: string;
   updated_at: string;

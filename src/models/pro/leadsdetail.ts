@@ -42,7 +42,7 @@ export interface User {
   mobile_number: string;
   address: string;
   city: string;
-  postcode_id: number;
+  postcode: string;
   bio: string;
   email: string;
   is_email_verified: string;
@@ -56,7 +56,7 @@ export interface Userrequest {
   id: number;
   user_id: number;
   service_id: number;
-  postcode_id: number;
+  postcode: string;
   file?: any;
   comment: string;
   status: string;

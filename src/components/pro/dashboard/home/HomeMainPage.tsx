@@ -12,7 +12,7 @@ function HomeMainPage() {
   }, []);
   return (
     <div>
-      {(!userData?.address || !userData?.city || !userData?.postcode_id) &&
+      {(!userData?.address || !userData?.city || !userData?.postcode) &&
         !isDetailLoading && <>{<NavigateSettingsModal />}</>}
 
       <WelcomeSection />
