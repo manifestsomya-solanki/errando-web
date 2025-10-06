@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import Button from "./Button";
 import Heading from "./Heading";
+import { API_BASE_URL } from "../../config/api";
 
 interface TermsAndCondition {
   id: number;
@@ -28,7 +29,7 @@ const TermsAndConditionsModal = ({ isOpen, onClose }: TermsAndConditionsModalPro
   const fetchTerms = async () => {
     try {
       setLoading(true);
-      const response = await fetch("http://localhost:8000/api/v1/terms-and-conditions", {
+      const response = await fetch(`${API_BASE_URL}/terms-and-conditions`, {
         headers: {
           "Content-Type": "application/json",
         },
