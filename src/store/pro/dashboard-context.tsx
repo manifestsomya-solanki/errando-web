@@ -283,7 +283,7 @@ const BusinessContextProvider = (props: { children: React.ReactNode }) => {
     setIsLoading(true);
     setError("");
     const res = await fetch(
-      buildApiUrl(`${API_ENDPOINTS.BUSINESS_SERVICES_EDIT}/${serviceId}`),
+      buildApiUrl(`${API_ENDPOINTS.BUSINESS_SERVICES_EDIT}/${serviceId}/edit`),
       {
         method: "POST",
         headers: {
@@ -320,22 +320,27 @@ const BusinessContextProvider = (props: { children: React.ReactNode }) => {
   };
 
   const deleteServiceHandler = async (id: string) => {
+    console.log('deleteServiceHandler called with ID:', id);
     setIsLoading(true);
     setError("");
     const token = localStorage.getItem("token");
+    console.log('Token:', token ? 'Present' : 'Missing');
 
-    const res = await fetch(
-      buildApiUrl(`${API_ENDPOINTS.BUSINESS_SERVICES_DELETE}/${id}`),
-      {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+    const url = buildApiUrl(`${API_ENDPOINTS.BUSINESS_SERVICES_DELETE}/${id}/delete`);
+    console.log('Delete URL:', url);
+
+    const res = await fetch(url, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    
+    console.log('Delete response status:', res.status);
 
     if (res.status === 200) {
       const data = await res.json();
+      console.log('Delete response data:', data);
 
       if (data.status === "1") {
         toast.success("Business service  deleted successfully !", {
@@ -353,6 +358,7 @@ const BusinessContextProvider = (props: { children: React.ReactNode }) => {
       }
     } else {
       const data = await res.json();
+      console.log('Delete error response:', data);
       setIsLoading(false);
       setError(data.message);
       toast.error(data.message, {

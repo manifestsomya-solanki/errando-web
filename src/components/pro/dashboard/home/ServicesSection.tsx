@@ -69,16 +69,16 @@ function ServiceSection() {
                       serviceId={item?.id}
                       title={item?.service?.name}
                       business={item?.user_bussiness?.name}
-                      locationOne={
-                        item.post_codes[0]
-                          ? `${item?.post_codes[0]?.radius} miles around ${item?.post_codes[0]?.postcode?.name}`
-                          : ""
-                      }
-                      locationTwo={
-                        item.post_codes[1]
-                          ? `${item?.post_codes[1]?.radius} miles around ${item?.post_codes[1]?.postcode?.name}`
-                          : ""
-                      }
+                        locationOne={
+                          item.post_codes[0]
+                            ? `${item?.post_codes[0]?.radius} miles around ${item?.post_codes[0]?.postcode}`
+                            : ""
+                        }
+                        locationTwo={
+                          item.post_codes[1]
+                            ? `${item?.post_codes[1]?.radius} miles around ${item?.post_codes[1]?.postcode}`
+                            : ""
+                        }
                       ratingCount={4}
                       progress="60%"
                       leads={20}

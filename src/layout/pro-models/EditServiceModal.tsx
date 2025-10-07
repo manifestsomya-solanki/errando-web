@@ -18,7 +18,6 @@ import EditDropdownCompoenet from "../../components/UI/EditDropdown";
 import DropdownCompoenet from "../../components/UI/Dropdown";
 import { useService } from "../../store/pro/service-context";
 import { useEffect, useState } from "react";
-import PostCodeDropDown from "../../components/UI/PostCodeDropDown";
 import FullPageLoading from "../../components/UI/FullPageLoading";
 import { useTheme } from "../../store/theme-context";
 import { API_BASE_URL, buildApiUrl, API_ENDPOINTS } from "../../config/api";
@@ -30,7 +29,7 @@ function EditServiceModal({
   onCancel: () => void;
   serviceId: number;
 }) {
-  const serviceDataUrl = buildApiUrl(`${API_ENDPOINTS.BUSINESS_SERVICES_DETAIL}/${serviceId}`);
+  const serviceDataUrl = buildApiUrl(`${API_ENDPOINTS.BUSINESS_SERVICES}/${serviceId}/detail`);
   const { data: oldData, isLoading: isDetailLoading } = useSWR(
     serviceDataUrl,
     fetcher
@@ -43,8 +42,8 @@ function EditServiceModal({
   if (oldServiceData) {
     oldServiceData?.post_codes?.map((d) =>
       oldPostCodeData.push({
-        label: d?.postcode?.name,
-        value: d?.postcode?.id.toString(),
+        label: d?.postcode,
+        value: d?.postcode,
       })
     );
     oldServiceData?.post_codes?.map((d) => oldRadiusData.push(d?.radius));
@@ -202,21 +201,14 @@ function EditServiceModal({
                 {props.values.nation_wide || props.values.remote_service ? (
                   <div>
                     <Label required label="Enter Location" />
-                    <PostCodeDropDown
-                      value={
-                        props?.values?.postcode[0]
-                          ? {
-                            label: props?.values?.postcode[0].label,
-                            value: props?.values?.postcode[0].value,
-                          }
-                          : undefined
-                      }
-                      className="my-2 !z-20 relative h-max"
-                      onChange={(newValue) => {
-                        console.log("mwdwdwrhg", newValue);
+                    <Input
+                      name="postcode"
+                      placeholder="Enter postcode (e.g., SE4 0DE, Nationwide, Remote Service)"
+                      value={props?.values?.postcode[0]?.value || props?.values?.postcode[0] || ""}
+                      onChange={(e) => {
                         props.setFieldValue("postcode[0]", {
-                          label: newValue.label,
-                          value: newValue.value,
+                          label: e.currentTarget.value,
+                          value: e.currentTarget.value,
                         });
                       }}
                     />

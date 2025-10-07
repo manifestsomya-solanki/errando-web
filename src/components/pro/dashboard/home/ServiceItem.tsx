@@ -69,7 +69,10 @@ function ServiceItem(props: {
                     </button>
                   </div>
                   <div className=" hover:bg-slate-100 dark:hover:bg-slate-700 w-10 h-10 flex items-center justify-center rounded-full">
-                    <button onClick={() => setOpenDeleteModal(true)}>
+                    <button onClick={() => {
+                      console.log('Delete button clicked for service ID:', props.serviceId);
+                      setOpenDeleteModal(true);
+                    }}>
                       <img src={Delete} className="w-h h-5" />
                     </button>
                   </div>
@@ -93,7 +96,7 @@ function ServiceItem(props: {
                               ? "Nation wide "
                               : "Remote service"
                             : `${item?.radius} miles`
-                        }  around ${item?.postcode?.name}`}
+                        }  around ${item?.postcode}`}
                         variant="subHeader"
                         headingclassname="!font-semibold my-2 !text-sm text-slate-600 tracking-wide  dark:text-slate-400 "
                       />

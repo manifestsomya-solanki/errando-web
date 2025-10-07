@@ -11,10 +11,11 @@ function DeleteBusinessServiceModal(props: {
   id: number;
 }) {
   const { deleteServiceBusiness, isLoading } = useBusiness();
+  
+  console.log('DeleteBusinessServiceModal rendered with ID:', props.id);
 
   const deleteLeadhandler = async () => {
-    deleteServiceBusiness(props.id.toString());
-
+    await deleteServiceBusiness(props.id.toString());
     props.onCancel();
   };
 

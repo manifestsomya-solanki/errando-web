@@ -6,9 +6,12 @@ import Input from "../components/UI/Input";
 import Error from "../components/UI/Error";
 import Button from "../components/UI/Button";
 import { useAuth } from "../store/customer/auth-context";
+import { useState } from "react";
 
 function ForgotPasswordModal({ onCancel }: { onCancel: () => void }) {
-  const { forgotPassword, isLoading } = useAuth();
+  console.log('ForgotPasswordModal rendered');
+  const { forgotPassword, isLoading, error } = useAuth();
+  const [isSubmitted, setIsSubmitted] = useState(false);
   const validate = (values: any) => {
     const errors: any = {};
     if (!values.email) {
@@ -47,8 +50,8 @@ function ForgotPasswordModal({ onCancel }: { onCancel: () => void }) {
         onSubmit={async (values) => {
           const formData = new FormData(); //initialize formdata
           formData.set("email", values.email);
-          forgotPassword(formData);
-          onCancel();
+          await forgotPassword(formData);
+          setIsSubmitted(true);
         }}
         validate={validate}
       >
@@ -72,22 +75,37 @@ function ForgotPasswordModal({ onCancel }: { onCancel: () => void }) {
                 ></Error>
               ) : null}
             </div>
-            <div className="flex gap-5 xl:w-[450px] md:w-[350px] justify-center">
-              <button
-                type="button"
-                onClick={() => onCancel()}
-                className="text-black w-32 border-[#707070] border  xl:text-lg md:text-sm rounded-xl xl:h-12 lg:h-10 xs:h-10 md:px-8 xs:px-5 text-center mr-3 md:mr-0 "
-              >
-                Cancel
-              </button>
-              <Button
-                loading={isLoading}
-                type="submit"
-                buttonClassName="text-white  bg-[#0003FF] hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 xl:text-lg md:text-sm rounded-xl xl:h-12 lg:h-10 xs:h-10 md:px-8 xs:px-5  mr-3 md:mr-0 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-              >
-                Continue
-              </Button>
-            </div>
+            {isSubmitted ? (
+              <div className="text-center">
+                <p className="text-green-600 mb-4">Password reset email sent successfully!</p>
+                <button
+                  type="button"
+                  className="text-white bg-blue-500 px-8 py-2 rounded-xl"
+                  onClick={() => {
+                    onCancel();
+                  }}
+                >
+                  Close
+                </button>
+              </div>
+            ) : (
+              <div className="flex gap-5 xl:w-[450px] md:w-[350px] justify-center">
+                <button
+                  type="button"
+                  onClick={() => onCancel()}
+                  className="text-black w-32 border-[#707070] border  xl:text-lg md:text-sm rounded-xl xl:h-12 lg:h-10 xs:h-10 md:px-8 xs:px-5 text-center mr-3 md:mr-0 "
+                >
+                  Cancel
+                </button>
+                <Button
+                  loading={isLoading}
+                  type="submit"
+                  buttonClassName="text-white  bg-[#0003FF] hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 xl:text-lg md:text-sm rounded-xl xl:h-12 lg:h-10 xs:h-10 md:px-8 xs:px-5  mr-3 md:mr-0 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                >
+                  Continue
+                </Button>
+              </div>
+            )}
           </form>
         )}
         {/* <Error

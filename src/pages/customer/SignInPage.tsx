@@ -57,8 +57,7 @@ const SignInPage = () => {
   });
   useEffect(() => {
     setError("");
-  }, []);
-  console.log(forgotPasswordModal);
+  }, [])
 
   return (
     <div>
@@ -174,7 +173,10 @@ const SignInPage = () => {
                   </NavLink>
                 </div>
                 <div className="w-full text-center pb-5">
-                  <button onClick={() => setForgotPasswordModal(true)}>
+                  <button onClick={() => {
+                    console.log('Forgot Password button clicked');
+                    setForgotPasswordModal(true);
+                  }}>
                     <Heading
                       variant="subHeader"
                       text="Forgot Password?"

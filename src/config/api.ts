@@ -42,8 +42,8 @@ export const API_ENDPOINTS = {
   SERVICES: 'services',
   BUSINESS_SERVICES: 'business-services',
   BUSINESS_SERVICES_CREATE: 'business-services/create',
-  BUSINESS_SERVICES_EDIT: 'business-services/edit',
-  BUSINESS_SERVICES_DELETE: 'business-services/delete',
+  BUSINESS_SERVICES_EDIT: 'business-services',
+  BUSINESS_SERVICES_DELETE: 'business-services',
   
   // User requests
   USER_REQUESTS: 'user-requests',
@@ -89,6 +89,6 @@ export const API_ENDPOINTS = {
   // Questions
   QUESTIONS: 'questions',
   
-  // Forgot password (special case - different endpoint)
-  FORGOT_PASSWORD: import.meta.env.VITE_FORGOT_PASSWORD_URL || 'http://127.0.0.1:8000/api/v1/forgot-password'
+  // Forgot password
+  FORGOT_PASSWORD: 'user/forgot-password'
 };
