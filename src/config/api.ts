@@ -85,6 +85,7 @@ export const API_ENDPOINTS = {
   
   // Postcodes
   POSTCODES: 'postcodes',
+  POSTCODES_VALIDATE: 'postcodes/validate',
   
   // Questions
   QUESTIONS: 'questions',

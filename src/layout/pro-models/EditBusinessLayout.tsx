@@ -12,6 +12,7 @@ import { useBusiness } from "../../store/pro/dashboard-context";
 import { useTheme } from "../../store/theme-context";
 import { useEffect, useState } from "react";
 import TextArea from "../../components/UI/TextArea.tsx";
+import ValidatedPostcodeInput from "../../components/UI/ValidatedPostcodeInput";
 
 function EditBusinessModal({
   onCancel,
@@ -192,11 +193,14 @@ function EditBusinessModal({
               </div>
               <div className="py-3">
                 <Label required label="Enter Business Postcode " />
-                <Input
+                <ValidatedPostcodeInput
                   id="postcode"
                   name="postcode"
                   value={props.values.postcode}
-                  onChange={props.handleChange}
+                  onChange={(value) => {
+                    props.setFieldValue("postcode", value);
+                  }}
+                  placeholder="Enter business postcode"
                 />
                 {props?.touched?.postcode && props?.errors?.postcode ? (
                   <Error error={props?.errors?.postcode} className="mt-2" />

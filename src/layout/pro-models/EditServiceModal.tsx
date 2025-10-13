@@ -21,6 +21,7 @@ import { useEffect, useState } from "react";
 import FullPageLoading from "../../components/UI/FullPageLoading";
 import { useTheme } from "../../store/theme-context";
 import { API_BASE_URL, buildApiUrl, API_ENDPOINTS } from "../../config/api";
+import ValidatedPostcodeInput from "../../components/UI/ValidatedPostcodeInput";
 
 function EditServiceModal({
   onCancel,
@@ -201,14 +202,14 @@ function EditServiceModal({
                 {props.values.nation_wide || props.values.remote_service ? (
                   <div>
                     <Label required label="Enter Location" />
-                    <Input
+                    <ValidatedPostcodeInput
                       name="postcode"
-                      placeholder="Enter postcode (e.g., SE4 0DE, Nationwide, Remote Service)"
+                      placeholder="Enter postcode"
                       value={props?.values?.postcode[0]?.value || props?.values?.postcode[0] || ""}
-                      onChange={(e) => {
+                      onChange={(value) => {
                         props.setFieldValue("postcode[0]", {
-                          label: e.currentTarget.value,
-                          value: e.currentTarget.value,
+                          label: value,
+                          value: value,
                         });
                       }}
                     />
@@ -224,18 +225,19 @@ function EditServiceModal({
                         <div className="pb-3 grid xl:grid-cols-2 xs:gap-5">
                           <div className="">
                             <Label label="Update Postcode " />
-                            <Input
+                            <ValidatedPostcodeInput
                               name="postcode"
                               value={props?.values?.postcode[index]
                                 ? props?.values?.postcode[index].label
-                                : undefined
+                                : ""
                               }
-                              onChange={(e) => {
+                              onChange={(value) => {
                                 props.setFieldValue(`postcode[${index}]`, {
-                                  label: e.currentTarget.value,
-                                  value: e.currentTarget.value,
+                                  label: value,
+                                  value: value,
                                 });
                               }}
+                              placeholder="Enter postcode"
                             />
                           </div>
                           <div>

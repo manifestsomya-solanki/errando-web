@@ -3,7 +3,7 @@ import Modal from "./Modal";
 import Close from "../../assets/close.tsx";
 import QuestionsModal from "./QuestionsModal";
 import { useFormik } from "formik";
-import PostCodeDetails from "../../components/UI/PostCodeDetails";
+import ValidatedPostcodeInput from "../../components/UI/ValidatedPostcodeInput";
 
 import { useTheme } from "../../store/theme-context";
 import Label from "../../components/UI/Label.tsx";
@@ -19,6 +19,7 @@ function PostCodeModal(props: {
   // Track the current postcode value to check API status
   const [currentPostcode, setCurrentPostcode] = useState("");
   const [apiStatus, setApiStatus] = useState("");
+  const [isPostcodeValid, setIsPostcodeValid] = useState(false);
   
   const formik = useFormik({
     initialValues: {
@@ -91,33 +92,39 @@ function PostCodeModal(props: {
             </div>
             
             <form autoComplete="off" onSubmit={formik.handleSubmit}>
-              <div className="flex gap-2 items-center w-full justify-between">
-                <PostCodeDetails
-                  className="rounded-lg md:w-96 lg:w-80 xl:w-96 xs:w-64 outline-none pl-3 text-[#707070]  "
-                  type="text"
-                  placeholder="Post Code"
-                  id="postCode"
-                  name="postCode"
-                  onChange={(ev: any) => {
-                    formik.setFieldValue("postCode", ev);
-                  }}
-                  onApiResponse={(status: string) => {
-                    setApiStatus(status);
-                  }}
-                />
+              <div className="w-full">
+                <div className="flex gap-2 items-center w-full">
+                  <div className="flex-1">
+                    <ValidatedPostcodeInput
+                      className="rounded-lg w-full outline-none pl-3 text-[#707070]"
+                      placeholder="Post Code"
+                      id="postCode"
+                      name="postCode"
+                      value={formik.values.postCode}
+                      onChange={(value) => {
+                        formik.setFieldValue("postCode", value);
+                      }}
+                      onValidationChange={(isValid, status) => {
+                        setIsPostcodeValid(isValid);
+                        setApiStatus(status);
+                      }}
+                      showValidationMessage={false}
+                    />
+                  </div>
 
-                {/* Search button - always visible but disabled when status is "0" */}
-                <button
-                  disabled={
-                    formik.errors.postCode || 
-                    !formik.values.postCode || 
-                    (apiStatus === "0")
-                  }
-                  type="submit"
-                  className="text-white bg-[#0003FF] hover:bg-blue-800 focus:ring-4 disabled:bg-gray-300 disabled:text-slate-500 dark:text-black focus:outline-none focus:ring-blue-300 xl:text-lg md:text-sm rounded-xl xl:h-12 lg:h-10 xs:h-10 md:px-8 xs:px-5 text-center mr-3 md:mr-0 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                >
-                  Search
-                </button>
+                  {/* Search button - positioned next to the input field */}
+                  <button
+                    disabled={
+                      formik.errors.postCode || 
+                      !formik.values.postCode || 
+                      !isPostcodeValid
+                    }
+                    type="submit"
+                    className="text-white bg-[#0003FF] hover:bg-blue-800 focus:ring-4 disabled:bg-gray-300 disabled:text-slate-500 dark:text-black focus:outline-none focus:ring-blue-300 xl:text-lg md:text-sm rounded-xl xl:h-12 lg:h-10 xs:h-10 md:px-8 xs:px-5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                  >
+                    Search
+                  </button>
+                </div>
               </div>
               
               {formik.errors.postCode && formik.touched.postCode ? (
