@@ -34,7 +34,7 @@ function QuestionsModal(props: {
   const postCode = localStorage.getItem("post_code");
   const token = localStorage.getItem("token");
   const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
-  const businessUrl = buildApiUrl(`${API_ENDPOINTS.BUSINESSES}?post_code_id=${postCode}&service_id=${service}`);
+  const businessUrl = buildApiUrl(`${API_ENDPOINTS.BUSINESSES}?postcode=${postCode}&service_id=${service}`);
   let datarenderForBusiness: BusinessData[] = [];
   const { data: BusinessData, isLoading: businessLoading } = useSWR(
     service && postCode ? businessUrl : null,
@@ -50,7 +50,7 @@ function QuestionsModal(props: {
   if (datarenderForBusiness?.length === 0) {
     error = "No services";
   }
-  const url = buildApiUrl(`${API_ENDPOINTS.QUESTIONS}?service_id=${service}&post_code_id=${postCode}&page=1&per_page=10`);
+  const url = buildApiUrl(`${API_ENDPOINTS.QUESTIONS}?service_id=${service}&postcode=${postCode}&page=1&per_page=10`);
   const dummy_data: Question[] = [];
   let datarender: QuestionData[] = [];
   const {
