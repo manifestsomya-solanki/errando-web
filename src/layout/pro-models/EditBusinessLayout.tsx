@@ -73,7 +73,6 @@ function EditBusinessModal({
             profile_picture: undefined,
             description: businessDetail?.description ?? "",
             service_images: undefined,
-            postcode: "",
             postcode: businessDetail?.business_postcode?.name ?? "",
           }}
           enableReinitialize={true}
