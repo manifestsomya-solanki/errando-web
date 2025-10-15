@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import Modal from "./Modal";
 import Close from "../../assets/close";
 import { FormikErrors, useFormik } from "formik";
@@ -19,8 +19,15 @@ function VerifyMobileModal(props: {
   onCancelAll: () => void;
   mobile_number: string;
 }) {
-  const { verifyOtp, isLoading, error, sendOtp, manageLoading, requestData } =
+  const { verifyOtp, isLoading, error, sendOtp, manageLoading, requestData, setError } =
     useAuth();
+
+  // Clear error when modal opens
+  React.useEffect(() => {
+    if (props.open) {
+      setError("");
+    }
+  }, [props.open, setError]);
 
   const formik = useFormik({
     initialValues: {
@@ -31,24 +38,26 @@ function VerifyMobileModal(props: {
 
       if (!values.mobile_number) {
         errors.mobile_number = "Please include a valid Otp of mobile number";
+      } else if (values.mobile_number.length < 4) {
+        errors.mobile_number = "OTP must be at least 4 digits";
+      } else if (!/^\d+$/.test(values.mobile_number)) {
+        errors.mobile_number = "OTP must contain only numbers";
       }
       return errors;
     },
 
     onSubmit: async (values) => {
+      if (isLoading) return; // Prevent double submit
       const formData = new FormData(); //initialize formdata
       formData.set("otp", values.mobile_number);
       formData.set("email", props.email);
       const success = await verifyOtp(formData, "register");
-      setTimeout(() => {
-        if (success) {
-          setOpenMenu(true);
-        }
-      }, 1000);
+      if (success) {
+        setOpenMenu(true);
+      }
     },
   });
   const [openMenu, setOpenMenu] = useState(false);
-  console.log("here", requestData?.data?.user_requests?.id);
   const { theme } = useTheme();
   return (
     <>
@@ -145,10 +154,12 @@ function VerifyMobileModal(props: {
             </div>
 
             <div className="flex flex-col gap-5 xl:w-[550px] md:w-[450px] justify-center items-center">
-              <Error
-                error={error}
-                className="text-center   xl:w-[550px] md:w-[450px]"
-              />
+              {error && (
+                <Error
+                  error={error}
+                  className="text-center xl:w-[550px] md:w-[450px]"
+                />
+              )}
               <Button
                 disabled={
                   formik?.values?.mobile_number?.length === 0 ? true : false

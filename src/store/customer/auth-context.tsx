@@ -546,10 +546,11 @@ const AuthContextProvider = (props: { children: React.ReactNode }) => {
     );
 
     if (res.status === 200) {
+      const responseData = await res.json();
       setIsLoading(false);
-      setrequestData(await res.json());
-      if (requestData.status === "0") {
-        setError(requestData.message);
+      setrequestData(responseData);
+      if (responseData.status === "0") {
+        setError(responseData.message);
       } else {
         if (!tokenFromApi) {
           setIsLoggedIn(true);
@@ -568,7 +569,6 @@ const AuthContextProvider = (props: { children: React.ReactNode }) => {
       setError(data.message);
     }
   };
-  console.log(requestData);
   const editRequest = async (formData: FormData, id: string) => {
     setIsLoading(true);
     setError("");

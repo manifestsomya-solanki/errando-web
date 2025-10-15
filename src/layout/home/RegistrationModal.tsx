@@ -161,10 +161,12 @@ function RegistrationModal(props: {
                 ></Error>
               ) : null}
             </div>
-            <Error
-              error={error}
-              className="text-center mt-3  xl:w-[550px] md:w-[450px]"
-            />
+            {error && (
+              <Error
+                error={error}
+                className="text-center mt-3 xl:w-[550px] md:w-[450px]"
+              />
+            )}
             <div className="flex gap-5 xl:w-[550px] md:w-[450px] justify-center pt-4">
               <button
                 type="button"
