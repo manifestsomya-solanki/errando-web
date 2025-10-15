@@ -14,7 +14,7 @@ import { fetcher } from "../../store/customer/home-context";
 import Input from "../../components/UI/Input";
 import { useTheme } from "../../store/theme-context.tsx";
 
-import PostCodeDropDown from "../../components/UI/PostCodeDropDown.tsx";
+import ValidatedPostcodeInput from "../../components/UI/ValidatedPostcodeInput";
 import { BusinessData } from "../../models/home.ts";
 import { useEffect, useState } from "react";
 import { useService } from "../../store/pro/service-context.tsx";
@@ -209,12 +209,13 @@ function AddServiceModal({
               {props.values.nation_wide || props.values.remote_service ? (
                 <div>
                   <Label required label="Enter Location" />
-                  <Input
+                  <ValidatedPostcodeInput
                     name="postcode"
-                    value={props.values.postcode}
-                    onChange={(e) => {
-                      props.setFieldValue("postcode[0]", e.currentTarget.value);
+                    value={props.values.postcode[0] || ""}
+                    onChange={(value) => {
+                      props.setFieldValue("postcode[0]", value);
                     }}
+                    placeholder="Enter postcode"
                   />
                   {props?.touched?.postcode && props?.errors?.postcode ? (
                     <Error error={props?.errors?.postcode} className="mt-2" />
@@ -225,12 +226,13 @@ function AddServiceModal({
                   <div className="pb-3 grid xl:grid-cols-2 xs:gap-5">
                     <div>
                       <Label required label="Postcode" />
-                      <Input
+                      <ValidatedPostcodeInput
                         name="postcode"
-                        value={props.values.postcode}
-                        onChange={(e) => {
-                          props.setFieldValue("postcode[0]", e.currentTarget.value);
+                        value={props.values.postcode[0] || ""}
+                        onChange={(value) => {
+                          props.setFieldValue("postcode[0]", value);
                         }}
+                        placeholder="Enter postcode"
                       />
                       {props?.touched?.postcode && props?.errors?.postcode ? (
                         <Error
@@ -260,15 +262,16 @@ function AddServiceModal({
                   <div className="pb-3 grid xl:grid-cols-2 xs:gap-5">
                     <div>
                       <Label label="Postcode" />
-                      <Input
+                      <ValidatedPostcodeInput
                         name="postcode"
-                        value={props.values.postcode[locationNumber - 1]}
-                        onChange={(e) => {
+                        value={props.values.postcode[locationNumber - 1] || ""}
+                        onChange={(value) => {
                           props.setFieldValue(
                             `postcode[${locationNumber - 1}]`,
-                            e.currentTarget.value
+                            value
                           );
                         }}
+                        placeholder="Enter postcode"
                       />
                     </div>
                     <div>

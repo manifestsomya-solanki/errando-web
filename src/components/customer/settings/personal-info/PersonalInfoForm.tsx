@@ -8,7 +8,7 @@ import { useAuth } from "../../../../store/customer/auth-context";
 import useSWR from "swr";
 import { fetcher } from "../../../../store/customer/home-context";
 import { UserData } from "../../../../models/user";
-import PostCodeDetails from "../../../UI/PostCodeDetails";
+import ValidatedPostcodeInput from "../../../UI/ValidatedPostcodeInput";
 import { API_BASE_URL, buildApiUrl, API_ENDPOINTS } from "../../../../config/api";
 
 function PersonalInfoForm() {
@@ -84,12 +84,14 @@ function PersonalInfoForm() {
               className={inputClassName}
               onChange={props.handleChange}
             /> */}
-            <PostCodeDetails
+            <ValidatedPostcodeInput
               id="post_code"
-              onChange={(ev: any) => {
-                props.setFieldValue("post_code", ev);
+              name="post_code"
+              value={props.values.post_code}
+              onChange={(value) => {
+                props.setFieldValue("post_code", value);
               }}
-              initialValue={props.values.post_code}
+              placeholder="Enter your postcode"
             />
             <h6 className="dark:text-gray-400 text-gray-400 text-center text-xs xs:my-1 lg:my-1">
               **This will be the default postcode when you place a request**
