@@ -34,7 +34,10 @@ function PostCodeModal(props: {
     },
     onSubmit: (values) => {
       localStorage.setItem("post_code", values.postCode);
-      setOpenModal(true);
+      // Add small delay to ensure postcode is saved before opening questions
+      setTimeout(() => {
+        setOpenModal(true);
+      }, 100);
     },
   });
   
@@ -116,8 +119,8 @@ function PostCodeModal(props: {
                   <button
                     disabled={
                       formik.errors.postCode || 
-                      !formik.values.postCode || 
-                      !isPostcodeValid
+                      !formik.values.postCode ||
+                      formik.values.postCode.length < 4
                     }
                     type="submit"
                     className="text-white bg-[#0003FF] hover:bg-blue-800 focus:ring-4 disabled:bg-gray-300 disabled:text-slate-500 dark:text-black focus:outline-none focus:ring-blue-300 xl:text-lg md:text-sm rounded-xl xl:h-12 lg:h-10 xs:h-10 md:px-8 xs:px-5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"

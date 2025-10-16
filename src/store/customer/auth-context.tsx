@@ -252,6 +252,14 @@ const AuthContextProvider = (props: { children: React.ReactNode }) => {
   const verifyOtp = async (formData: FormData, key: string) => {
     setIsLoading(true);
     setError("");
+    
+    // Debug logging
+    console.log('OTP Verification Debug:', {
+      otp: formData.get('otp'),
+      email: formData.get('email'),
+      key: key
+    });
+    
     const res = await fetch(
       buildApiUrl(API_ENDPOINTS.USER_VERIFY_OTP),
       {
@@ -259,8 +267,13 @@ const AuthContextProvider = (props: { children: React.ReactNode }) => {
         body: formData,
       }
     );
+    
+    console.log('OTP Response Status:', res.status);
+    
     if (res.status === 200) {
       const data: VerifyOtp = await res.json();
+      console.log('OTP Response Data:', data);
+      
       if (data.status == "0") {
         setError(data.message ?? "The otp is not valid");
         setIsLoading(false);
@@ -288,6 +301,7 @@ const AuthContextProvider = (props: { children: React.ReactNode }) => {
       }
     } else {
       const data: any = await res.json();
+      console.log('OTP Error Response:', data);
       setIsLoading(false);
       setError(data.message);
       return 0;
@@ -552,15 +566,21 @@ const AuthContextProvider = (props: { children: React.ReactNode }) => {
       if (responseData.status === "0") {
         setError(responseData.message);
       } else {
-        if (!tokenFromApi) {
+        // Auto-login after successful request submission
+        if (responseData.data?.token) {
+          localStorage.setItem("token", responseData.data.token);
+          localStorage.setItem("data", JSON.stringify(responseData.data.user));
           setIsLoggedIn(true);
           localStorage.setItem("role", "customer");
           localStorage.setItem("isLoggedIn", "true");
           localStorage.removeItem("service");
           localStorage.removeItem("post_code");
           localStorage.removeItem("question");
+          console.log("Navigating to /projects after successful request submission");
           navigate("/projects");
           await mutate("project_contect_api");
+        } else {
+          console.log("No token received in response:", responseData);
         }
       }
     } else {

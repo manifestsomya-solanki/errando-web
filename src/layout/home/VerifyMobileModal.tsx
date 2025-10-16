@@ -51,7 +51,13 @@ function VerifyMobileModal(props: {
       const formData = new FormData(); //initialize formdata
       formData.set("otp", values.mobile_number);
       formData.set("email", props.email);
-      const success = await verifyOtp(formData, "register");
+      
+      console.log('OTP Verification Attempt:', {
+        otp: values.mobile_number,
+        email: props.email
+      });
+      
+      const success = await verifyOtp(formData, "customer");
       if (success) {
         setOpenMenu(true);
       }

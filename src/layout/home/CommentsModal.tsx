@@ -71,6 +71,10 @@ function CommentsModal(props: {
 
         await editRequest(formData, props.requestId?.toString() ?? "");
       }
+      // Navigate to projects page after successful submission
+      setTimeout(() => {
+        window.location.href = "/projects";
+      }, 1000);
       props.onCancelAll();
     },
   });

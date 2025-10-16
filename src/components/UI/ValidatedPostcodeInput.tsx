@@ -48,7 +48,7 @@ const ValidatedPostcodeInput: React.FC<ValidatedPostcodeInputProps> = ({
         if (onValidationChange) {
           onValidationChange(result.isValid, result.status);
         }
-      }, 1000); // 1 second debounce
+      }, 500); // 0.5 second debounce for faster validation
 
       setDebounceTimer(timer);
     } else {

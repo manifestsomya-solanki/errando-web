@@ -64,7 +64,7 @@ function RegistrationModal(props: {
       for (let i = 0; i < questions.length; i++) {
         requestFormData.set(
           `data[${i}][question_id]`,
-          (questions[i].question + 1).toString()
+          questions[i].question.toString()
         );
         requestFormData.set(
           `data[${i}][answer]`,

@@ -64,6 +64,9 @@ function QuestionsModal(props: {
       revalidateOnFocus: false,
       revalidateOnReconnect: false,
       dedupingInterval: 60000, // 1 minute deduplication
+      errorRetryCount: 3,
+      errorRetryInterval: 1000,
+      loadingTimeout: 5000, // 5 second timeout
     }
   );
   datarender = data?.data || dummy_data;
@@ -74,9 +77,11 @@ function QuestionsModal(props: {
     },
 
     onSubmit: () => {
-      datarender.length - 1 !== questionNumber
-        ? setQuestionNumber(questionNumber + 1)
-        : setOpenModal(true);
+      if (questionNumber < datarender.length - 1) {
+        setQuestionNumber(questionNumber + 1);
+      } else {
+        setOpenModal(true);
+      }
       localStorage.setItem("question", JSON.stringify(ids));
     },
   });
@@ -107,9 +112,15 @@ function QuestionsModal(props: {
   const newAnswerHandler = (e: string) => {
     setInputValue(e);
     formik.setFieldValue("content", e);
-    if (ids[questionNumber]) {
-      ids[questionNumber].answer = e;
+    
+    // Find existing answer for this question
+    const existingIndex = ids.findIndex(item => item.question === questionNumber);
+    
+    if (existingIndex !== -1) {
+      // Update existing answer
+      ids[existingIndex].answer = e;
     } else {
+      // Add new answer
       ids.push({
         question: questionNumber,
         answer: e,
@@ -154,7 +165,20 @@ function QuestionsModal(props: {
       ) : null}
       {props.open && (
         <div>
-          {!businessLoading ? (
+          {/* Loading State - Show immediately */}
+          {businessLoading ? (
+            <Modal className="bg-gray-100 opacity-100 rounded-lg dark:bg-modalDarkColor">
+              <div className="flex flex-col items-center justify-center p-8">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+                <p className="text-lg font-semibold text-gray-700 dark:text-white">
+                  Loading Questions...
+                </p>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
+                  Please wait while we prepare your questions
+                </p>
+              </div>
+            </Modal>
+          ) : (
             <div>
               {error.length === 0 ? (
                 // {true ? (
@@ -355,13 +379,6 @@ function QuestionsModal(props: {
                 />
               )}
             </div>
-          ) : (
-            <Modal
-              className="bg-slate-100 opacity-90 rounded-lg xl:w-[570px] md:w-[470px] dark:!bg-modalDarkColor"
-              backdropClassName="bg-transparent"
-            >
-              <FullPageLoading className="xl:w-[0px] md:w-[0px] !h-[40vh] !bg-transparent dark:!bg-modalDarkColor" />
-            </Modal>
           )}
         </div>
       )}
