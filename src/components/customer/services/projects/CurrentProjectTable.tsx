@@ -50,7 +50,8 @@ function CurrentProjectTable(props: { data: Request[] }) {
                 </td>
                 <td className="py-2 text-left">
                   <button className="w-full p-2 text-left">
-                    {d?.postcode?.name}
+                    {d?.postcode}
+                    {/* {d?.postcode?.name} */}
                   </button>
                 </td>
                 <td className="py-2 text-left">
