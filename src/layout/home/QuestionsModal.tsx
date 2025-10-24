@@ -298,8 +298,10 @@ function QuestionsModal(props: {
                                       );
                                     }
                                   )}
-
-                                <div className="mb-5 flex xl:w-[550px] w-44 justify-center items-center mt-3 gap-3 ">
+                              </div>
+                              
+                              <div className="mt-4 p-2 border-t border-gray-200 dark:border-gray-600">
+                                <div className="flex items-center gap-3">
                                   <input
                                     onClick={() => {
                                       setChecked(false);
@@ -328,7 +330,7 @@ function QuestionsModal(props: {
                                     onChange={(e: any) => {
                                       newAnswerHandler(e.target.value);
                                     }}
-                                    className="p-1 pl-2 rounded-lg xl:w-[400px] "
+                                    className="p-1 pl-2 rounded-lg w-full"
                                     placeholder="Write your own answer"
                                   />
                                 </div>
