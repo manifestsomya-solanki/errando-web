@@ -35,9 +35,9 @@ function PersonalInfoForm() {
       errors.post_code = "Please include a postcode";
     }
 
-    if (!values.bio) {
-      errors.bio = "Please include a valid bio";
-    }
+    // if (!values.bio) {
+    //   errors.bio = "Please include a valid bio";
+    // }
     return errors;
   };
   const inputClassName =
@@ -101,7 +101,7 @@ function PersonalInfoForm() {
             ) : null}
           </div>
           <div className="my-5">
-            <Label required label="Bio" className="ml-1" />
+            <Label label="Bio" className="ml-1" />
             <Input
               id="bio"
               value={props.values.bio}
