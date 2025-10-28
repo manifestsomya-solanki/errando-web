@@ -8,11 +8,15 @@ import { useAuth } from "../../../../store/pro/auth-pro-context";
 import Heading from "../../../UI/Heading";
 import { useState } from "react";
 import EditContactModal from "../../../../layout/home/EditContactModal";
+import EmailVerificationLinkModal from "../../../../layout/customer/EmailVerificationLinkModal";
 
 function ContactDetailFormPro() {
   const { userData, profileHandler, isProfileLoading, sendOtp, mutate } =
     useAuth();
   const [openModal, setOpenModal] = useState(false);
+  const [openEmailModal, setOpenEmailModal] = useState(false);
+  const [emailChanged, setEmailChanged] = useState(false);
+  const [isVerifying, setIsVerifying] = useState(false);
 
   //validate the logs entered in the form
   const validate = (values: any) => {
@@ -43,6 +47,22 @@ function ContactDetailFormPro() {
         }}
         enableReinitialize
         onSubmit={async (values) => {
+          if (isVerifying) {
+            console.log("Auto-save blocked: Verification in progress");
+            return;
+          }
+          
+          if (emailChanged && userData?.is_email_verified === "0") {
+            console.log("Auto-save blocked: Email changed but not verified");
+            return;
+          }
+          
+          if (values.email !== userData?.email && userData?.is_email_verified === "0") {
+            console.log("Auto-save blocked: Email different and not verified");
+            return;
+          }
+          
+          console.log("Manual save allowed");
           const formData = new FormData();
           if (values.email) {
             formData.set("email", values.email);
@@ -52,6 +72,7 @@ function ContactDetailFormPro() {
           }
           profileHandler(formData);
           await mutate();
+          setEmailChanged(false);
         }}
         validate={validate}
       >
@@ -63,25 +84,56 @@ function ContactDetailFormPro() {
                 email={props.values.email ?? ""}
               />
             )}
+            {openEmailModal && (
+              <EmailVerificationLinkModal
+                onCancel={() => setOpenEmailModal(false)}
+                email={props.values.email ?? ""}
+              />
+            )}
             <input className="hidden" autoComplete="false" />
             <div className="my-3">
               <div className="flex flex-row justify-between">
                 <Label required label="Email" className="ml-1 text-center" />
-                <div
-                  className={`ml-16  ${
-                    userData?.is_email_verified === "0"
-                      ? "bg-slate-300 text-white"
+                <Button
+                  type="button"
+                  variant="filled"
+                  color="primary"
+                  size="normal"
+                  buttonClassName={`!py-0.5 !px-5 text-sm ${
+                    emailChanged || userData?.is_email_verified === "0"
+                      ? "bg-slate-300 text-white hover:bg-slate-400"
                       : "!bg-green-500 !text-white"
-                  } px-5 rounded-md`}
+                  } rounded-md`}
+                  onClick={async () => {
+                    setIsVerifying(true);
+                    const formData = new FormData();
+                    formData.set("email", props.values.email ?? "");
+                    formData.set("mobile_number", props.values.mobile_number);
+                    formData.set("key", "0");
+                    await sendOtp(formData);
+                    setOpenEmailModal(!openEmailModal);
+                    
+                    const checkVerification = setInterval(async () => {
+                      await mutate();
+                      if (userData?.is_email_verified === "1") {
+                        clearInterval(checkVerification);
+                        setEmailChanged(false);
+                        setIsVerifying(false);
+                        console.log("Verification complete - manual save required");
+                        setTimeout(async () => {
+                          await mutate();
+                        }, 1000);
+                      }
+                    }, 3000);
+                    
+                    setTimeout(() => {
+                      clearInterval(checkVerification);
+                      setIsVerifying(false);
+                    }, 300000);
+                  }}
                 >
-                  <Heading
-                    text={
-                      userData?.is_email_verified === "0"
-                        ? "Verify"
-                        : "Verified"
-                    }
-                  />
-                </div>
+                  {emailChanged || userData?.is_email_verified === "0" ? "Verify" : "Verified"}
+                </Button>
               </div>
 
               <div className="my-5 flex justify-center">
@@ -89,7 +141,14 @@ function ContactDetailFormPro() {
                   id="email"
                   value={props.values.email}
                   className={inputClassName}
-                  onChange={props.handleChange}
+                  onChange={(e) => {
+                    props.handleChange(e);
+                    if (e.target.value !== userData?.email) {
+                      setEmailChanged(true);
+                    } else {
+                      setEmailChanged(false);
+                    }
+                  }}
                 />
                 {props.touched.email && props.errors.email ? (
                   <Error error={props?.errors.email} />
@@ -144,7 +203,10 @@ function ContactDetailFormPro() {
                   !props.values.mobile_number ||
                   (userData &&
                     userData.email === props.values.email &&
-                    userData?.mobile_number === props.values.mobile_number)
+                    userData?.mobile_number === props.values.mobile_number) ||
+                  (emailChanged && userData?.is_email_verified === "0") ||
+                  (props.values.email !== userData?.email && userData?.is_email_verified === "0") ||
+                  (props.values.email !== userData?.email && emailChanged)
                 }
                 loading={isProfileLoading}
                 variant="filled"
