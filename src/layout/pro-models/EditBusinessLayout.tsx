@@ -31,9 +31,12 @@ function EditBusinessModal({
     editBusiness,
     setError,
   } = useBusiness();
+  
   useEffect(() => {
     detailBusiness(id);
-  }, []);
+  }, [id]);
+  
+  
   const validate = (values: AddBusiness) => {
     const errors: FormikErrors<AddBusiness> = {};
     if (!values.name) {
@@ -69,13 +72,14 @@ function EditBusinessModal({
         />
         <Formik<AddBusiness>
           initialValues={{
-            name: businessDetail?.name ?? "",
+            name: businessDetail?.name || "",
             profile_picture: undefined,
-            description: businessDetail?.description ?? "",
+            description: businessDetail?.description || "",
             service_images: undefined,
-            postcode: businessDetail?.business_postcode?.name ?? "",
+            postcode: businessDetail?.postcode || "",
           }}
           enableReinitialize={true}
+          key={`business-${businessDetail?.id || 'loading'}`}
           onSubmit={async (values) => {
             const files = values.service_images
               ? [...values.service_images]

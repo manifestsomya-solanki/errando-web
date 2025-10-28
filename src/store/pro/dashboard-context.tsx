@@ -84,9 +84,8 @@ const BusinessContextProvider = (props: { children: React.ReactNode }) => {
 
   //detail  business
   const DetailBusiness = async (id?: number) => {
-    setBusinessDetailUrl(
-      buildApiUrl(`${API_ENDPOINTS.BUSINESSES_DETAIL}/${id}`)
-    );
+    const url = buildApiUrl(`${API_ENDPOINTS.BUSINESSES}/${id}/detail`);
+    setBusinessDetailUrl(url);
   };
 
   const dummy_detail_data: Business = {} as Business;

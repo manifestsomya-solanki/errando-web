@@ -299,7 +299,7 @@ function QuestionsModal(props: {
                                     }
                                   )}
                               </div>
-                              
+                               
                               <div className="mt-4 p-2 border-t border-gray-200 dark:border-gray-600">
                                 <div className="flex items-center gap-3">
                                   <input
