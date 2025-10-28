@@ -32,6 +32,8 @@ function ContactDetailsForm() {
     "items-center w-full text-md md:w-full text-slate-700 border-slate-500 outline-none  font-medium font-poppins     border rounded-lg    ease-in focus:caret-slate-500  lg:mr-3";
   const [openModal, setOpenModal] = useState(false);
   const [openEmailModal, setOpenEmailModal] = useState(false);
+  const [emailChanged, setEmailChanged] = useState(false);
+  const [isVerifying, setIsVerifying] = useState(false);
 
   return (
     <>
@@ -42,6 +44,14 @@ function ContactDetailsForm() {
         }}
         enableReinitialize
         onSubmit={async (values) => {
+          if (isVerifying) {
+            return;
+          }
+          
+          if (emailChanged && userData?.is_email_verified === "0") {
+            return;
+          }
+          
           const formData = new FormData();
           if (values.email) {
             formData.set("email", values.email);
@@ -51,6 +61,7 @@ function ContactDetailsForm() {
           }
           profileHandler(formData);
           await mutate();
+          setEmailChanged(false);
         }}
         validate={validate}
       >
@@ -80,27 +91,53 @@ function ContactDetailsForm() {
                   size="normal"
                   buttonClassName={`!py-0.5 !px-5  
                   ${
-                    userData?.is_email_verified === "0"
+                    emailChanged || userData?.is_email_verified === "0"
                       ? "bg-slate-300 text-white hover:bg-slate-400"
                       : "!bg-green-500 !text-white"
                   }  rounded-md`}
-                  onClick={() => {
+                  onClick={async () => {
+                    setIsVerifying(true);
                     const formData = new FormData(); //initialize formdata
                     formData.set("email", props.values.email ?? "");
                     formData.set("mobile_number", props.values.mobile_number);
                     formData.set("key", "0");
-                    sendOtp(formData);
+                    await sendOtp(formData);
                     setOpenEmailModal(!openEmailModal);
+                    
+                    const checkVerification = setInterval(async () => {
+                      await mutate();
+                      if (userData?.is_email_verified === "1") {
+                        clearInterval(checkVerification);
+                        setEmailChanged(false);
+                        setIsVerifying(false);
+                        setTimeout(async () => {
+                          await mutate();
+                          console.log("Verification complete - manual save required");
+                        }, 1000);
+                      }
+                    }, 3000);
+                    
+                    setTimeout(() => {
+                      clearInterval(checkVerification);
+                      setIsVerifying(false);
+                    }, 300000);
                   }}
                 >
-                  {userData?.is_email_verified === "0" ? "Verify" : "Verified"}
+                  {emailChanged || userData?.is_email_verified === "0" ? "Verify" : "Verified"}
                 </Button>
               </div>
               <Input
                 id="email"
                 value={props.values.email}
                 className={inputClassName}
-                onChange={props.handleChange}
+                onChange={(e) => {
+                  props.handleChange(e);
+                  if (e.target.value !== userData?.email) {
+                    setEmailChanged(true);
+                  } else {
+                    setEmailChanged(false);
+                  }
+                }}
               />
               {props.touched.email && props.errors.email ? (
                 <Error error={props?.errors.email} />
@@ -160,7 +197,10 @@ function ContactDetailsForm() {
                   !props.values.mobile_number ||
                   (userData &&
                     userData.email === props.values.email &&
-                    userData?.mobile_number === props.values.mobile_number)
+                    userData?.mobile_number === props.values.mobile_number) ||
+                  (emailChanged && userData?.is_email_verified === "0") ||
+                  (props.values.email !== userData?.email && userData?.is_email_verified === "0") ||
+                  (props.values.email !== userData?.email && emailChanged)
                 }
               >
                 Save
