@@ -89,32 +89,26 @@ function QuestionsModal(props: {
   const [openModal, setOpenModal] = useState(false);
   const [checked, setChecked] = useState(false);
   const [extraAnswer, setExtraAnswer] = useState(false);
-  const [inputValue, setInputValue] = useState(
+  const [inputValue, setInputValue] = useState<string>(
     ids.length > 0
-      ? ids.map((d) => {
-          if (d.question === questionNumber && d.custom === true) {
-            console.log("answer", d.answer);
-            return d.answer;
-          }
-        })
+      ? ids.find((d) => d.question === (datarender[questionNumber]?.id || questionNumber) && d.custom === true)?.answer || ""
       : ""
   );
   useEffect(() => {
     setInputValue(() => {
-      const matchingAnswers = ids
-        .filter((d) => d.question === questionNumber && d.custom === true)
-        .map((d) => d.answer);
-
-      return matchingAnswers;
+      const currentQuestionId = datarender[questionNumber]?.id || questionNumber;
+      const matchingAnswer = ids.find((d) => d.question === currentQuestionId && d.custom === true)?.answer;
+      return matchingAnswer || "";
     });
-  }, [ids, questionNumber]);
+  }, [ids, questionNumber, datarender]);
 
   const newAnswerHandler = (e: string) => {
     setInputValue(e);
     formik.setFieldValue("content", e);
     
     // Find existing answer for this question
-    const existingIndex = ids.findIndex(item => item.question === questionNumber);
+    const currentQuestionId = datarender[questionNumber]?.id || questionNumber;
+    const existingIndex = ids.findIndex(item => item.question === currentQuestionId);
     
     if (existingIndex !== -1) {
       // Update existing answer
@@ -122,7 +116,7 @@ function QuestionsModal(props: {
     } else {
       // Add new answer
       ids.push({
-        question: questionNumber,
+        question: datarender[questionNumber]?.id || questionNumber,
         answer: e,
         custom: true,
       });
@@ -247,7 +241,7 @@ function QuestionsModal(props: {
                                           <input
                                             key={key}
                                             checked={
-                                              d === ids[questionNumber]?.answer
+                                              d === ids.find(item => item.question === (datarender[questionNumber]?.id || questionNumber))?.answer
                                                 ? true
                                                 : false
                                             }
@@ -255,16 +249,18 @@ function QuestionsModal(props: {
                                               setChecked(true);
                                               setInputValue("");
                                               setExtraAnswer(false);
-                                              if (
-                                                ids.length > 0 &&
-                                                ids[ids.length - 1]?.question ===
-                                                questionNumber
-                                              ) {
-                                                ids.pop();
-                                              } else if (ids[questionNumber]) {
-                                                ids[questionNumber].answer = d;
-                                                ids[questionNumber].custom =
-                                                  false;
+                                              const currentQuestionId = datarender[questionNumber]?.id || questionNumber;
+                                              const existingIndex = ids.findIndex(item => item.question === currentQuestionId);
+                                              
+                                              if (existingIndex !== -1) {
+                                                ids[existingIndex].answer = d;
+                                                ids[existingIndex].custom = false;
+                                              } else {
+                                                ids.push({
+                                                  question: currentQuestionId,
+                                                  answer: d,
+                                                  custom: false,
+                                                });
                                               }
                                             }}
                                             id={d}
@@ -280,7 +276,7 @@ function QuestionsModal(props: {
                                                 ids[questionNumber].answer = d;
                                               } else {
                                                 ids.push({
-                                                  question: questionNumber,
+                                                  question: datarender[questionNumber]?.id || questionNumber,
                                                   answer: d,
                                                   custom: false,
                                                 });
@@ -312,13 +308,23 @@ function QuestionsModal(props: {
                                         questionNumber
                                       ) {
                                         ids.pop();
-                                      } else if (ids[questionNumber]) {
-                                        ids[questionNumber].answer =
-                                          inputValue.toString();
-                                        ids[questionNumber].custom = true;
+                                      } else {
+                                        const currentQuestionId = datarender[questionNumber]?.id || questionNumber;
+                                        const existingIndex = ids.findIndex(item => item.question === currentQuestionId);
+                                        
+                                        if (existingIndex !== -1) {
+                                          ids[existingIndex].answer = inputValue.toString();
+                                          ids[existingIndex].custom = true;
+                                        } else {
+                                          ids.push({
+                                            question: currentQuestionId,
+                                            answer: inputValue.toString(),
+                                            custom: true,
+                                          });
+                                        }
                                       }
                                     }}
-                                    checked={extraAnswer}
+                                    checked={ids.find(item => item.question === (datarender[questionNumber]?.id || questionNumber))?.custom || false}
                                     type="radio"
                                     name="content"
                                     className="xl:w-4 xl:h-4 md:w-3 md:h-3 xs:w-3 xs:h-3 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800  dark:bg-gray-700 dark:border-gray-600"
