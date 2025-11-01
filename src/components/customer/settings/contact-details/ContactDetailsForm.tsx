@@ -2,10 +2,10 @@ import { Formik, FormikErrors } from "formik";
 import Input from "../../../UI/Input";
 import Error from "../../../UI/Error";
 import Label from "../../../UI/Label";
-import Heading from "../../../UI/Heading";
+
 import Button from "../../../UI/Button";
 import EditContactModal from "../../../../layout/home/EditContactModal";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "../../../../store/customer/auth-context";
 import EmailVerificationLinkModal from "../../../../layout/customer/EmailVerificationLinkModal";
 
@@ -34,6 +34,23 @@ function ContactDetailsForm() {
   const [openEmailModal, setOpenEmailModal] = useState(false);
   const [emailChanged, setEmailChanged] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
+  const isEmailVerified = String(userData?.is_email_verified) === "1";
+
+  // Revalidate user detail when tab gains focus or visibility changes
+  useEffect(() => {
+    const onFocus = () => {
+      mutate();
+    };
+    const onVisibility = () => {
+      if (!document.hidden) mutate();
+    };
+    window.addEventListener("focus", onFocus);
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => {
+      window.removeEventListener("focus", onFocus);
+      document.removeEventListener("visibilitychange", onVisibility);
+    };
+  }, [mutate]);
 
   return (
     <>
@@ -48,7 +65,7 @@ function ContactDetailsForm() {
             return;
           }
           
-          if (emailChanged && userData?.is_email_verified === "0") {
+          if (emailChanged && !isEmailVerified) {
             return;
           }
           
@@ -91,7 +108,7 @@ function ContactDetailsForm() {
                   size="normal"
                   buttonClassName={`!py-0.5 !px-5  
                   ${
-                    emailChanged || userData?.is_email_verified === "0"
+                    emailChanged || !isEmailVerified
                       ? "bg-slate-300 text-white hover:bg-slate-400"
                       : "!bg-green-500 !text-white"
                   }  rounded-md`}
@@ -105,11 +122,17 @@ function ContactDetailsForm() {
                     setOpenEmailModal(!openEmailModal);
                     
                     const checkVerification = setInterval(async () => {
-                      await mutate();
-                      if (userData?.is_email_verified === "1") {
+                      // Use fresh data returned by mutate to avoid stale closure
+                      const latest = await mutate();
+                      const latestUser = (latest as any)?.data ?? latest;
+                      if (String(latestUser?.is_email_verified) === "1") {
                         clearInterval(checkVerification);
                         setEmailChanged(false);
                         setIsVerifying(false);
+                        setOpenEmailModal(false);
+                        if (latestUser?.email && latestUser?.email !== props.values.email) {
+                          props.setFieldValue("email", latestUser.email);
+                        }
                         setTimeout(async () => {
                           await mutate();
                           console.log("Verification complete - manual save required");
@@ -120,10 +143,11 @@ function ContactDetailsForm() {
                     setTimeout(() => {
                       clearInterval(checkVerification);
                       setIsVerifying(false);
+                      setOpenEmailModal(false);
                     }, 300000);
                   }}
                 >
-                  {emailChanged || userData?.is_email_verified === "0" ? "Verify" : "Verified"}
+                  {emailChanged || !isEmailVerified ? "Verify" : "Verified"}
                 </Button>
               </div>
               <Input

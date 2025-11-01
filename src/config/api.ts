@@ -49,7 +49,7 @@ export const API_ENDPOINTS = {
   USER_REQUESTS: 'user-requests',
   USER_REQUESTS_ADD: 'user-requests/add',
   USER_REQUESTS_EDIT: 'user-requests/edit',
-  USER_REQUESTS_DETAIL: 'user-requests/detail',
+  USER_REQUESTS_DETAIL: 'user-requests',
   USER_REQUESTS_SHOW_INTEREST: 'user-requests/show-interest',
   USER_REQUESTS_SHOW_INTEREST_ALL: 'user-requests/show-interest-all',
   USER_REQUESTS_REQUEST_QUOTE: 'user-requests/request-quote',

@@ -22,8 +22,19 @@ function SeviceDetailMainPage() {
   const requestId = useParams();
   console.log(requestId?.id, "hygvhui");
 
-  const url = buildApiUrl(`${API_ENDPOINTS.USER_REQUESTS_DETAIL}/${requestId?.id}`);
-  const { data, isLoading } = useSWR(url, fetcher);
+  const url = buildApiUrl(`${API_ENDPOINTS.USER_REQUESTS_DETAIL}/${requestId?.id}/detail`);
+  const { data, isLoading, error: apiError } = useSWR(
+    requestId?.id ? url : null,
+    fetcher
+  );
+
+  // Debug logging
+  if (apiError) {
+    console.error("ServiceDetail API Error:", apiError);
+  }
+  if (data && data.status === "0") {
+    console.error("ServiceDetail API Response Error:", data.message);
+  }
 
   const serviceRequestData = data?.data;
   const {
@@ -66,6 +77,22 @@ function SeviceDetailMainPage() {
           <div>
             {isLoading ? (
               <ServiceQuestionsSkeleton />
+            ) : apiError || (data && data.status === "0") ? (
+              <div className="py-10">
+                <Heading
+                  text={data?.message || "Failed to load service details"}
+                  variant="subHeader"
+                  headingclassname="!font-normal !text-lg mx-1 text-red-500 tracking-wide dark:text-red-400 text-center"
+                />
+              </div>
+            ) : !serviceRequestData ? (
+              <div className="py-10">
+                <Heading
+                  text="No data available"
+                  variant="subHeader"
+                  headingclassname="!font-normal !text-lg mx-1 text-textColor tracking-wide dark:text-white text-center"
+                />
+              </div>
             ) : (
               <div>
                 <ServiceTitle data={serviceRequestData} />

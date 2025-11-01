@@ -53,10 +53,46 @@ export function useHomeServices() {
 export default HomeServiceContextProvider;
 
 export const fetcher = async (url: string) => {
-  const token = localStorage.getItem("token") ?? "{}";
-  return fetch(url, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  }).then((r) => r.json());
+  const token = localStorage.getItem("token");
+  if (!token || token === "{}") {
+    return {
+      status: "0",
+      message: "No token found",
+      data: null,
+    };
+  }
+
+  try {
+    const response = await fetch(url, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: "application/json",
+      },
+    });
+
+    const data = await response.json();
+
+    // Handle error responses
+    if (!response.ok) {
+      console.error("API Error:", {
+        url,
+        status: response.status,
+        data,
+      });
+      return {
+        status: "0",
+        message: data.message || "Failed to load data",
+        data: null,
+      };
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Fetcher Error:", error);
+    return {
+      status: "0",
+      message: "Network error",
+      data: null,
+    };
+  }
 };

@@ -16,9 +16,32 @@ import { API_BASE_URL, buildApiUrl, API_ENDPOINTS } from "../../../config/api";
 
 function LeadDetails() {
   const leadsId = useParams();
-  const dealerdetailurl = buildApiUrl(`${API_ENDPOINTS.USER_REQUESTS_DETAIL}/${leadsId.id}`);
-  const { data: leadsDetailData, isLoading } = useSWR(dealerdetailurl, fetcher);
+  const dealerdetailurl = buildApiUrl(`${API_ENDPOINTS.USER_REQUESTS_DETAIL}/${leadsId.id}/detail`);
+  const { data: leadsDetailData, isLoading, error: apiError } = useSWR(
+    leadsId?.id ? dealerdetailurl : null,
+    fetcher
+  );
   const leadsDetail: UserRequestList = leadsDetailData?.data;
+  
+  // Debug logging
+  console.log("LeadDetails Debug:", {
+    leadsId: leadsId?.id,
+    url: dealerdetailurl,
+    isLoading,
+    apiError,
+    responseStatus: leadsDetailData?.status,
+    hasData: !!leadsDetail,
+    answersCount: leadsDetail?.answers?.length,
+    hasUser: !!leadsDetail?.user,
+    fullResponse: leadsDetailData
+  });
+  
+  if (apiError) {
+    console.error("LeadDetails API Error:", apiError);
+  }
+  if (leadsDetailData && leadsDetailData.status === "0") {
+    console.error("LeadDetails API Response Error:", leadsDetailData.message);
+  }
   const { userData } = useAuth();
   const { buyLead, page, isBuyLeadLoading, isBuyOutrightLoading } = useLead();
   const baseUrl = buildApiUrl(`${API_ENDPOINTS.USER_REQUESTS}?for_pro=1&page=${page}&per_page=5`);
@@ -46,6 +69,26 @@ function LeadDetails() {
     <div>
       {isLoading ? (
         <LeadsDetailSkeleton limit={1} />
+      ) : apiError || (leadsDetailData && leadsDetailData.status === "0") ? (
+        <HomeCard className="rounded-md  px-5 pb-10 mt-5">
+          <div className="py-4">
+            <Heading
+              text={leadsDetailData?.message || "Failed to load lead details"}
+              variant="subHeader"
+              headingclassname="!font-normal !text-lg mx-1 text-red-500 tracking-wide dark:text-red-400"
+            />
+          </div>
+        </HomeCard>
+      ) : !leadsDetail ? (
+        <HomeCard className="rounded-md  px-5 pb-10 mt-5">
+          <div className="py-4">
+            <Heading
+              text="No data available"
+              variant="subHeader"
+              headingclassname="!font-normal !text-lg mx-1 text-textColor tracking-wide dark:text-white"
+            />
+          </div>
+        </HomeCard>
       ) : (
         <HomeCard className="rounded-md  px-5 pb-10 mt-5">
           <div className="py-4 border-b-[0.5px] border-b-slate-200">
@@ -56,16 +99,16 @@ function LeadDetails() {
             />
           </div>
           <div className="py-4 grid lg:grid-cols-2 xs:gap-3 lg:gap-6">
-            {leadsDetail?.answers?.length ? (
-              leadsDetail?.answers?.map((answer) => (
+            {leadsDetail?.answers && leadsDetail.answers.length > 0 ? (
+              leadsDetail.answers.map((answer) => (
                 <div key={answer.id}>
                   <Heading
-                    text={answer.question.title}
+                    text={answer?.question?.title || "Question"}
                     variant="subTitle"
                     headingclassname="!font-semibold text-slate-400 !text-sm  mx-1 tracking-wide dark:text-slate-400 "
                   />
                   <Heading
-                    text={answer.answer}
+                    text={answer?.answer || "--"}
                     variant="subHeader"
                     headingclassname="!font-normal !text-lg mx-1 text-textColor tracking-wide dark:text-white"
                   />
@@ -117,8 +160,8 @@ function LeadDetails() {
               />
               <Button
                 disabled={
-                  leadsDetail?.leads_count >= 4 ||
-                  userData?.available_credits == 0
+                  (leadsDetail?.leads_count ?? 0) >= 4 ||
+                  (userData?.available_credits ?? 0) == 0
                 }
                 variant="filled"
                 color="primary"
@@ -129,7 +172,7 @@ function LeadDetails() {
                 loading={isBuyLeadLoading}
               />
             </div>
-            {leadsDetail.leads_count === 0 && (
+            {(leadsDetail?.leads_count ?? 0) === 0 && (
               <div className="flex w-full items-center gap-3 relative">
                 <img src={Credit} className="w-5 h-5 object-cover" />
                 <Heading
@@ -139,8 +182,8 @@ function LeadDetails() {
                 />
                 <Button
                   disabled={
-                    leadsDetail?.leads_count > 0 ||
-                    userData?.available_credits == 0
+                    (leadsDetail?.leads_count ?? 0) > 0 ||
+                    (userData?.available_credits ?? 0) == 0
                   }
                   variant="filled"
                   color="primary"

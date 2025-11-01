@@ -39,27 +39,49 @@ function getTimeDifferenceString(time: any) {
 
 function MyLeads(props: any) {
   const leadsId = useParams();
-  const dealerdetailurl = buildApiUrl(`${API_ENDPOINTS.USER_REQUESTS_DETAIL}/${leadsId.id}`);
-  const { data: leadsDetailData, isLoading } = useSWR(dealerdetailurl, fetcher);
+  // Use /detail endpoint (same as LeadDetails) since route only has /detail
+  const dealerdetailurl = buildApiUrl(`${API_ENDPOINTS.USER_REQUESTS_DETAIL}/${leadsId.id}/detail`);
+  const { data: leadsDetailData, isLoading, error: apiError } = useSWR(
+    leadsId?.id ? dealerdetailurl : null, 
+    fetcher
+  );
   const leadsDetail: UserRequestList = leadsDetailData?.data;
-  const firstTwoDigits =
-    leadsDetail?.user?.mobile_number &&
-    leadsDetail?.user?.mobile_number.slice(0, 3);
-  const lastDigit =
-    leadsDetail?.user?.mobile_number &&
-    leadsDetail?.user?.mobile_number.slice(-1);
+  
+  // Debug logging
+  console.log("MyLeads Debug:", {
+    leadsId: leadsId?.id,
+    url: dealerdetailurl,
+    isLoading,
+    apiError,
+    responseStatus: leadsDetailData?.status,
+    hasData: !!leadsDetail,
+    dataKeys: leadsDetail ? Object.keys(leadsDetail) : null,
+    fullResponse: leadsDetailData
+  });
+  
+  if (apiError) {
+    console.error("MyLeads API Error:", apiError);
+  }
+  if (leadsDetailData && leadsDetailData.status === "0") {
+    console.error("MyLeads API Response Error:", leadsDetailData.message);
+  }
+  
+  // Safe data extraction with null checks
+  const mobile_number = leadsDetail?.user?.mobile_number || "";
+  // Show first 4 digits, then underscores for the rest
+  const firstFourDigits = mobile_number ? mobile_number.slice(0, 4) : "";
+  const remainingLength = mobile_number ? Math.max(0, mobile_number.length - 4) : 0;
+  const underscores = "_".repeat(remainingLength);
+  const maskedNumber = mobile_number ? `${firstFourDigits}${underscores}` : "--";
 
-  // Create the masked number string
-  const maskedNumber = `${firstTwoDigits}**********${lastDigit}`;
-
-  const firsttwoemail =
-    leadsDetail?.user?.email && leadsDetail?.user?.email.slice(0, 3);
-  const lastcharinemail =
-    leadsDetail?.user?.email && leadsDetail?.user?.email.slice(-3);
-
-  // Create the masked number string
-  const email = `${firsttwoemail}**********${lastcharinemail}`;
-  const timeDifferenceString = getTimeDifferenceString(leadsDetail?.created_at);
+  const userEmail = leadsDetail?.user?.email || "";
+  const firsttwoemail = userEmail ? userEmail.slice(0, 3) : "";
+  const lastcharinemail = userEmail ? userEmail.slice(-3) : "";
+  const email = userEmail ? `${firsttwoemail}**********${lastcharinemail}` : "--";
+  
+  const timeDifferenceString = leadsDetail?.created_at 
+    ? getTimeDifferenceString(leadsDetail.created_at) 
+    : "Posted recently";
 
   const { theme } = useTheme();
 
@@ -77,6 +99,26 @@ function MyLeads(props: any) {
       )}
       {isLoading ? (
         <MyLeadsSkeleton limit={1} />
+      ) : apiError || (leadsDetailData && leadsDetailData.status === "0") ? (
+        <HomeCard className="rounded-md  px-5 pb-5">
+          <div className="py-4">
+            <Heading
+              text={leadsDetailData?.message || "Failed to load lead details"}
+              variant="subHeader"
+              headingclassname="!font-normal !text-lg mx-1 text-red-500 tracking-wide dark:text-red-400"
+            />
+          </div>
+        </HomeCard>
+      ) : !leadsDetail ? (
+        <HomeCard className="rounded-md  px-5 pb-5">
+          <div className="py-4">
+            <Heading
+              text="No data available"
+              variant="subHeader"
+              headingclassname="!font-normal !text-lg mx-1 text-textColor tracking-wide dark:text-white"
+            />
+          </div>
+        </HomeCard>
       ) : (
         <HomeCard className="rounded-md  px-5 pb-5">
           <div className="py-4 border-b-[0.5px] border-b-slate-200">
@@ -133,7 +175,7 @@ function MyLeads(props: any) {
                 />
               ) : (
                 <Heading
-                  text={leadsDetail?.user?.full_name.slice(0, 1)}
+                  text={leadsDetail?.user?.full_name?.slice(0, 1) || "?"}
                   variant="subTitle"
                   headingclassname="!font-semibold text-white !text-2xl   tracking-wide dark:text-white px-6 py-4 rounded-full bg-blue-300"
                 />
@@ -148,7 +190,7 @@ function MyLeads(props: any) {
                 {leadsDetail?.user?.full_name ? (
                   <div className="flex gap-3">
                     <Heading
-                      text={leadsDetail?.user?.full_name.split(" ")[0]}
+                      text={leadsDetail.user.full_name.split(" ")[0]}
                       variant="subHeader"
                       headingclassname="!font-normal !text-lg mx-1 text-textColor tracking-wide dark:text-white"
                     />
@@ -171,9 +213,15 @@ function MyLeads(props: any) {
 
               <div className="flex gap-3">
                 <Heading
-                  text={`${leadsDetail?.user?.city ?? "--"} , ${
-                    leadsDetail?.postcode?.name.split(" ")[0] ?? "--"
-                  }`}
+                  text={
+                    leadsDetail?.user?.city && leadsDetail?.postcode
+                      ? `${leadsDetail.user.city} , ${(leadsDetail.postcode.split(" ")[0]?.slice(0, 4) || leadsDetail.postcode.slice(0, 4)) + "**"}`
+                      : leadsDetail?.user?.city
+                      ? leadsDetail.user.city
+                      : leadsDetail?.postcode
+                      ? `${(leadsDetail.postcode.split(" ")[0]?.slice(0, 4) || leadsDetail.postcode.slice(0, 4)) + "**"}`
+                      : "--"
+                  }
                   variant="subHeader"
                   headingclassname="!font-normal !text-lg mx-1 text-textColor tracking-wide dark:text-white"
                 />
@@ -234,16 +282,16 @@ function MyLeads(props: any) {
           </div>
           <div className="pt-4">
             <Heading
-              text={`Only 4 Pro’s can reply to this lead`}
+              text={`Only 4 Pro's can reply to this lead`}
               variant="subHeader"
               headingclassname="!font-normal !text-lg mx-1 text-textColor tracking-wide dark:text-white"
             />
             <div className="flex gap-2 my-1 ml-1">
-              {Array.from({ length: leadsDetail?.leads_count }, () => (
-                <img src={GreenRoundTick} />
+              {Array.from({ length: leadsDetail?.leads_count || 0 }, () => (
+                <img src={GreenRoundTick} alt="filled" />
               ))}
-              {Array.from({ length: 4 - leadsDetail?.leads_count }, () => (
-                <img src={BlackRoundTick} />
+              {Array.from({ length: Math.max(0, 4 - (leadsDetail?.leads_count || 0)) }, () => (
+                <img src={BlackRoundTick} alt="empty" />
               ))}
             </div>
           </div>

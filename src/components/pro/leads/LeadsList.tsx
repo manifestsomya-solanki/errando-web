@@ -27,9 +27,15 @@ function LeadsList() {
               }
               service={`${item?.service?.name} `}
               answers={answers.length > 0 ? answers : ["No answers"]}
-              location={`${item?.user?.city ?? "--"} , ${
-                item?.postcode?.name?.slice(0, 3) ?? "--"
-              }`}
+              location={
+                item?.user?.city && item?.postcode
+                  ? `${item.user.city} , ${(item.postcode.split(" ")[0]?.slice(0, 4) || item.postcode.slice(0, 4)) + "**"}`
+                  : item?.user?.city
+                  ? item.user.city
+                  : item?.postcode
+                  ? `${(item.postcode.split(" ")[0]?.slice(0, 4) || item.postcode.slice(0, 4)) + "**"}`
+                  : "--"
+              }
               mincredits={6}
               maxcredits={3}
               id={item?.id}
