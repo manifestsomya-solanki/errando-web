@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Search from "../../../assets/search.tsx";
 import { useTheme } from "../../../store/theme-context";
 import Button from "../../UI/Button.tsx";
@@ -10,12 +10,23 @@ const SearchBar = (props: {
   page_key?: string;
 }) => {
   const [searchKey, setSearchKey] = useState("");
+  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
+  
   const searchHandler = (
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
     event.preventDefault();
     props.onChange(searchKey);
   };
+  
+  // Clear debounce timer on unmount
+  useEffect(() => {
+    return () => {
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     return () => {
@@ -51,8 +62,23 @@ const SearchBar = (props: {
             placeholder={`${localStorage.getItem("service") ?? "Search"}`}
             className="focus:outline-none w-full placeholder:text-md placeholder:font-normal  bg-white dark:text-white dark:bg-black dark:placeholder:text-white"
             onChange={(event: any) => {
-              setSearchKey(event.target.value);
-              if (props.searchkey.length != 0) searchHandler(event);
+              const value = event.target.value;
+              setSearchKey(value);
+               
+              // Clear previous debounce timer
+              if (debounceTimerRef.current) {
+                clearTimeout(debounceTimerRef.current);
+              }
+              
+              // Debounce search - trigger after 300ms of no typing
+              debounceTimerRef.current = setTimeout(() => {
+                if (value.trim().length > 0) {
+                  props.onChange(value.trim());
+                } else {
+                  // Clear search if input is empty
+                  props.onChange("");
+                }
+              }, 300);
             }}
           />
         </div>
