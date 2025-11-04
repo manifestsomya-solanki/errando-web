@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { createContext } from "react";
 import { toast } from "react-toastify";
 import { buildApiUrl, API_ENDPOINTS } from "../../config/api";
@@ -50,79 +50,110 @@ export const ProjectContext = createContext<ProjectResponseType>({
 });
 
 const ProjectContextProvider = (props: { children: React.ReactNode }) => {
-  const id = JSON.parse(localStorage.getItem("data") ?? "").id;
+  const [userId, setUserId] = useState<number | null>(null);
   const perPage = 5;
   const [currentPage, setCurrentPage] = useState(1);
   const [completePage, setCompletePage] = useState(1);
 
-  const [url, setUrl] = useState(
-    buildApiUrl(`${API_ENDPOINTS.USER_REQUESTS}?page=${currentPage}&per_page=${perPage}&status=PENDING&user_id=${id}`)
-  );
+  // Read user ID reactively from localStorage
+  useEffect(() => {
+    const readUserData = () => {
+      try {
+        const userData = localStorage.getItem("data");
+        if (userData) {
+          const parsed = JSON.parse(userData);
+          if (parsed?.id) {
+            setUserId(parsed.id);
+            return;
+          }
+        }
+        setUserId(null);
+      } catch (error) {
+        console.error("Error reading user data from localStorage:", error);
+        setUserId(null);
+      }
+    };
 
-  const [completeurl, setCompleteUrl] = useState(
-    buildApiUrl(`${API_ENDPOINTS.USER_REQUESTS}?page=${completePage}&per_page=${perPage}&status=COMPLETED&user_id=${id}`)
-  );
+    // Read initially
+    readUserData();
+
+    // Listen for storage changes (when localStorage is updated from other tabs/components)
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === "data") {
+        readUserData();
+      }
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+
+    // Also check periodically (in case same-tab updates don't trigger storage event)
+    const interval = setInterval(readUserData, 1000);
+
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+      clearInterval(interval);
+    };
+  }, []);
+
+  // Update URLs when userId or page changes
+  const [url, setUrl] = useState<string | null>(null);
+  const [completeurl, setCompleteUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (userId) {
+      setUrl(
+        buildApiUrl(`${API_ENDPOINTS.USER_REQUESTS}?page=${currentPage}&per_page=${perPage}&status=PENDING&user_id=${userId}`)
+      );
+      setCompleteUrl(
+        buildApiUrl(`${API_ENDPOINTS.USER_REQUESTS}?page=${completePage}&per_page=${perPage}&status=COMPLETED&user_id=${userId}`)
+      );
+    } else {
+      setUrl(null);
+      setCompleteUrl(null);
+    }
+  }, [userId, currentPage, completePage]);
 
   const dummy_data: Request[] = [];
   let current: Request[] = [];
   let complete: Request[] = [];
 
   const handleNextPage = (key: string) => {
-    console.log("here");
     if (key === "current") {
       setCurrentPage((c) => c + 1);
-      const params = new URLSearchParams(url);
-      params.delete("page");
-
-      params.set("page", `${currentPage + 1}`);
-      params.set("per_page", `${perPage}`);
-      setUrl(decodeURIComponent(params.toString()));
+      // URL will be updated automatically by useEffect when currentPage changes
     } else {
       setCompletePage((c) => c + 1);
-      const params = new URLSearchParams(completeurl);
-
-      params.set("page", `${completePage + 1}`);
-      params.set("per_page", `${perPage}`);
-      setCompleteUrl(decodeURIComponent(params.toString()));
+      // URL will be updated automatically by useEffect when completePage changes
     }
   };
 
   const handlePrevPage = (key: string) => {
     if (key === "current") {
-      setCurrentPage((c) => c - 1);
-      const params = new URLSearchParams(url);
-      params.delete("page");
-
-      params.set("page", `${currentPage - 1}`);
-      params.set("per_page", `${perPage}`);
-      setUrl(decodeURIComponent(params.toString()));
+      setCurrentPage((c) => Math.max(1, c - 1));
+      // URL will be updated automatically by useEffect when currentPage changes
     } else {
-      setCompletePage((c) => c - 1);
-      const params = new URLSearchParams(completeurl);
-      params.delete("page");
-      params.set("page", `${completePage - 1}`);
-      params.set("per_page", `${perPage}`);
-      setCompleteUrl(decodeURIComponent(params.toString()));
+      setCompletePage((c) => Math.max(1, c - 1));
+      // URL will be updated automatically by useEffect when completePage changes
     }
   };
 
-  //curent
+  //current - only fetch if URL is available
   const {
     data: currentData,
     isLoading: iCurrentLoading,
     mutate: isCurrentMutate,
   } = useSWR(url, fetcher);
   current = currentData?.data || dummy_data;
-  const currentNumber = currentData?.total;
+  const currentNumber = currentData?.total || 0;
 
-  //complete
+  //complete - only fetch if URL is available
   const {
     data: completeData,
     isLoading: iCompleteLoading,
     mutate: isCompleteMutate,
   } = useSWR(completeurl, fetcher);
   complete = completeData?.data || dummy_data;
-  const completeNumber = completeData?.total;
+  const completeNumber = completeData?.total || 0;
 
   return (
     <ProjectContext.Provider

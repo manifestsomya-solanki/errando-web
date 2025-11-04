@@ -56,25 +56,55 @@ function CommentsModal(props: {
         for (let i = 0; i < questions.length; i++) {
           formData.set(
             `data[${i}][question_id]`,
-            (questions[i].question + 1).toString()
+            questions[i].question.toString()
           );
           formData.set(`data[${i}][answer]`, questions[i].answer.toString());
         }
 
         await addRequest(formData);
+        // addRequest handles navigation internally, no need for hard redirect
       } else {
-        console.log(props.requestId, "id of request");
-        const formData = new FormData();
+        // Check if this is a registration flow with pending request data
+        const pendingRequestData = localStorage.getItem("pending_request_data");
+        const pendingRequestToken = localStorage.getItem("pending_request_token");
+        
+        if (pendingRequestData && pendingRequestToken) {
+          // Registration flow: reconstruct FormData from stored data
+          const formData = new FormData();
+          const storedData = JSON.parse(pendingRequestData);
+          
+          // Reconstruct all stored form data
+          Object.keys(storedData).forEach((key) => {
+            formData.set(key, storedData[key]);
+          });
+          
+          // Add comment and file from current form
+          if (values?.img) formData.set("file", values?.img);
+          formData.set("comment", values.comment);
+          
+          // Use latest token from verifyOtp (localStorage) instead of old pending token
+          // verifyOtp already updated localStorage with the latest token after OTP verification
+          const latestToken = localStorage.getItem("token") || pendingRequestToken;
+          
+          // Call addRequest with the latest token
+          await addRequest(formData, latestToken);
+          
+          // Clear pending data after use
+          localStorage.removeItem("pending_request_data");
+          localStorage.removeItem("pending_request_token");
+        } else {
+          // Existing edit flow
+          console.log(props.requestId, "id of request");
+          const formData = new FormData();
 
-        if (values?.img) formData.set("file", values?.img);
-        formData.set("comment", values.comment);
+          if (values?.img) formData.set("file", values?.img);
+          formData.set("comment", values.comment);
 
-        await editRequest(formData, props.requestId?.toString() ?? "");
+          await editRequest(formData, props.requestId?.toString() ?? "");
+          // editRequest also handles navigation internally
+        }
       }
-      // Navigate to projects page after successful submission
-      setTimeout(() => {
-        window.location.href = "/projects";
-      }, 1000);
+      // Close modal - navigation is handled by addRequest/editRequest
       props.onCancelAll();
     },
   });

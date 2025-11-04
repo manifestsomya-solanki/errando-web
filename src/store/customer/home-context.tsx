@@ -1,7 +1,7 @@
 import React, { ReactNode, useContext, useState } from "react";
 import { Service } from "../../models/home";
 import useSWR from "swr";
-import { API_BASE_URL, buildApiUrl, API_ENDPOINTS } from "../../config/api";
+import { buildApiUrl, API_ENDPOINTS } from "../../config/api";
 
 
 type HomeServiceDetailsType = {
@@ -29,7 +29,8 @@ const HomeServiceContextProvider = (props: { children: ReactNode }) => {
 
   const dummy_data: Service[] = [];
   let datarender: Service[] = [];
-  const { data, isLoading } = useSWR(url, fetcher);
+  // Use publicFetcher for services search (works without token)
+  const { data, isLoading } = useSWR(url, publicFetcher);
   datarender = data?.data || dummy_data;
 
   return (
@@ -52,6 +53,43 @@ export function useHomeServices() {
 
 export default HomeServiceContextProvider;
 
+// Public fetcher - works without token (for services search on home page)
+export const publicFetcher = async (url: string) => {
+  try {
+    const response = await fetch(url, {
+      headers: {
+        Accept: "application/json",
+      },
+    });
+
+    const data = await response.json();
+
+    // Handle error responses
+    if (!response.ok) {
+      console.error("API Error:", {
+        url,
+        status: response.status,
+        data,
+      });
+      return {
+        status: "0",
+        message: data.message || "Failed to load data",
+        data: null,
+      };
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Public Fetcher Error:", error);
+    return {
+      status: "0",
+      message: "Network error",
+      data: null,
+    };
+  }
+};
+
+// Original fetcher - requires token (for all other authenticated endpoints)
 export const fetcher = async (url: string) => {
   const token = localStorage.getItem("token");
   if (!token || token === "{}") {

@@ -82,6 +82,7 @@ export interface RegisterUser {
 export interface Data {
   user: UserData;
   user_requests: Userrequests;
+  token?: string; // Token returned from addRequest endpoint
 }
 
 export interface Userrequests {

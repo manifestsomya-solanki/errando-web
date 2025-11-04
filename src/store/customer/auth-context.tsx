@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { RegisterUser, SendOtp, UserData, VerifyOtp } from "../../models/user";
 import { toast } from "react-toastify";
 import useSWR, { KeyedMutator } from "swr";
+import { mutate as globalMutate } from "swr";
 import { fetcher } from "./home-context";
 import { API_BASE_URL, buildApiUrl, API_ENDPOINTS } from "../../config/api";
 
@@ -218,6 +219,13 @@ const AuthContextProvider = (props: { children: React.ReactNode }) => {
   ) => {
     setIsLoading(true);
     setError("");
+    
+    // If registration flow, clear old token and data first to prevent stale data
+    if (key === "registration") {
+      localStorage.removeItem("token");
+      localStorage.removeItem("data");
+    }
+    
     const res = await fetch(
       buildApiUrl(API_ENDPOINTS.USER_SEND_OTP),
       {
@@ -236,7 +244,24 @@ const AuthContextProvider = (props: { children: React.ReactNode }) => {
         setIsLoading(false);
         console.log(data);
         setError("");
-        if (key && requestFormData) {
+        
+        // For registration flow, store requestFormData and token temporarily
+        // Don't call addRequest immediately - wait for OTP verification
+        if (key === "registration" && requestFormData && data?.token) {
+          // Store requestFormData and token for later use after OTP verification
+          requestFormData.set("user_id", data.data.id.toString());
+          
+          // Convert FormData to a storable format
+          const formDataObj: Record<string, string> = {};
+          requestFormData.forEach((value, key) => {
+            formDataObj[key] = value.toString();
+          });
+          
+          localStorage.setItem("pending_request_data", JSON.stringify(formDataObj));
+          localStorage.setItem("pending_request_token", data.token);
+          // Don't call addRequest here - wait for OTP verification
+        } else if (key && requestFormData && key !== "registration") {
+          // For non-registration flows, keep the old behavior
           requestFormData.set("user_id", data.data.id.toString());
           addRequest(requestFormData, data?.token);
         }
@@ -284,11 +309,19 @@ const AuthContextProvider = (props: { children: React.ReactNode }) => {
         setData(data.data);
         localStorage.setItem("data", JSON.stringify(data.data));
         localStorage.setItem("token", data.token);
+        
+        // Check if this is registration flow (pending request data exists)
+        const isRegistrationFlow = localStorage.getItem("pending_request_data") !== null;
+        
         if (key === "customer") {
           setIsLoggedIn(true);
           localStorage.setItem("role", "customer");
           localStorage.setItem("isLoggedIn", "true");
-          navigate("/home");
+          
+          // Don't navigate to /home if registration flow - CommentsModal will open
+          if (!isRegistrationFlow) {
+            navigate("/home");
+          }
         } else if (key === "pro") {
           setIsLoggedIn(true);
           localStorage.setItem("isLoggedIn", "true");
@@ -435,13 +468,27 @@ const AuthContextProvider = (props: { children: React.ReactNode }) => {
       const data = await res.json();
       setIsLoading(false);
       if (data.status === "1") {
-        // on success
+        // on success - clear all authentication and service flow data
         setTimeout(() => {
+          // Clear all authentication data
           localStorage.removeItem("token");
           localStorage.removeItem("role");
           localStorage.removeItem("data");
-
-          localStorage.setItem("isLoggedIn", "false");
+          localStorage.removeItem("isLoggedIn");
+          
+          // Clear service flow data
+          localStorage.removeItem("service");
+          localStorage.removeItem("post_code");
+          localStorage.removeItem("question");
+          
+          // Clear registration data
+          localStorage.removeItem("email");
+          localStorage.removeItem("mobile_number");
+          
+          // Clear pending request data
+          localStorage.removeItem("pending_request_data");
+          localStorage.removeItem("pending_request_token");
+          
           setIsLoggedIn(false);
           setIsLoading(false);
           navigate("/sign-in");
@@ -546,7 +593,16 @@ const AuthContextProvider = (props: { children: React.ReactNode }) => {
   const addRequest = async (formData: FormData, tokenFromApi?: string) => {
     setIsLoading(true);
     setError("");
-    const token = localStorage.getItem("token") ?? tokenFromApi;
+    
+    // Prioritize tokenFromApi (passed from CommentsModal) over localStorage token
+    // CommentsModal passes the latest token from verifyOtp, not old pending token
+    const token = tokenFromApi || localStorage.getItem("token");
+    
+    if (!token) {
+      setError("No authentication token available");
+      setIsLoading(false);
+      return;
+    }
 
     const res = await fetch(
       buildApiUrl(API_ENDPOINTS.USER_REQUESTS_ADD),
@@ -568,17 +624,44 @@ const AuthContextProvider = (props: { children: React.ReactNode }) => {
       } else {
         // Auto-login after successful request submission
         if (responseData.data?.token) {
-          localStorage.setItem("token", responseData.data.token);
+          // Update localStorage first - ensure all data is saved
+          const newToken = responseData.data.token;
+          const oldToken = localStorage.getItem("token");
+          
+          console.log("Token Update:", {
+            oldToken: oldToken?.substring(0, 20) + "...",
+            newToken: newToken?.substring(0, 20) + "...",
+            updated: newToken !== oldToken
+          });
+          
+          localStorage.setItem("token", newToken);
           localStorage.setItem("data", JSON.stringify(responseData.data.user));
-          setIsLoggedIn(true);
           localStorage.setItem("role", "customer");
           localStorage.setItem("isLoggedIn", "true");
+          
+          // Clear service flow data
           localStorage.removeItem("service");
           localStorage.removeItem("post_code");
           localStorage.removeItem("question");
+          
+          // Update state
+          setIsLoggedIn(true);
+          setData(responseData.data.user);
+          
+          // Small delay to ensure localStorage is written and project context can read it
+          await new Promise(resolve => setTimeout(resolve, 150));
+          
+          // Navigate to projects page
           console.log("Navigating to /projects after successful request submission");
           navigate("/projects");
-          await mutate("project_contect_api");
+          
+          // Refresh project data by mutating all USER_REQUESTS related SWR keys
+          // This will trigger revalidation of project context data
+          await globalMutate(
+            (key) => typeof key === 'string' && key.includes(API_ENDPOINTS.USER_REQUESTS),
+            undefined,
+            { revalidate: true }
+          );
         } else {
           console.log("No token received in response:", responseData);
         }

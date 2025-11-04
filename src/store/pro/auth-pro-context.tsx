@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { createContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { RegisterUser, SendOtp, UserData, VerifyOtp } from "../../models/user";
@@ -109,9 +109,57 @@ const AuthContextProvider = (props: { children: React.ReactNode }) => {
   const [data, setData] = useState(
     initialToken ? JSON.parse(initialToken) : undefined
   );
-  const [requestData, setrequestData] = useState(
-    initialToken ? JSON.parse(initialToken) : undefined
-  );
+  
+  // Initialize requestData from localStorage, but make it reactive
+  const [requestData, setrequestData] = useState<RegisterUser | undefined>(() => {
+    try {
+      const userData = localStorage.getItem("data");
+      if (userData) {
+        return JSON.parse(userData);
+      }
+    } catch (error) {
+      console.error("Error reading requestData:", error);
+    }
+    return undefined;
+  });
+  
+  // Update requestData when localStorage changes (reactive)
+  useEffect(() => {
+    const updateRequestData = () => {
+      try {
+        const userData = localStorage.getItem("data");
+        if (userData) {
+          const parsed = JSON.parse(userData);
+          setrequestData(parsed);
+        } else {
+          setrequestData(undefined);
+        }
+      } catch (error) {
+        console.error("Error updating requestData:", error);
+        setrequestData(undefined);
+      }
+    };
+
+    // Update initially
+    updateRequestData();
+
+    // Listen for storage changes
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === "data") {
+        updateRequestData();
+      }
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+
+    // Also check periodically
+    const interval = setInterval(updateRequestData, 1000);
+
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+      clearInterval(interval);
+    };
+  }, []);
   const [isLoading, setIsLoading] = useState(false);
   const [isProLoading, setIsProLoading] = useState(false);
   const [isCustomerLoading, setIsCustomerLoading] = useState(false);
@@ -120,11 +168,66 @@ const AuthContextProvider = (props: { children: React.ReactNode }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(initialToken ? true : false);
   const [error, setError] = useState("");
   const navigate = useNavigate();
-  let id;
-  if (initialToken) {
-    id = JSON.parse(initialToken).id;
-  }
-  const userDetailUrl = buildApiUrl(`${API_ENDPOINTS.USER_DETAIL}?user_id=${id}`);
+  
+  // Read user ID reactively from localStorage
+  const [userId, setUserId] = useState<number | null>(() => {
+    try {
+      const userData = localStorage.getItem("data");
+      if (userData) {
+        const parsed = JSON.parse(userData);
+        return parsed?.id || null;
+      }
+    } catch (error) {
+      console.error("Error reading user data:", error);
+    }
+    return null;
+  });
+
+  // Update userId when localStorage changes
+  useEffect(() => {
+    const readUserData = () => {
+      try {
+        const userData = localStorage.getItem("data");
+        if (userData) {
+          const parsed = JSON.parse(userData);
+          if (parsed?.id) {
+            setUserId(parsed.id);
+            return;
+          }
+        }
+        setUserId(null);
+      } catch (error) {
+        console.error("Error reading user data from localStorage:", error);
+        setUserId(null);
+      }
+    };
+
+    // Read initially
+    readUserData();
+
+    // Listen for storage changes
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === "data") {
+        readUserData();
+      }
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+
+    // Also check periodically (in case same-tab updates don't trigger storage event)
+    const interval = setInterval(readUserData, 1000);
+
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+      clearInterval(interval);
+    };
+  }, []);
+
+  // Build URL reactively based on userId
+  const userDetailUrl = userId 
+    ? buildApiUrl(`${API_ENDPOINTS.USER_DETAIL}?user_id=${userId}`)
+    : null;
+    
   const {
     data: userdata,
     isLoading: detailLoading,
@@ -547,9 +650,10 @@ const AuthContextProvider = (props: { children: React.ReactNode }) => {
 
     if (res.status === 200) {
       setIsLoading(false);
-      setrequestData(await res.json());
-      if (requestData.status === "0") {
-        setError(requestData.message);
+      const responseData = await res.json();
+      setrequestData(responseData);
+      if (responseData.status === "0") {
+        setError(responseData.message);
       } else {
         if (!tokenFromApi) {
           setIsLoggedIn(true);
@@ -568,7 +672,7 @@ const AuthContextProvider = (props: { children: React.ReactNode }) => {
       setError(data.message);
     }
   };
-  console.log(requestData);
+  
   const editRequest = async (formData: FormData, id: string) => {
     setIsLoading(true);
     setError("");
@@ -613,7 +717,7 @@ const AuthContextProvider = (props: { children: React.ReactNode }) => {
       value={{
         data: data,
         userData: userData,
-        requestData: requestData,
+        requestData: requestData || ({} as RegisterUser),
         login: login,
         loginPro: loginPro,
         logout: logoutHandler,

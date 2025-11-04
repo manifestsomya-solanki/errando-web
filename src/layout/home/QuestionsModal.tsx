@@ -6,7 +6,7 @@ import { useFormik } from "formik";
 import CommentsModal from "./CommentsModal";
 import { BusinessData, Question, QuestionData } from "../../models/home";
 import useSWR from "swr";
-import { fetcher } from "../../store/customer/home-context.tsx";
+import { fetcher, publicFetcher } from "../../store/customer/home-context.tsx";
 import FullPageLoading from "../../components/UI/FullPageLoading";
 import Error from "../../components/UI/Error";
 import NotFoundModal from "./NotFoundModal";
@@ -36,9 +36,10 @@ function QuestionsModal(props: {
   const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
   const businessUrl = buildApiUrl(`${API_ENDPOINTS.BUSINESSES}?postcode=${postCode}&service_id=${service}`);
   let datarenderForBusiness: BusinessData[] = [];
+  // Use publicFetcher for businesses (works without token - public endpoint)
   const { data: BusinessData, isLoading: businessLoading } = useSWR(
     service && postCode ? businessUrl : null,
-    fetcher,
+    publicFetcher,
     {
       revalidateOnFocus: false,
       revalidateOnReconnect: false,
@@ -53,13 +54,15 @@ function QuestionsModal(props: {
   const url = buildApiUrl(`${API_ENDPOINTS.QUESTIONS}?service_id=${service}&postcode=${postCode}&page=1&per_page=10`);
   const dummy_data: Question[] = [];
   let datarender: QuestionData[] = [];
+  
+  // Use publicFetcher for questions (works without token - public endpoint)
   const {
     data,
     error: ApiError,
     isLoading,
   } = useSWR(
     error.length === 0 && service && postCode ? url : null, 
-    fetcher,
+    publicFetcher,
     {
       revalidateOnFocus: false,
       revalidateOnReconnect: false,
