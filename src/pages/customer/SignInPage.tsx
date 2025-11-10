@@ -35,7 +35,7 @@ const SignInPage = () => {
         errors.email = "Please include an email.";
       }
       if (values.password.length === 0) {
-        errors.password = "Please include a password.";
+        errors.password = "Please include an password.";
       } else if (values.password.length < 6) {
         errors.password = "Enter password with length more than 6 characters.";
       }

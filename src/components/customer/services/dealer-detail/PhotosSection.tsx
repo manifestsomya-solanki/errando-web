@@ -17,7 +17,7 @@ import { API_BASE_URL, buildApiUrl, API_ENDPOINTS } from "../../../../config/api
 
 function PhotosSection() {
   const { id } = useParams();
-  const url = buildApiUrl(`${API_ENDPOINTS.BUSINESSES_DETAIL}/${id}`);
+  const url = id ? buildApiUrl(`${API_ENDPOINTS.BUSINESSES_DETAIL}/${id}`) : null;
   const { data, error } = useSWR(url, fetcher);
   const photoData: Business = data?.data;
   const isLoading = !data && !error;

@@ -133,6 +133,9 @@ function DealerDetailSection(props: {
   };
 
   const disableEmailsAndLinks = (text: any) => {
+    if (!text || typeof text !== 'string') {
+      return '';
+    }
     const emailRegex = /\S+@\S+\.\S+/g;
     const urlRegex = /(?:https?|ftp):\/\/[\n\S]+|www\.[\S]+\.[a-z]+/g;
     const phoneRegex = /\(?([0-9]{3})\)?([ .-]?)([0-9]{3})\2([0-9]{4})/g;

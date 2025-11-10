@@ -1,34 +1,54 @@
 import { useState } from "react";
-import { useNavigate, useParams } from "react-router";
+import { useParams } from "react-router";
 import Close from "../../assets/close.tsx";
 import Button from "../../components/UI/Button";
 import { useTheme } from "../../store/theme-context.tsx";
 import Modal from "../home/Modal.tsx";
 import { useServices } from "../../store/customer/service-context.tsx";
-import useSWR, { mutate } from "swr";
-import { fetcher } from "../../store/customer/home-context.tsx";
-import { API_BASE_URL, buildApiUrl, API_ENDPOINTS } from "../../config/api";
 
 function ShowInterestModal(props: any) {
   const { theme } = useTheme();
+  const [isLoading, setIsLoading] = useState(false);
 
   const requestId = useParams()?.id;
-  const { handleShowInterest, isLoading } = useServices();
-  const url = buildApiUrl(`${API_ENDPOINTS.BUSINESSES_DETAIL}/${props?.id}`);
-  const { mutate } = useSWR(url, fetcher);
+  const { handleShowInterest } = useServices();
+  
   const handleShowInterestAsync = async () => {
-    const formData = new FormData();
-    if (props?.userRequestId) {
-      formData.set("user_request_id", props?.userRequestId ?? "");
-    } else {
-      formData.set("user_request_id", requestId ?? "");
-    }
-    formData.set("user_business_id", props?.id ?? "");
+    setIsLoading(true);
+    try {
+      const formData = new FormData();
+      if (props?.userRequestId) {
+        formData.set("user_request_id", props?.userRequestId ?? "");
+      } else {
+        formData.set("user_request_id", requestId ?? "");
+      }
+      formData.set("user_business_id", props?.id ?? "");
 
-    await handleShowInterest(formData);
-    await props.onCancel();
-    if (props?.userRequestId) {
-      await mutate();
+      await handleShowInterest(formData);
+      
+      // Call onSuccess callback if provided (for optimistic UI update)
+      if (props?.onSuccess) {
+        props.onSuccess();
+      }
+      
+      setIsLoading(false);
+      
+      // Try to refresh data, but don't fail if it errors
+      if (props?.mutate) {
+        try {
+          await props.mutate();
+        } catch (mutateError) {
+          console.warn("Failed to refresh data, but interest was shown:", mutateError);
+        }
+      }
+      
+      // Close modal after a brief delay
+      setTimeout(() => {
+        props.onCancel();
+      }, 300);
+    } catch (error) {
+      setIsLoading(false);
+      console.error("Show interest error:", error);
     }
   };
   return (

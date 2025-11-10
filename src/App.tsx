@@ -43,6 +43,7 @@ import NotificationPro from "./pages/pro/NotificationPro";
 import NotificationContentPro from "./components/pro/notifications/NotificationContentPro";
 import NotificationSettingDetailSectionPro from "./components/pro/notifications/NotificationSettingDetailSectionPro";
 import MyReviews from "./components/customer/settings/reviews/MyReviews";
+import TermsAndConditionsPage from "./pages/customer/TermsAndConditionsPage";
 
 function App() {
   const role = localStorage.getItem("role");
@@ -85,6 +86,7 @@ function App() {
         <Route path="/signup-pro" element={<SignUpPage />} />
         <Route path="/signup-customer" element={<SignUpCustomer />} />
         <Route path="/sign-in" element={<SignInPage />} />
+        <Route path="/terms-and-conditions" element={<TermsAndConditionsPage />} />
         <Route
           path="/services/dealer-detail/:id"
           element={<DealerDetail />}

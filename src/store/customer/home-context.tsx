@@ -53,13 +53,35 @@ export function useHomeServices() {
 
 export default HomeServiceContextProvider;
 
-// Public fetcher - works without token (for services search on home page)
+// Public fetcher - works without token, but sends token if available (for services search on home page)
 export const publicFetcher = async (url: string) => {
+  const token = localStorage.getItem("token");
+  let parsedToken = null;
+  
+  if (token && token !== "{}" && token.trim() !== "") {
+    try {
+      const tokenObj = JSON.parse(token);
+      if (tokenObj && typeof tokenObj === 'object' && tokenObj.token) {
+        parsedToken = tokenObj.token;
+      } else {
+        parsedToken = token.trim();
+      }
+    } catch (e) {
+      parsedToken = token.trim();
+    }
+  }
+
+  const headers: HeadersInit = {
+    Accept: "application/json",
+  };
+
+  if (parsedToken) {
+    headers.Authorization = `Bearer ${parsedToken}`;
+  }
+
   try {
     const response = await fetch(url, {
-      headers: {
-        Accept: "application/json",
-      },
+      headers,
     });
 
     const data = await response.json();
@@ -91,8 +113,16 @@ export const publicFetcher = async (url: string) => {
 
 // Original fetcher - requires token (for all other authenticated endpoints)
 export const fetcher = async (url: string) => {
+  if (!url) {
+    return {
+      status: "0",
+      message: "Invalid URL",
+      data: null,
+    };
+  }
+
   const token = localStorage.getItem("token");
-  if (!token || token === "{}") {
+  if (!token || token === "{}" || token.trim() === "") {
     return {
       status: "0",
       message: "No token found",
@@ -100,10 +130,28 @@ export const fetcher = async (url: string) => {
     };
   }
 
+  let parsedToken = token.trim();
+  try {
+    const tokenObj = JSON.parse(token);
+    if (tokenObj && typeof tokenObj === 'object' && tokenObj.token) {
+      parsedToken = tokenObj.token;
+    }
+  } catch (e) {
+    parsedToken = token.trim();
+  }
+
+  if (!parsedToken || parsedToken === "{}" || parsedToken.trim() === "") {
+    return {
+      status: "0",
+      message: "Invalid token format",
+      data: null,
+    };
+  }
+
   try {
     const response = await fetch(url, {
       headers: {
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${parsedToken}`,
         Accept: "application/json",
       },
     });

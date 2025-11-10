@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Modal from "./Modal";
 import Close from "../../assets/close";
 import { useFormik } from "formik";
@@ -37,6 +37,21 @@ function NearlyThere(props: {
   const [check, setChech] = useState(false);
   const [openModal, setOpenModal] = useState(false);
   const [isLoading, setisLoading] = useState(false);
+
+  useEffect(() => {
+    const checkTermsAgreed = () => {
+      const termsAgreed = localStorage.getItem("termsAgreed");
+      if (termsAgreed === "true") {
+        setChech(true);
+        localStorage.removeItem("termsAgreed");
+      }
+    };
+
+    checkTermsAgreed();
+    const interval = setInterval(checkTermsAgreed, 500);
+
+    return () => clearInterval(interval);
+  }, [props.open]);
 
   const { theme } = useTheme();
 
@@ -97,9 +112,17 @@ function NearlyThere(props: {
                 checked={check}
                 onClick={() => setChech(!check)}
               />
-              <label htmlFor="terms">
-                I agree to Erranddo’s T&C's and I’m happy to receive occasional
-                promotion.
+              <label htmlFor="terms" className="flex flex-wrap gap-1">
+                <span>I agree to</span>
+                <a
+                  href="/terms-and-conditions"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primaryBlue hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 cursor-pointer"
+                >
+                  Erranddo's T&C's
+                </a>
+                <span>and I'm happy to receive occasional promotion.</span>
               </label>
             </div>
             <div className="flex gap-5 xl:w-[550px] md:w-[450px] justify-center lg:px-10">

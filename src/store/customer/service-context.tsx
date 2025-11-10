@@ -1,6 +1,6 @@
 import React, { ReactNode, useContext, useEffect, useState } from "react";
 
-import useSWR, { mutate } from "swr";
+import useSWR, { mutate as globalMutate } from "swr";
 import { fetcher } from "./home-context";
 import { Business, Service } from "../../models/customer/businesslist";
 import { useParams } from "react-router";
@@ -106,7 +106,23 @@ const ServiceContextProvider = (props: { children: ReactNode }) => {
   const [loading, setIsLoading] = useState(false);
 
   const handleShowInterest = async (formData: FormData) => {
-    const token = (await localStorage.getItem("token")) ?? "{}";
+    const token = localStorage.getItem("token");
+    if (!token || token === "{}") {
+      setError("Authentication required. Please login again.");
+      setIsLoading(false);
+      return;
+    }
+
+    let parsedToken = token;
+    try {
+      const tokenObj = JSON.parse(token);
+      if (tokenObj && tokenObj.token) {
+        parsedToken = tokenObj.token;
+      }
+    } catch (e) {
+      parsedToken = token;
+    }
+
     setError("");
     setIsLoading(true);
 
@@ -116,43 +132,171 @@ const ServiceContextProvider = (props: { children: ReactNode }) => {
         {
           method: "POST",
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${parsedToken}`,
+            Accept: "application/json",
           },
           body: formData,
         }
       );
 
-      const data = await res.json();
+      let data;
+      try {
+        data = await res.json();
+      } catch (jsonError) {
+        console.error("JSON Parse Error:", jsonError);
+        setError("Invalid response from server");
+        setIsLoading(false);
+        toast.error("Invalid response from server", {
+          hideProgressBar: false,
+          position: "bottom-left",
+        });
+        return;
+      }
+
       if (res.status === 200) {
-        setError("");
         setIsLoading(false);
         if (data.status === "1") {
+          setError("");
+          
+          const formDataUserRequestId = formData.get("user_request_id")?.toString();
+          const formDataBusinessId = formData.get("user_business_id")?.toString();
+          
+          // Store in localStorage for cross-page sync
+          if (formDataBusinessId && formDataUserRequestId) {
+            localStorage.setItem(`interest_shown_${formDataBusinessId}_${formDataUserRequestId}`, 'true');
+          }
+          
+          // Revalidate business list (service list page)
           mutate();
           countMutate();
+          
+          // Revalidate specific business detail page
+          if (formDataBusinessId) {
+            // Build URL with and without user_request_id to match both cases
+            const businessDetailUrlWithRequest = buildApiUrl(
+              `${API_ENDPOINTS.BUSINESSES_DETAIL}/${formDataBusinessId}${formDataUserRequestId ? `?user_request_id=${formDataUserRequestId}` : ''}`
+            );
+            const businessDetailUrlWithoutRequest = buildApiUrl(
+              `${API_ENDPOINTS.BUSINESSES_DETAIL}/${formDataBusinessId}`
+            );
+            
+            // Revalidate both URL variations
+            await Promise.all([
+              globalMutate(businessDetailUrlWithRequest, undefined, { revalidate: true }),
+              globalMutate(businessDetailUrlWithoutRequest, undefined, { revalidate: true })
+            ]);
+          }
+          
+          // Revalidate all business detail pages using pattern matching
+          // Match URLs containing "businesses/detail/" (works with full URLs)
+          await globalMutate(
+            (key) => {
+              if (typeof key !== 'string') return false;
+              // Match both the endpoint pattern and full URL pattern
+              const endpointPattern = `${API_ENDPOINTS.BUSINESSES_DETAIL}/`;
+              const fullUrlPattern = `/businesses/detail/`;
+              return key.includes(endpointPattern) || key.includes(fullUrlPattern);
+            },
+            undefined,
+            { revalidate: true }
+          );
+          
+          // Revalidate business list pages
+          await globalMutate(
+            (key) => {
+              if (typeof key !== 'string') return false;
+              const endpointPattern = `${API_ENDPOINTS.BUSINESSES}?`;
+              const fullUrlPattern = `/businesses?`;
+              return key.includes(endpointPattern) || key.includes(fullUrlPattern);
+            },
+            undefined,
+            { revalidate: true }
+          );
+          
           toast.success("Successful", {
             hideProgressBar: false,
             position: "bottom-left",
           });
         } else {
-          setError(data.message);
-          toast.error(data.message, {
-            hideProgressBar: false,
-            position: "bottom-left",
-          });
+          // Check if interest already exists - this is actually a success case
+          const message = data.message || "";
+          if (message.toLowerCase().includes("already exists") || message.toLowerCase().includes("intrest_already_exists")) {
+            // Interest already shown, treat as success
+            setError("");
+            
+            const formDataUserRequestId = formData.get("user_request_id")?.toString();
+            const formDataBusinessId = formData.get("user_business_id")?.toString();
+            
+            // Store in localStorage for cross-page sync
+            if (formDataBusinessId && formDataUserRequestId) {
+              localStorage.setItem(`interest_shown_${formDataBusinessId}_${formDataUserRequestId}`, 'true');
+            }
+            
+            // Still revalidate cache
+            if (formDataBusinessId) {
+              const businessDetailUrl = buildApiUrl(
+                `${API_ENDPOINTS.BUSINESSES_DETAIL}/${formDataBusinessId}${formDataUserRequestId ? `?user_request_id=${formDataUserRequestId}` : ''}`
+              );
+              await globalMutate(businessDetailUrl, undefined, { revalidate: true });
+            }
+            
+            toast.success("Interest already shown", {
+              hideProgressBar: false,
+              position: "bottom-left",
+            });
+          } else {
+            setError(message || "Failed to show interest");
+            toast.error(message || "Failed to show interest", {
+              hideProgressBar: false,
+              position: "bottom-left",
+            });
+          }
         }
-      } else {
-        setError(data.message);
+      } else if (res.status === 500) {
+        const errorMessage = data?.message || "Server error occurred. Please try again later.";
+        setError(errorMessage);
         setIsLoading(false);
+        toast.error(errorMessage, {
+          hideProgressBar: false,
+          position: "bottom-left",
+        });
+      } else {
+        const errorMessage = data?.message || data?.error || `Server error (${res.status})`;
+        setError(errorMessage);
+        setIsLoading(false);
+        toast.error(errorMessage, {
+          hideProgressBar: false,
+          position: "bottom-left",
+        });
       }
     } catch (error) {
       console.error(error, "ygh98yg");
-      setError("Failed to show interest.");
+      setError("Network error. Please try again.");
       setIsLoading(false);
+      toast.error("Network error. Please try again.", {
+        hideProgressBar: false,
+        position: "bottom-left",
+      });
     }
   };
 
   const handleShowInterestToAll = async (formData: FormData) => {
-    const token = (await localStorage.getItem("token")) ?? "{}";
+    const token = localStorage.getItem("token");
+    if (!token || token === "{}") {
+      setError("Authentication required. Please login again.");
+      setIsLoading(false);
+      return;
+    }
+
+    let parsedToken = token;
+    try {
+      const tokenObj = JSON.parse(token);
+      if (tokenObj && tokenObj.token) {
+        parsedToken = tokenObj.token;
+      }
+    } catch (e) {
+      parsedToken = token;
+    }
 
     setError("");
     setIsLoading(true);
@@ -163,7 +307,8 @@ const ServiceContextProvider = (props: { children: ReactNode }) => {
         {
           method: "POST",
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${parsedToken}`,
+            Accept: "application/json",
           },
           body: formData,
         }
@@ -193,7 +338,23 @@ const ServiceContextProvider = (props: { children: ReactNode }) => {
   };
 
   const handleRequestQuote = async (formData: FormData) => {
-    const token = (await localStorage.getItem("token")) ?? "{}";
+    const token = localStorage.getItem("token");
+    if (!token || token === "{}") {
+      setError("Authentication required. Please login again.");
+      setIsLoading(false);
+      return;
+    }
+
+    let parsedToken = token;
+    try {
+      const tokenObj = JSON.parse(token);
+      if (tokenObj && tokenObj.token) {
+        parsedToken = tokenObj.token;
+      }
+    } catch (e) {
+      parsedToken = token;
+    }
+
     setError("");
     setIsLoading(true);
 
@@ -203,7 +364,8 @@ const ServiceContextProvider = (props: { children: ReactNode }) => {
         {
           method: "POST",
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${parsedToken}`,
+            Accept: "application/json",
           },
           body: formData,
         }

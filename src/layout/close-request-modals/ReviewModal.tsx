@@ -25,7 +25,7 @@ function ReviewModal(props: {
   const { closeRequestReview } = useReview();
   const [starRating, setStarRating] = useState("");
   const [checked, setChecked] = useState(false);
-  const url = buildApiUrl(`${API_ENDPOINTS.BUSINESSES_DETAIL}/${props?.businessId}`);
+  const url = props?.businessId ? buildApiUrl(`${API_ENDPOINTS.BUSINESSES_DETAIL}/${props?.businessId}`) : null;
   const { data, isLoading } = useSWR(url, fetcher);
   const serviceData: ServiceList = data?.data;
 

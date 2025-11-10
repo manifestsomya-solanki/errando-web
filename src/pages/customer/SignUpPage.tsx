@@ -7,12 +7,10 @@ import Button from "../../components/UI/Button";
 import { useEffect, useState } from "react";
 import { useAuth } from "../../store/customer/auth-context";
 import OtpVerificationModal from "../../layout/otp-verification/OtpVerificationModal";
-import TermsAndConditionsModal from "../../components/UI/TermsAndConditionsModal";
 import { NavLink } from "react-router-dom";
 
 const SignUpPage = () => {
   const [openModal, setOpenModal] = useState(false);
-  const [showTermsModal, setShowTermsModal] = useState(false);
   const { register, error, isLoading, setError } = useAuth();
   console.log(error);
   const formik = useFormik({
@@ -39,7 +37,7 @@ const SignUpPage = () => {
         errors.mobile_number = "Please include a valid phone number";
       }
       if (!values.password) {
-        errors.password = "Please include a valid password";
+        errors.password = "Please confirm the password";
       }
       if (!values.confirmPassword) {
         errors.confirmPassword = "Please confirm the password";
@@ -66,6 +64,21 @@ const SignUpPage = () => {
   useEffect(() => {
     setError("");
   }, []);
+
+  useEffect(() => {
+    const checkTermsAgreed = () => {
+      const termsAgreed = localStorage.getItem("termsAgreed");
+      if (termsAgreed === "true") {
+        formik.setFieldValue("agree", true);
+        localStorage.removeItem("termsAgreed");
+      }
+    };
+
+    checkTermsAgreed();
+    const interval = setInterval(checkTermsAgreed, 500);
+
+    return () => clearInterval(interval);
+  }, []);
   console.log(openModal);
   const inputClassName =
     "rounded-lg  bg-white dark:text-darktextColor dark:bg-black shadow-md xs:w-full outline-none pl-3 ";
@@ -79,12 +92,6 @@ const SignUpPage = () => {
           email={formik.values.email}
           mobile_number={formik.values.mobile_number}
           role="pro"
-        />
-      )}
-      {showTermsModal && (
-        <TermsAndConditionsModal
-          isOpen={showTermsModal}
-          onClose={() => setShowTermsModal(false)}
         />
       )}
       <SignUpTopBar />
@@ -208,17 +215,18 @@ const SignUpPage = () => {
                     text="I agree to the"
                     headingclassname="!font-medium !font-poppins-bold tracking-wide dark:text-darktextColor "
                   />
-                  <button
-                    type="button"
-                    onClick={() => setShowTermsModal(true)}
-                    className="text-primaryBlue hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 underline cursor-pointer"
+                  <a
+                    href="/terms-and-conditions"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-black dark:text-white hover:opacity-80 cursor-pointer"
                   >
                     <Heading
                       variant="smallTitle"
                       text="Terms & Conditions"
                       headingclassname="!font-bold !font-poppins-bold tracking-wide"
                     />
-                  </button>
+                  </a>
                 </label>
               </div>
               <div className="px-6 mt-4 w-full">
@@ -230,7 +238,7 @@ const SignUpPage = () => {
                   color="primary"
                   buttonClassName="w-full py-3 font-poppins "
                   centerClassName="flex justify-center items-center"
-                  children="Sign Up As Pro"
+                  children="Sign Up As A Pro"
                 />
                 {error && !openModal && (
                   <Error error={error} className="text-center my-3" />
@@ -258,7 +266,4 @@ const SignUpPage = () => {
   );
 };
 
-const delay = (delayInms: number) => {
-  return new Promise((resolve) => setTimeout(resolve, delayInms));
-};
 export default SignUpPage;

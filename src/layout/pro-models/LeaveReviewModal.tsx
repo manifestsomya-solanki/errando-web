@@ -24,9 +24,8 @@ function LeaveReviewModal(props: {
 }) {
   const dealerId = useParams();
 
-  const url = buildApiUrl(`${API_ENDPOINTS.BUSINESSES_DETAIL}/${
-    props.dealerId ?? dealerId?.id
-  }`);
+  const businessId = props.dealerId ?? dealerId?.id;
+  const url = businessId ? buildApiUrl(`${API_ENDPOINTS.BUSINESSES_DETAIL}/${businessId}`) : null;
   const { data } = useSWR(url, fetcher);
   const serviceData: ServiceList = data?.data;
 

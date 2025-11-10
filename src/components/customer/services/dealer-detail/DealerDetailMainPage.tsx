@@ -23,7 +23,11 @@ function DealerDetailMainPage() {
   const serviceName = useLocation()?.state?.serviceName;
   const userRequestId = useLocation()?.state?.userRequestId;
   const distance = useLocation()?.state?.distance;
-  const url = buildApiUrl(`${API_ENDPOINTS.BUSINESSES_DETAIL}/${businessId?.id}?user_request_id=${userRequestId}`);
+  const url = businessId?.id 
+    ? buildApiUrl(
+        `${API_ENDPOINTS.BUSINESSES_DETAIL}/${businessId?.id}${userRequestId ? `?user_request_id=${userRequestId}` : ''}`
+      ) 
+    : null;
 
   const { data, isLoading, mutate } = useSWR(url, fetcher);
   const serviceData: Business = data?.data;
