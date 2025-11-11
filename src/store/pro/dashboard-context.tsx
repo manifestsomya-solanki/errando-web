@@ -189,8 +189,16 @@ const BusinessContextProvider = (props: { children: React.ReactNode }) => {
     setIsLoading(true);
     console.log("herr");
     setError("");
+    if (!businessId || businessId === "") {
+      setError("Business ID is required");
+      setIsLoading(false);
+      toast.error("Business ID is required", {
+        position: "bottom-left",
+      });
+      return;
+    }
     const res = await fetch(
-      buildApiUrl(`${API_ENDPOINTS.BUSINESSES_EDIT}/${businessId}`),
+      buildApiUrl(`${API_ENDPOINTS.BUSINESSES}/${businessId}/edit`),
       {
         method: "POST",
         headers: {

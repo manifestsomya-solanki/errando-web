@@ -8,18 +8,46 @@ import { useParams } from "react-router";
 import useSWR from "swr";
 import { fetcher } from "../../../store/customer/home-context";
 import { UserRequestList } from "../../../models/pro/userrequestlist";
-import { API_BASE_URL, buildApiUrl, API_ENDPOINTS } from "../../../config/api";
+import { buildApiUrl, API_ENDPOINTS } from "../../../config/api";
 
 function ResponsesDetail() {
   const leadsId = useParams();
-  const dealerdetailurl = buildApiUrl(`${API_ENDPOINTS.USER_REQUESTS_DETAIL}/${leadsId.id}`);
-  const { data: leadsDetailData, isLoading } = useSWR(dealerdetailurl, fetcher);
+  const dealerdetailurl = buildApiUrl(`${API_ENDPOINTS.USER_REQUESTS_DETAIL}/${leadsId.id}/detail`);
+  const { data: leadsDetailData, isLoading, error: apiError } = useSWR(leadsId?.id ? dealerdetailurl : null, fetcher);
   const leadsDetail: UserRequestList = leadsDetailData?.data;
+
+  // Debug logging
+  if (apiError) {
+    console.error("ResponsesDetail API Error:", apiError);
+  }
+  if (leadsDetailData && leadsDetailData.status === "0") {
+    console.error("ResponsesDetail API Response Error:", leadsDetailData.message);
+  }
 
   return (
     <div>
       {isLoading ? (
         <LeadsDetailSkeleton limit={1} />
+      ) : apiError || (leadsDetailData && leadsDetailData.status === "0") ? (
+        <HomeCard className="rounded-md  px-5 pb-10 mt-5">
+          <div className="py-4">
+            <Heading
+              text={leadsDetailData?.message || "Failed to load response details"}
+              variant="subHeader"
+              headingclassname="!font-normal !text-lg mx-1 text-red-500 tracking-wide dark:text-red-400"
+            />
+          </div>
+        </HomeCard>
+      ) : !leadsDetail ? (
+        <HomeCard className="rounded-md  px-5 pb-10 mt-5">
+          <div className="py-4">
+            <Heading
+              text="No data available"
+              variant="subHeader"
+              headingclassname="!font-normal !text-lg mx-1 text-textColor tracking-wide dark:text-white"
+            />
+          </div>
+        </HomeCard>
       ) : (
         <HomeCard className="rounded-md  px-5 pb-10 mt-5">
           <div className="py-4 border-b-[0.5px] border-b-slate-200">

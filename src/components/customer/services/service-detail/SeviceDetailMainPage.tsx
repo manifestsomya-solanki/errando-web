@@ -98,7 +98,7 @@ function SeviceDetailMainPage() {
                 <ServiceTitle data={serviceRequestData} />
                 <AnswersSections
                   array={array}
-                  location={serviceRequestData?.postcode?.name}
+                  location={serviceRequestData?.postcode || ""}
                 />
               </div>
             )}

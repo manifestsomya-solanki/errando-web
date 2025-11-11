@@ -32,9 +32,26 @@ function ResponsesList() {
               }
               service={`${item?.service?.name} `}
               answers={answers.length > 0 ? answers : ["No answers"]}
-              location={`${item?.user?.city ?? "--"} , ${
-                item?.postcode?.name ?? "--"
-              }`}
+              location={(() => {
+                const city = item?.user?.city ? String(item.user.city).trim() : undefined;
+                let postcode: string | undefined;
+                
+                if (typeof item?.postcode === 'string') {
+                  postcode = item.postcode.trim();
+                } else if (item?.postcode && typeof item.postcode === 'object' && 'name' in item.postcode) {
+                  const postcodeName = (item.postcode as { name: string }).name;
+                  postcode = postcodeName ? String(postcodeName).trim() : undefined;
+                }
+                
+                if (city && city.length > 0 && postcode && postcode.length > 0) {
+                  return `${city}, ${postcode}`;
+                } else if (postcode && postcode.length > 0) {
+                  return postcode;
+                } else if (city && city.length > 0) {
+                  return city;
+                }
+                return "--";
+              })()}
               id={item?.id}
               is_outright={item?.leads[0]?.is_outright ? true : false}
               interested={item?.intrests?.length > 0 ? true : false}

@@ -74,9 +74,7 @@ function DealerDetailMainPage() {
           </HomeCard>
         )}
 
-        <ServicesandLocationDetailSection
-          services={businessDetail?.services ?? []}
-        />
+        <ServicesandLocationDetailSection />
         <ReviewsBar />
         <CommentSection reviews={data ?? []} />
       </div>

@@ -60,7 +60,7 @@ function getTimeDifferenceString(time: any) {
 function MyResponses() {
   const navigate = useNavigate();
   const leadsId = useParams();
-  const dealerdetailurl = buildApiUrl(`${API_ENDPOINTS.USER_REQUESTS_DETAIL}/${leadsId.id}`);
+  const dealerdetailurl = buildApiUrl(`${API_ENDPOINTS.USER_REQUESTS_DETAIL}/${leadsId.id}/detail`);
   const {
     data: leadsDetailData,
     isLoading,
@@ -337,12 +337,18 @@ function MyResponses() {
                 variant="subTitle"
                 headingclassname="!font-semibold text-slate-400 !text-sm  mx-1 tracking-wide dark:text-white "
               />
-              {leadsDetail?.user?.city &&
-              leadsDetail?.user?.postcode &&
-              !null ? (
+              {leadsDetail?.user?.city && leadsDetail?.postcode ? (
                 <div className="flex gap-3">
                   <Heading
-                    text={`${leadsDetail?.user?.city} ,${leadsDetail?.postcode?.name}`}
+                    text={`${leadsDetail?.user?.city} , ${leadsDetail?.postcode}`}
+                    variant="subHeader"
+                    headingclassname="!font-normal !text-lg mx-1 text-textColor tracking-wide dark:text-white"
+                  />
+                </div>
+              ) : leadsDetail?.postcode ? (
+                <div className="flex gap-3">
+                  <Heading
+                    text={leadsDetail?.postcode}
                     variant="subHeader"
                     headingclassname="!font-normal !text-lg mx-1 text-textColor tracking-wide dark:text-white"
                   />
