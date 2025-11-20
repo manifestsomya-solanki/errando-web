@@ -1,4 +1,3 @@
-import { useParams } from "react-router";
 import { Business } from "../../../../models/customer/businesslist";
 import { useServices } from "../../../../store/customer/service-context";
 import Button from "../../../UI/Button";
@@ -9,7 +8,7 @@ import { useEffect, useState } from "react";
 import ShowInterestToAllModal from "../../../../layout/customer/ShowInterestToAllModal";
 import useSWR from "swr";
 import { fetcher } from "../../../../store/customer/home-context";
-import { API_BASE_URL, buildApiUrl, API_ENDPOINTS } from "../../../../config/api";
+import { buildApiUrl, API_ENDPOINTS } from "../../../../config/api";
 
 function FilterSection(props: any) {
   const { businessListHandler, to_show_interest } = useServices();
@@ -37,9 +36,13 @@ function FilterSection(props: any) {
 
   const [showModal, setShowModal] = useState(false);
   const [link, setLink] = useState("all");
+  
   useEffect(() => {
-    businessListHandler(props.serviceId, props.userRequestId ?? "", link);
-  }, [props.serviceId]);
+    // Set default tab: if responded_count > 0, show "response", else show "all"
+    const newDefaultLink = data?.responded_count > 0 ? "response" : "all";
+    setLink(newDefaultLink);
+    businessListHandler(props.serviceId, props.userRequestId ?? "", newDefaultLink);
+  }, [props.serviceId, data?.responded_count]);
   return (
     <div>
       {showModal && (
@@ -83,13 +86,17 @@ function FilterSection(props: any) {
                 <Heading
                   text={"All"}
                   variant="subHeader"
-                  headingclassname={headingclassname}
+                  headingclassname={
+                    link === "all"
+                      ? headingclassname.replace("!font-normal", "!font-bold")
+                      : headingclassname
+                  }
                 />
                 <Button
                   children={
-                    data?.not_responded_count < 10
-                      ? `0${data?.not_responded_count}` ?? "00"
-                      : data?.not_responded_count ?? "00"
+                    data?.not_responded_count !== undefined && data.not_responded_count < 10
+                      ? `0${data.not_responded_count}`
+                      : (data?.not_responded_count ?? "00")
                   }
                   size="normal"
                   centerClassName="flex justify-center"
@@ -119,13 +126,17 @@ function FilterSection(props: any) {
                 <Heading
                   text={"Response"}
                   variant="subHeader"
-                  headingclassname={headingclassname}
+                  headingclassname={
+                    link === "response"
+                      ? headingclassname.replace("!font-normal", "!font-bold")
+                      : headingclassname
+                  }
                 />
                 <Button
                   children={
-                    data?.responded_count < 10
-                      ? `0${data?.responded_count}` ?? "00"
-                      : data?.responded_count ?? "00"
+                    data?.responded_count !== undefined && data.responded_count < 10
+                      ? `0${data.responded_count}`
+                      : (data?.responded_count ?? "00")
                   }
                   centerClassName="flex justify-center"
                   buttonClassName=" hover:bg-transparent active:bg-transparent border-textColor hover:border-primaryBlue  !py-2 xs:w-full dark:text-darktextColor"

@@ -28,13 +28,34 @@ function LeadsList() {
               service={`${item?.service?.name} `}
               answers={answers.length > 0 ? answers : ["No answers"]}
               location={
-                item?.user?.city && item?.postcode
-                  ? `${item.user.city} , ${(item.postcode.split(" ")[0]?.slice(0, 4) || item.postcode.slice(0, 4)) + "**"}`
-                  : item?.user?.city
-                  ? item.user.city
-                  : item?.postcode
-                  ? `${(item.postcode.split(" ")[0]?.slice(0, 4) || item.postcode.slice(0, 4)) + "**"}`
-                  : "--"
+                (() => {
+                  const postcodeDisplay = item?.postcode
+                    ? `${(item.postcode.split(" ")[0]?.slice(0, 4) || item.postcode.slice(0, 4)) + "**"}`
+                    : "";
+                  
+                  // If town_name is available, show it before postcode
+                  if (item?.town_name && postcodeDisplay) {
+                    if (item?.user?.city) {
+                      return `${item.user.city}, ${item.town_name}, ${postcodeDisplay}`;
+                    }
+                    return `${item.town_name}, ${postcodeDisplay}`;
+                  }
+                  
+                  // Fallback to original logic if town_name is not available
+                  if (item?.user?.city && postcodeDisplay) {
+                    return `${item.user.city}, ${postcodeDisplay}`;
+                  }
+                  
+                  if (item?.user?.city) {
+                    return item.user.city;
+                  }
+                  
+                  if (postcodeDisplay) {
+                    return postcodeDisplay;
+                  }
+                  
+                  return "--";
+                })()
               }
               mincredits={6}
               maxcredits={3}

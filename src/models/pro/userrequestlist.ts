@@ -12,6 +12,7 @@ export interface UserRequestList {
   user_id: number;
   service_id: number;
   postcode: string;
+  town_name?: string;
   file?: string;
   comment: string;
   status: string;

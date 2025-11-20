@@ -17,12 +17,14 @@ import { API_BASE_URL, buildApiUrl, API_ENDPOINTS } from "../../../../config/api
 
 function PhotosSection() {
   const { id } = useParams();
-  const url = id ? buildApiUrl(`${API_ENDPOINTS.BUSINESSES_DETAIL}/${id}`) : null;
+  const userRequestId = useLocation()?.state?.userRequestId;
+  const url = id 
+    ? buildApiUrl(`businesses/${id}/detail${userRequestId ? `?user_request_id=${userRequestId}` : ''}`) 
+    : null;
   const { data, error } = useSWR(url, fetcher);
   const photoData: Business = data?.data;
   const isLoading = !data && !error;
   const [imgShow, setimgShow] = useState(false);
-  const userRequestId = useLocation()?.state?.userRequestId;
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   if (isLoading) {

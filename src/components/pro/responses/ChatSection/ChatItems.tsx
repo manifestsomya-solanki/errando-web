@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import Heading from "../../../UI/Heading";
 import HomeCard from "../../dashboard/home/HomeCard";
 import Button from "../../../UI/Button";
@@ -12,6 +12,7 @@ import {
   onSnapshot,
   orderBy,
   query,
+  serverTimestamp,
   where,
 } from "firebase/firestore";
 import { db } from "../../../../Firebase";
@@ -62,15 +63,17 @@ function ChatItems() {
     photoURL: state?.imgAvatar,
   };
   const [showDropdown, setShowDropdown] = useState(false);
-  let combinedId: any;
-  if (user?.uid) {
-    combinedId =
-      +currentUser?.uid < user?.uid
+  const combinedId = useMemo(() => {
+    if (user?.uid && currentUser?.uid) {
+      return +currentUser?.uid < user?.uid
         ? currentUser?.uid + "-" + user?.uid
         : user?.uid + "-" + currentUser?.uid;
-  }
+    }
+    return null;
+  }, [user?.uid, currentUser?.uid]);
 
   const fetchData = async (bool?: boolean) => {
+    if (!combinedId) return;
     if (bool) setLoading(true);
     const getChatQuery = query(
       collection(db, "chats"),
@@ -92,10 +95,8 @@ function ChatItems() {
       );
       const docs = await getDocs(getMessagesQuery);
       setOldChats(docs.docs.map((doc) => doc?.data()).reverse());
-      if (bool) setLoading(true);
-    } else {
-      if (bool) setLoading(true);
     }
+    if (bool) setLoading(false);
   };
 
   const moreData = async () => {
@@ -104,8 +105,18 @@ function ChatItems() {
   };
 
   useEffect(() => {
-    fetchData();
-  }, [oldChats, pageSize]);
+    if (combinedId && pageSize > initialPageSize) {
+      fetchData(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pageSize]);
+
+  useEffect(() => {
+    if (combinedId) {
+      fetchData(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [combinedId]);
 
   const handleScroll = () => {
     setMoreLoading(true);
@@ -126,6 +137,7 @@ function ChatItems() {
   }, [oldChats, more]);
 
   const handleSendMessage = async () => {
+    if (!combinedId) return;
     setShow(false);
     setUserInput("");
     //return when spaces
@@ -138,16 +150,49 @@ function ChatItems() {
       where("chat_id", "==", combinedId)
     );
     const getChatDocument = await getDocs(getChatQuery);
-    if (user?.uid) addChat(user?.uid, userInput);
-    await addDoc(
-      collection(db, "chats", getChatDocument.docs[0].id, "messages"), //docs[0] is already exisiting doc
-      {
-        message: userInput,
-        sender_id: user.uid,
-        timestamp: new Date(),
-        type: "text",
-      }
-    );
+    if (getChatDocument?.docs?.length === 0) {
+      // Create chat if it doesn't exist
+      const chatData = {
+        chat_id: combinedId,
+        users_ids: [currentUser?.uid, user?.uid],
+        updated_at: serverTimestamp(),
+        created_at: serverTimestamp(),
+        users: [
+          {
+            user_id: user?.uid,
+            badge: 0,
+            full_name: user?.fullName,
+          },
+          {
+            user_id: currentUser?.uid,
+            badge: 0,
+            full_name: currentUser?.fullName,
+          },
+        ],
+      };
+      const temp = await addDoc(collection(db, "chats"), { ...chatData });
+      if (user?.uid) addChat(user?.uid, userInput);
+      await addDoc(
+        collection(db, "chats", temp.id, "messages"),
+        {
+          message: userInput,
+          sender_id: user.uid,
+          timestamp: new Date(),
+          type: "text",
+        }
+      );
+    } else {
+      if (user?.uid) addChat(user?.uid, userInput);
+      await addDoc(
+        collection(db, "chats", getChatDocument.docs[0].id, "messages"), //docs[0] is already exisiting doc
+        {
+          message: userInput,
+          sender_id: user.uid,
+          timestamp: new Date(),
+          type: "text",
+        }
+      );
+    }
   };
   const [show, setShow] = useState(false);
   const [imageModal, setImageModal] = useState(false);

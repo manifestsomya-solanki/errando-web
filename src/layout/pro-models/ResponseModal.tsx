@@ -57,8 +57,12 @@ function ResponseModal({
           formData.set("description", description);
           formData.set("rating", rating?.toString());
 
-          addResponse(formData, id);
-          setTimeout(() => onCancel(), 1000);
+          try {
+            await addResponse(formData, id);
+            onCancel();
+          } catch (error) {
+            console.error("Error saving response:", error);
+          }
         }}
         validate={validate}
       >

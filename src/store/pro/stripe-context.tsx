@@ -7,18 +7,15 @@ export interface StripeProviderProps {
 }
 
 // Only load Stripe if a valid publishable key is provided
-const STRIPE_PUBLISHABLE_KEY = ""; // Set this to your Stripe key when you want to enable Stripe
-const stripePromise = STRIPE_PUBLISHABLE_KEY ? loadStripe(STRIPE_PUBLISHABLE_KEY) : null;
+const STRIPE_PUBLISHABLE_KEY = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || ""; // Set this to your Stripe key when you want to enable Stripe
+const stripePromise = STRIPE_PUBLISHABLE_KEY ? loadStripe(STRIPE_PUBLISHABLE_KEY) : Promise.resolve(null);
 
 export const StripeProvider: React.FC<StripeProviderProps> = ({
   children,
 }: {
   children: React.ReactNode;
 }) => {
-  // If no Stripe key is provided, just return children without Stripe Elements
-  if (!stripePromise) {
-    return <>{children}</>;
-  }
-  
+  // Always wrap in Elements to provide context
+  // Components should check for stripe/elements availability before using PaymentElement
   return <Elements stripe={stripePromise}>{children}</Elements>;
 };

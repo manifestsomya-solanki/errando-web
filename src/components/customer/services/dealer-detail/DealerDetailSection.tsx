@@ -50,6 +50,7 @@ function DealerDetailSection(props: {
   description: string;
   location: number;
   ratingCount: number;
+  reviewsCount?: number;
   quote: number | string;
   quoteType: string;
   service: string;
@@ -74,12 +75,13 @@ function DealerDetailSection(props: {
   const handleSelect = async () => {
     //check whether the group(chats in firestore) exists, if not create
     let combinedId: any;
-    if (user?.uid) {
+    if (user?.uid && currentUser?.uid) {
       combinedId =
         +currentUser?.uid < user?.uid
           ? currentUser?.uid + "-" + user?.uid
           : user?.uid + "-" + currentUser?.uid;
     }
+    if (!combinedId) return;
     try {
       const res = await getDoc(doc(db, "chats", combinedId));
 
@@ -202,14 +204,14 @@ function DealerDetailSection(props: {
               <img src={Star} />
             ))}
             <Heading
-              text={`${props.ratingCount} of 5 / 120`}
+              text={`${props.ratingCount} of 5 / ${props.reviewsCount ?? 0}`}
               variant="subHeader"
               headingclassname="text-gray-500 !font-normal tracking-wide !text-xs mx-2 dark:text-darktextColor"
             />
             {props.quote && props.quoteType ? (
               <div className="xs:hidden lg:flex">
                 <Heading
-                  text={`Quote: £${props.quote} ${props.quoteType}`}
+                  text={`Quote: £${props.quote} ${props.quoteType.replace("_", " ")}`}
                   variant="subHeader"
                   headingclassname="text-primaryYellow !font-semibold tracking-wide lg:text-xs text-md"
                 />
@@ -302,7 +304,7 @@ function DealerDetailSection(props: {
             {props.quote && props.quoteType ? (
               <div className="lg:hidden">
                 <Heading
-                  text={`Quote: £${props.quote} ${props.quoteType}`}
+                  text={`Quote: £${props.quote} ${props.quoteType.replace("_", " ")}`}
                   variant="subHeader"
                   headingclassname="text-primaryYellow !font-semibold tracking-wide lg:text-xs text-md"
                 />

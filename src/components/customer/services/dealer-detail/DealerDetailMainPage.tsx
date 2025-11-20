@@ -17,15 +17,17 @@ import TopBar from "../top-bar/TopBar";
 import { API_BASE_URL, buildApiUrl, API_ENDPOINTS } from "../../../../config/api";
 
 function DealerDetailMainPage() {
-  const page_key = useLocation()?.state?.page_key;
+  const location = useLocation();
+  const page_key = location?.state?.page_key;
   console.log(page_key);
   const businessId = useParams();
-  const serviceName = useLocation()?.state?.serviceName;
-  const userRequestId = useLocation()?.state?.userRequestId;
-  const distance = useLocation()?.state?.distance;
+  const serviceName = location?.state?.serviceName;
+  const userRequestId = location?.state?.userRequestId;
+  const distance = location?.state?.distance;
+  const userIdFromState = location?.state?.userId;
   const url = businessId?.id 
     ? buildApiUrl(
-        `${API_ENDPOINTS.BUSINESSES_DETAIL}/${businessId?.id}${userRequestId ? `?user_request_id=${userRequestId}` : ''}`
+        `businesses/${businessId?.id}/detail${userRequestId ? `?user_request_id=${userRequestId}` : ''}`
       ) 
     : null;
 
@@ -63,7 +65,7 @@ function DealerDetailMainPage() {
                   businessName={serviceData?.name}
                   requestId={userRequestId}
                   service={serviceName}
-                  userBusinessId={serviceData?.user_id}
+                  userBusinessId={userIdFromState || serviceData?.user_id}
                   title={serviceData?.name}
                   subTitle={subTitle}
                   location={distance}
@@ -72,15 +74,16 @@ function DealerDetailMainPage() {
                       ? serviceData?.reviews_avg_rating
                       : 0
                   }
+                  reviewsCount={serviceData?.reviews_count ?? 0}
                   icon={displayPhoto}
                   description={serviceData?.description}
                   quote={
-                    serviceData?.request_quotes.length > 0
+                    serviceData?.request_quotes && serviceData.request_quotes.length > 0
                       ? serviceData.request_quotes[0]?.quote
                       : ""
                   }
                   quoteType={
-                    serviceData?.request_quotes.length > 0
+                    serviceData?.request_quotes && serviceData.request_quotes.length > 0
                       ? serviceData.request_quotes[0]?.payment_type
                       : ""
                   }

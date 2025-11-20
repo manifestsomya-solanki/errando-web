@@ -11,8 +11,22 @@ import { fetcher } from "../../../store/customer/home-context";
 import { UserRequestList } from "../../../models/pro/userrequestlist";
 import { useLead } from "../../../store/pro/lead-context";
 import { useAuth } from "../../../store/pro/auth-pro-context";
-import { useState } from "react";
-import { API_BASE_URL, buildApiUrl, API_ENDPOINTS } from "../../../config/api";
+import { buildApiUrl, API_ENDPOINTS } from "../../../config/api";
+import "../dashboard/services/dealer-detail/check.css";
+
+function DangerousHTML({
+  dangerouslySetInnerHTML,
+}: {
+  dangerouslySetInnerHTML: { __html: string };
+}) {
+  return (
+    <div
+      dangerouslySetInnerHTML={{
+        __html: `<span class="text-textColor !font-normal tracking-wide !text-lg dark:text-white">${dangerouslySetInnerHTML.__html}</span>`,
+      }}
+    />
+  );
+}
 
 function LeadDetails() {
   const leadsId = useParams();
@@ -48,6 +62,29 @@ function LeadDetails() {
   const { mutate } = useSWR(baseUrl, fetcher);
 
   const navigate = useNavigate();
+
+  const disableEmailsAndLinks = (text: any) => {
+    if (!text || typeof text !== 'string') {
+      return '';
+    }
+    const emailRegex = /\S+@\S+\.\S+/g;
+    const urlRegex = /(?:https?|ftp):\/\/[\n\S]+|www\.[\S]+\.[a-z]+/g;
+    // Phone regex to match various formats: 10+ digits (with spaces, dashes, parentheses)
+    const phoneRegex = /[\+]?[(]?[0-9]{1,4}[)]?[-\s\.]?[(]?[0-9]{1,4}[)]?[-\s\.]?[0-9]{1,9}/g;
+    const blurredText = text.replace(
+      emailRegex,
+      '<span class="blur-text">$&</span>'
+    );
+    const blurredAndLinkedText = blurredText.replace(
+      urlRegex,
+      '<span class="blur-text">$&</span>'
+    );
+    const finalText = blurredAndLinkedText.replace(
+      phoneRegex,
+      '<span class="blur-text">$&</span>'
+    );
+    return finalText;
+  };
 
   const handleBuy = async (type: string) => {
     const formData = new FormData();
@@ -107,10 +144,10 @@ function LeadDetails() {
                     variant="subTitle"
                     headingclassname="!font-semibold text-slate-400 !text-sm  mx-1 tracking-wide dark:text-slate-400 "
                   />
-                  <Heading
-                    text={answer?.answer || "--"}
-                    variant="subHeader"
-                    headingclassname="!font-normal !text-lg mx-1 text-textColor tracking-wide dark:text-white"
+                  <DangerousHTML
+                    dangerouslySetInnerHTML={{
+                      __html: disableEmailsAndLinks(answer?.answer || "--"),
+                    }}
                   />
                 </div>
               ))
@@ -131,10 +168,10 @@ function LeadDetails() {
                 variant="subTitle"
                 headingclassname="!font-semibold text-slate-400 !text-sm  mx-1 tracking-wide dark:text-slate-400 "
               />
-              <Heading
-                text={leadsDetail?.comment}
-                variant="subHeader"
-                headingclassname="!font-normal !text-lg mx-1 text-textColor tracking-wide dark:text-white"
+              <DangerousHTML
+                dangerouslySetInnerHTML={{
+                  __html: disableEmailsAndLinks(leadsDetail?.comment || ""),
+                }}
               />
             </div>
           </div>

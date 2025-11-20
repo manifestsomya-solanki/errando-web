@@ -337,29 +337,66 @@ function MyResponses() {
                 variant="subTitle"
                 headingclassname="!font-semibold text-slate-400 !text-sm  mx-1 tracking-wide dark:text-white "
               />
-              {leadsDetail?.user?.city && leadsDetail?.postcode ? (
-                <div className="flex gap-3">
+              {(() => {
+                const postcodeDisplay = leadsDetail?.postcode || "";
+                
+                // If town_name is available, show it before postcode
+                if (leadsDetail?.town_name && postcodeDisplay) {
+                  if (leadsDetail?.user?.city) {
+                    return (
+                      <div className="flex gap-3">
+                        <Heading
+                          text={`${leadsDetail.user.city}, ${leadsDetail.town_name}, ${postcodeDisplay}`}
+                          variant="subHeader"
+                          headingclassname="!font-normal !text-lg mx-1 text-textColor tracking-wide dark:text-white"
+                        />
+                      </div>
+                    );
+                  }
+                  return (
+                    <div className="flex gap-3">
+                      <Heading
+                        text={`${leadsDetail.town_name}, ${postcodeDisplay}`}
+                        variant="subHeader"
+                        headingclassname="!font-normal !text-lg mx-1 text-textColor tracking-wide dark:text-white"
+                      />
+                    </div>
+                  );
+                }
+                
+                // Fallback to original logic if town_name is not available
+                if (leadsDetail?.user?.city && postcodeDisplay) {
+                  return (
+                    <div className="flex gap-3">
+                      <Heading
+                        text={`${leadsDetail.user.city}, ${postcodeDisplay}`}
+                        variant="subHeader"
+                        headingclassname="!font-normal !text-lg mx-1 text-textColor tracking-wide dark:text-white"
+                      />
+                    </div>
+                  );
+                }
+                
+                if (postcodeDisplay) {
+                  return (
+                    <div className="flex gap-3">
+                      <Heading
+                        text={postcodeDisplay}
+                        variant="subHeader"
+                        headingclassname="!font-normal !text-lg mx-1 text-textColor tracking-wide dark:text-white"
+                      />
+                    </div>
+                  );
+                }
+                
+                return (
                   <Heading
-                    text={`${leadsDetail?.user?.city} , ${leadsDetail?.postcode}`}
+                    text="--"
                     variant="subHeader"
                     headingclassname="!font-normal !text-lg mx-1 text-textColor tracking-wide dark:text-white"
                   />
-                </div>
-              ) : leadsDetail?.postcode ? (
-                <div className="flex gap-3">
-                  <Heading
-                    text={leadsDetail?.postcode}
-                    variant="subHeader"
-                    headingclassname="!font-normal !text-lg mx-1 text-textColor tracking-wide dark:text-white"
-                  />
-                </div>
-              ) : (
-                <Heading
-                  text="--"
-                  variant="subHeader"
-                  headingclassname="!font-normal !text-lg mx-1 text-textColor tracking-wide dark:text-white"
-                />
-              )}
+                );
+              })() as React.ReactNode}
             </div>
           </div>
           <div className="lg:py-4 grid lg:grid-cols-2 border-b-[0.5px] border-b-slate-200 xs:gap-3 lg:gap-0 xs:pb-4 lg:pb-4">

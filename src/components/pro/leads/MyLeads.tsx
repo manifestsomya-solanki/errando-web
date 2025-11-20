@@ -214,13 +214,34 @@ function MyLeads(props: any) {
               <div className="flex gap-3">
                 <Heading
                   text={
-                    leadsDetail?.user?.city && leadsDetail?.postcode
-                      ? `${leadsDetail.user.city} , ${(leadsDetail.postcode.split(" ")[0]?.slice(0, 4) || leadsDetail.postcode.slice(0, 4)) + "**"}`
-                      : leadsDetail?.user?.city
-                      ? leadsDetail.user.city
-                      : leadsDetail?.postcode
-                      ? `${(leadsDetail.postcode.split(" ")[0]?.slice(0, 4) || leadsDetail.postcode.slice(0, 4)) + "**"}`
-                      : "--"
+                    (() => {
+                      const postcodeDisplay = leadsDetail?.postcode
+                        ? `${(leadsDetail.postcode.split(" ")[0]?.slice(0, 4) || leadsDetail.postcode.slice(0, 4)) + "**"}`
+                        : "";
+                      
+                      // If town_name is available, show it before postcode
+                      if (leadsDetail?.town_name && postcodeDisplay) {
+                        if (leadsDetail?.user?.city) {
+                          return `${leadsDetail.user.city}, ${leadsDetail.town_name}, ${postcodeDisplay}`;
+                        }
+                        return `${leadsDetail.town_name}, ${postcodeDisplay}`;
+                      }
+                      
+                      // Fallback to original logic if town_name is not available
+                      if (leadsDetail?.user?.city && postcodeDisplay) {
+                        return `${leadsDetail.user.city}, ${postcodeDisplay}`;
+                      }
+                      
+                      if (leadsDetail?.user?.city) {
+                        return leadsDetail.user.city;
+                      }
+                      
+                      if (postcodeDisplay) {
+                        return postcodeDisplay;
+                      }
+                      
+                      return "--";
+                    })()
                   }
                   variant="subHeader"
                   headingclassname="!font-normal !text-lg mx-1 text-textColor tracking-wide dark:text-white"

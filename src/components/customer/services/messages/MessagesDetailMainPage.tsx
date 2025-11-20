@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
+import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import Heading from "../../../UI/Heading";
 import {
   DocumentData,
@@ -10,6 +10,7 @@ import {
   onSnapshot,
   orderBy,
   query,
+  serverTimestamp,
   setDoc,
   startAfter,
   startAt,
@@ -68,6 +69,12 @@ const MessagesDetailMainPage = () => {
   const anotherUserDetailUrl = buildApiUrl(`${API_ENDPOINTS.USER_DETAIL}?user_id=${businessUserId}`);
   const { data: userdata } = useSWR(anotherUserDetailUrl, fetcher);
   const anotherUserDetail: UserData = userdata?.data;
+  
+  // Fetch business name if not in navigation state
+  const businessDetailUrl = businessUserId ? buildApiUrl(`${API_ENDPOINTS.BUSINESSES}?user_id=${businessUserId}`) : null;
+  const { data: businessData } = useSWR(businessDetailUrl, fetcher);
+  const businessList = businessData?.data || [];
+  const proBusinessName = businessList?.length > 0 ? businessList[0]?.name : null;
 
   const user = {
     uid: userData?.id,
@@ -79,15 +86,17 @@ const MessagesDetailMainPage = () => {
     fullName: anotherUserDetail?.full_name,
     photoURL: businessDisplayPhoto,
   };
-  let combinedId: any;
-  if (user?.uid) {
-    combinedId =
-      +currentUser?.uid < user?.uid
+  const combinedId = useMemo(() => {
+    if (user?.uid && currentUser?.uid) {
+      return +currentUser?.uid < user?.uid
         ? currentUser?.uid + "-" + user?.uid
         : user?.uid + "-" + currentUser?.uid;
-  }
+    }
+    return null;
+  }, [user?.uid, currentUser?.uid]);
   //handle scroll
   const fetchData = async (bool?: boolean) => {
+    if (!combinedId) return;
     if (bool) setLoading(true);
     const getChatQuery = query(
       collection(db, "chats"),
@@ -109,10 +118,8 @@ const MessagesDetailMainPage = () => {
       );
       const docs = await getDocs(getMessagesQuery);
       setOldChats(docs.docs.map((doc) => doc?.data()).reverse());
-      if (bool) setLoading(true);
-    } else {
-      if (bool) setLoading(true);
     }
+    if (bool) setLoading(false);
   };
 
   //handle scroll
@@ -122,9 +129,19 @@ const MessagesDetailMainPage = () => {
   };
 
   useEffect(() => {
-    console.log("fetch");
-    fetchData();
-  }, [oldchats, pageSize]);
+    if (combinedId && pageSize > initialPageSize) {
+      fetchData(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pageSize]);
+
+  useEffect(() => {
+    if (combinedId) {
+      console.log("fetch");
+      fetchData(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [combinedId]);
 
   const handleScroll = () => {
     setMoreLoading(true);
@@ -146,6 +163,7 @@ const MessagesDetailMainPage = () => {
   }, [oldchats, more]);
   //send message
   const handleSendMessage = async () => {
+    if (!combinedId) return;
     setMore(false);
     setShow(false);
     setUserInput("");
@@ -164,16 +182,49 @@ const MessagesDetailMainPage = () => {
       where("chat_id", "==", combinedId)
     );
     const getChatDocument = await getDocs(getChatQuery);
-    if (user?.uid) addChat(user?.uid, userInput);
-    await addDoc(
-      collection(db, "chats", getChatDocument?.docs[0]?.id, "messages"), //docs[0] is already exisiting doc
-      {
-        message: userInput,
-        sender_id: user?.uid,
-        timestamp: new Date(),
-        type: "text",
-      }
-    );
+    if (getChatDocument?.docs?.length === 0) {
+      // Create chat if it doesn't exist
+      const chatData = {
+        chat_id: combinedId,
+        users_ids: [currentUser?.uid, user?.uid],
+        updated_at: serverTimestamp(),
+        created_at: serverTimestamp(),
+        users: [
+          {
+            user_id: user?.uid,
+            badge: 0,
+            full_name: user?.fullName,
+          },
+          {
+            user_id: currentUser?.uid,
+            badge: 0,
+            full_name: currentUser?.fullName,
+          },
+        ],
+      };
+      const temp = await addDoc(collection(db, "chats"), { ...chatData });
+      if (user?.uid) addChat(user?.uid, userInput);
+      await addDoc(
+        collection(db, "chats", temp.id, "messages"),
+        {
+          message: userInput,
+          sender_id: user?.uid,
+          timestamp: new Date(),
+          type: "text",
+        }
+      );
+    } else {
+      if (user?.uid) addChat(user?.uid, userInput);
+      await addDoc(
+        collection(db, "chats", getChatDocument?.docs[0]?.id, "messages"), //docs[0] is already exisiting doc
+        {
+          message: userInput,
+          sender_id: user?.uid,
+          timestamp: new Date(),
+          type: "text",
+        }
+      );
+    }
   };
 
   const [show, setShow] = useState(false);
@@ -242,14 +293,9 @@ const MessagesDetailMainPage = () => {
             </div>
             <div className="flex flex-col my-1">
               <Heading
-                text={businessName}
+                text={businessName || proBusinessName || anotherUserDetail?.full_name || "Business"}
                 variant="headingTitle"
                 headingclassname="font-poppins !text-lg !font-bold tracking-wide capitalize"
-              />
-              <Heading
-                text={serviceName}
-                variant="subHeader"
-                headingclassname="font-poppins text-sm capitalize"
               />
               {useLocation().state.isQuote && (
                 <div className="bg-white text-primaryYellow py-2 lg:hidden">

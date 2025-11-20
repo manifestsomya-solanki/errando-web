@@ -48,6 +48,7 @@ function ServiceItemsSection(props: {
                     : 0.0
                 }
                 ratingCount={item?.reviews_avg_rating}
+                reviewsCount={item?.reviews_count ?? 0}
                 isInterested={item?.is_interest}
                 isClientNotInterested={
                   item?.user?.not_interested_user_requests?.length > 0

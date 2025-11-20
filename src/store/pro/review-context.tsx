@@ -62,30 +62,42 @@ const ReviewContextProProvider = (props: { children: React.ReactNode }) => {
     const token = localStorage.getItem("token");
     setIsLoading(true);
     setError("");
-    const res = await fetch(
-      buildApiUrl(`${API_ENDPOINTS.REVIEWS_ADD_RESPONSE}/${id}`),
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        body: formData,
-      }
-    );
-    if (res.status === 200) {
-      setIsLoading(false);
-      const data: AddResponseData = await res.json();
+    try {
+      const res = await fetch(
+        buildApiUrl(`${API_ENDPOINTS.REVIEWS}/${id}/addresponse`),
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: formData,
+        }
+      );
+      if (res.status === 200) {
+        const data: AddResponseData = await res.json();
 
-      if (data.status === "0") {
-        setError(data.message);
+        if (data.status === "0") {
+          setError(data.message);
+          setIsLoading(false);
+          throw new Error(data.message);
+        } else {
+          setError("");
+          await mutate();
+          setIsLoading(false);
+          toast.success("Response saved successfully");
+        }
       } else {
-        setError("");
-        mutate();
+        const data: any = await res.json();
+        setIsLoading(false);
+        setError(data.message);
+        toast.error(data.message || "Failed to save response");
+        throw new Error(data.message || "Failed to save response");
       }
-    } else {
-      const data: any = await res.json();
+    } catch (error: any) {
       setIsLoading(false);
-      setError(data.message);
+      setError(error.message || "Failed to save response");
+      toast.error(error.message || "Failed to save response");
+      throw error;
     }
   };
 

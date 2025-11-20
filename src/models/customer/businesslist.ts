@@ -16,6 +16,7 @@ export interface Business {
   created_at: string;
   updated_at: string;
   reviews_avg_rating: number;
+  reviews_count: number;
   files: File[];
   services: Service[];
   is_responded: boolean;

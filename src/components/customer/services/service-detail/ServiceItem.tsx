@@ -82,12 +82,13 @@ function ServiceCard(props: any) {
   const handleSelect = async () => {
     //check whether the group(chats in firestore) exists, if not create
     let combinedId: any;
-    if (user?.uid) {
+    if (user?.uid && currentUser?.uid) {
       combinedId =
         +currentUser?.uid < user?.uid
           ? currentUser?.uid + "-" + user?.uid
           : user?.uid + "-" + currentUser?.uid;
     }
+    if (!combinedId) return;
     try {
       const res = await getDoc(doc(db, "chats", combinedId));
 
@@ -199,6 +200,7 @@ function ServiceCard(props: any) {
                   userRequestId: requestId?.id,
                   distance: props?.location,
                   page_key: "customer",
+                  userId: props?.userId,
                 },
               })
             }
@@ -255,6 +257,8 @@ function ServiceCard(props: any) {
                       isInterested: props?.isInterested,
                       userRequestId: requestId?.id,
                       distance: props?.location,
+                      page_key: "customer",
+                      userId: props?.userId,
                     },
                   })
                 }
@@ -305,6 +309,8 @@ function ServiceCard(props: any) {
                   isInterested: props?.isInterested,
                   userRequestId: requestId?.id,
                   distance: props?.location,
+                  page_key: "customer",
+                  userId: props?.userId,
                 },
               })
             }
@@ -317,7 +323,7 @@ function ServiceCard(props: any) {
               <img src={Star} alt="Star" />
             ))}
             <Heading
-              text={`${props.ratingCount ?? 0} of 5 / 120`}
+              text={`${props.ratingCount ?? 0} of 5 / ${props.reviewsCount ?? 0}`}
               variant="subHeader"
               headingclassname="text-gray-500 !font-normal tracking-wide !text-xs mx-2 dark:text-slate-400"
             />
@@ -381,6 +387,7 @@ function ServiceCard(props: any) {
                     id: props?.userId,
                     displayPhoto: props?.icon,
                     name: props.serviceName,
+                    businessName: props.title,
                     quote: `Quote: £${props.quotes} ${props.quoteTypes}`,
                     isQuote: props.quotes ? true : false,
                   }}

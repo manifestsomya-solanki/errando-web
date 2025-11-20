@@ -99,13 +99,13 @@ function PostCodeModal(props: {
                 <div className="flex gap-2 items-center w-full">
                   <div className="flex-1">
                     <ValidatedPostcodeInput
-                      className="rounded-lg w-full outline-none pl-3 text-[#707070]"
+                      className="rounded-lg w-full outline-none pl-3 text-[#707070] uppercase"
                       placeholder="Post Code"
                       id="postCode"
                       name="postCode"
                       value={formik.values.postCode}
                       onChange={(value) => {
-                        formik.setFieldValue("postCode", value);
+                        formik.setFieldValue("postCode", value.toUpperCase());
                       }}
                       onValidationChange={(isValid, status) => {
                         setIsPostcodeValid(isValid);
@@ -118,7 +118,7 @@ function PostCodeModal(props: {
                   {/* Search button - positioned next to the input field */}
                   <button
                     disabled={
-                      formik.errors.postCode || 
+                      !!formik.errors.postCode || 
                       !formik.values.postCode ||
                       formik.values.postCode.length < 4
                     }
