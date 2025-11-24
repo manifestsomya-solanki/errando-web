@@ -2,7 +2,7 @@ import Plumber from "../../assets/plumber.png";
 import SignInTopBar from "../../components/customer/home/SignInTopBar";
 import Heading from "../../components/UI/Heading";
 import { useFormik } from "formik";
-import { NavLink } from "react-router-dom";
+import { NavLink, useSearchParams, useNavigate } from "react-router-dom";
 import Error from "../../components/UI/Error";
 import Input from "../../components/UI/Input";
 import { useAuth } from "../../store/customer/auth-context";
@@ -11,10 +11,13 @@ import { useEffect, useState } from "react";
 import Footer from "../../components/customer/home/Footer";
 import ForgotPasswordModal from "../../layout/ForgotPasswordModal";
 import { userCurrentToken } from "../../Firebase";
+import { buildApiUrl, API_ENDPOINTS } from "../../config/api";
 
 const SignInPage = () => {
   const [key, setKey] = useState("");
   const [forgotPasswordModal, setForgotPasswordModal] = useState(false);
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const {
     login,
     loginPro,
@@ -55,9 +58,66 @@ const SignInPage = () => {
       }
     },
   });
+
+  // Handle token from URL (admin login as user)
   useEffect(() => {
-    setError("");
-  }, [])
+    const token = searchParams.get("token");
+    const userId = searchParams.get("user_id");
+    
+    if (token && userId) {
+      const loginWithToken = async () => {
+        try {
+          // Fetch user details with the token
+          const response = await fetch(
+            buildApiUrl(`${API_ENDPOINTS.USER_DETAIL}?user_id=${userId}`),
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+                Accept: "application/json",
+              },
+            }
+          );
+
+          if (response.ok) {
+            const data = await response.json();
+            
+            if (data.status === "1" && data.data) {
+              const userData = data.data;
+              const role = userData.role === "pro" ? "pro" : "customer";
+              
+              // Set all localStorage items (same as normal login)
+              localStorage.setItem("token", token);
+              localStorage.setItem("data", JSON.stringify(userData));
+              localStorage.setItem("isLoggedIn", "true");
+              localStorage.setItem("role", role);
+              
+              // Clear URL parameters
+              window.history.replaceState({}, document.title, "/sign-in");
+              
+              // Navigate based on role (same as normal login)
+              if (role === "pro") {
+                navigate("/pro");
+              } else {
+                navigate("/home");
+              }
+            } else {
+              setError(data.message || "Failed to login with token");
+            }
+          } else {
+            const errorData = await response.json().catch(() => ({ message: "Invalid token" }));
+            setError(errorData.message || "Invalid token");
+          }
+        } catch (error) {
+          console.error("Error logging in with token:", error);
+          setError("Failed to login with token");
+        }
+      };
+      
+      loginWithToken();
+    } else {
+      setError("");
+    }
+  }, [searchParams, navigate, setError]);
 
   return (
     <div>
