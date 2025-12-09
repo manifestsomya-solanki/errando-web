@@ -14,9 +14,7 @@ import {
   query,
   where,
   getDocs,
-  setDoc,
   doc,
-  updateDoc,
   serverTimestamp,
   getDoc,
   addDoc,
@@ -26,7 +24,8 @@ import { useAuth } from "../../../../store/customer/auth-context";
 import useSWR from "swr";
 import { fetcher } from "../../../../store/customer/home-context";
 import { UserData } from "../../../../models/user";
-import { API_BASE_URL, buildApiUrl, API_ENDPOINTS } from "../../../../config/api";
+import { buildApiUrl, API_ENDPOINTS } from "../../../../config/api";
+import MailIcon from "../../../../assets/MailIcon";
 
 function DangerousHTML({
   dangerouslySetInnerHTML,
@@ -183,11 +182,17 @@ function ServiceCard(props: any) {
           </h1>
         )}
         <div
-          className={`bg-white box-shadow-lg drop-shadow-[0_15px_20px_rgba(0,0,0,0.15)] py-5 px-5 rounded-md flex flex-col dark:bg-dimGray flex-grow cursor-pointer ${
+          className={`bg-white box-shadow-lg drop-shadow-[0_15px_20px_rgba(0,0,0,0.15)] py-5 px-5 rounded-md flex flex-col dark:bg-dimGray flex-grow cursor-pointer relative ${
             props.isClientNotInterested &&
-            "blur-sm  relative !cursor-not-allowed"
+            "blur-sm  !cursor-not-allowed"
           }`}
         >
+          {/* Mail Icon - Show when Pro has sent message */}
+          {props.isResponded && (
+            <div className="absolute bottom-4 right-4">
+              <MailIcon color={theme === "dark" ? "#3b82f6" : "#3b82f6"} />
+            </div>
+          )}
           <div
             className="flex gap-2 flex-nowrap"
             onClick={() =>
@@ -266,19 +271,19 @@ function ServiceCard(props: any) {
                 <Heading
                   text="Quote:"
                   variant="subTitle"
-                  headingclassname="text-primaryYellow !font-semibold tracking-wide !text-xs dark:text-darkprimaryYellow"
+                  headingclassname="text-primaryYellow !font-semibold tracking-wide !text-base dark:text-darkprimaryYellow"
                 />
                 <div className="flex gap-1 items-center">
-                  <p className="text-primaryYellow font-bold ">£</p>
+                  <p className="text-primaryYellow font-bold !text-base">£</p>
                   <Heading
                     text={requestQuote?.quote}
                     variant="subTitle"
-                    headingclassname="text-primaryYellow !font-semibold tracking-wide !text-xs dark:text-darkprimaryYellow"
+                    headingclassname="text-primaryYellow !font-semibold tracking-wide !text-base dark:text-darkprimaryYellow"
                   />
                   <Heading
                     text={requestQuote?.payment_type.replace("_", " ")}
                     variant="subTitle"
-                    headingclassname="text-primaryYellow !font-semibold tracking-wide !text-xs dark:text-darkprimaryYellow"
+                    headingclassname="text-primaryYellow !font-semibold tracking-wide !text-base dark:text-darkprimaryYellow"
                   />
                 </div>
                 {/* <div>{props?.quote[0]?.quote}</div> */}

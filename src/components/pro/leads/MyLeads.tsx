@@ -15,6 +15,7 @@ import { useTheme } from "../../../store/theme-context";
 import { useState } from "react";
 import DeleteLeadModal from "../../../layout/pro-models/DeleteLeadModal";
 import { API_BASE_URL, buildApiUrl, API_ENDPOINTS } from "../../../config/api";
+import { formatUKPostcode } from "../../../utils/postcodeFormatter";
 
 function getTimeDifferenceString(time: any) {
   const currentTime = dayjs();
@@ -215,8 +216,10 @@ function MyLeads(props: any) {
                 <Heading
                   text={
                     (() => {
-                      const postcodeDisplay = leadsDetail?.postcode
-                        ? `${(leadsDetail.postcode.split(" ")[0]?.slice(0, 4) || leadsDetail.postcode.slice(0, 4)) + "**"}`
+                      // Format postcode first (adds correct spacing for UK postcodes)
+                      const formattedPostcode = formatUKPostcode(leadsDetail?.postcode);
+                      const postcodeDisplay = formattedPostcode
+                        ? `${(formattedPostcode.split(" ")[0]?.slice(0, 4) || formattedPostcode.slice(0, 4)) + "**"}`
                         : "";
                       
                       // If town_name is available, show it before postcode

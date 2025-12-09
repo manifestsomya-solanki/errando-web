@@ -9,14 +9,13 @@ import ServiceQuestionsSkeleton from "../skeleton/ServiceQuestionSkeleton";
 import useSWR from "swr";
 import { fetcher } from "../../../../store/customer/home-context";
 import { useParams } from "react-router";
-import { Request } from "../../../../models/customer/requestlist";
 import { Business } from "../../../../models/customer/businesslist";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useServices } from "../../../../store/customer/service-context";
 import Heading from "../../../UI/Heading";
 import ServiceDetailSkeleton from "../skeleton/ServiceDetailSkeleton";
 import CloseRequestModal from "../../../../layout/close-request-modals/CloseRequestModal";
-import { API_BASE_URL, buildApiUrl, API_ENDPOINTS } from "../../../../config/api";
+import { buildApiUrl, API_ENDPOINTS } from "../../../../config/api";
 
 function SeviceDetailMainPage() {
   const requestId = useParams();

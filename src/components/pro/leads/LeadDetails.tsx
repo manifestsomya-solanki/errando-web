@@ -69,21 +69,28 @@ function LeadDetails() {
     }
     const emailRegex = /\S+@\S+\.\S+/g;
     const urlRegex = /(?:https?|ftp):\/\/[\n\S]+|www\.[\S]+\.[a-z]+/g;
-    // Phone regex to match various formats: 10+ digits (with spaces, dashes, parentheses)
-    const phoneRegex = /[\+]?[(]?[0-9]{1,4}[)]?[-\s\.]?[(]?[0-9]{1,4}[)]?[-\s\.]?[0-9]{1,9}/g;
-    const blurredText = text.replace(
+    const numberSequenceRegex = /(\d[\d\s\-\.]{0,}\d|\d)/g;
+    
+    let processedText = text.replace(
       emailRegex,
       '<span class="blur-text">$&</span>'
     );
-    const blurredAndLinkedText = blurredText.replace(
+    processedText = processedText.replace(
       urlRegex,
       '<span class="blur-text">$&</span>'
     );
-    const finalText = blurredAndLinkedText.replace(
-      phoneRegex,
-      '<span class="blur-text">$&</span>'
-    );
-    return finalText;
+    
+    processedText = processedText.replace(numberSequenceRegex, (match) => {
+      const digitsOnly = match.replace(/\D/g, '');
+      
+      if (digitsOnly.length > 6) {
+        return '<span class="blur-text">' + match + '</span>';
+      }
+      
+      return match;
+    });
+    
+    return processedText;
   };
 
   const handleBuy = async (type: string) => {

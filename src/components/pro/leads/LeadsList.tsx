@@ -1,6 +1,7 @@
 import { useLead } from "../../../store/pro/lead-context";
 import TableFooter from "./TableFooter";
 import LeadsListItem from "./LeadsListItem";
+import { formatUKPostcode } from "../../../utils/postcodeFormatter";
 
 function LeadsList() {
   const { leads, page, handlePrevPage, handleNextPage, total } = useLead();
@@ -29,8 +30,10 @@ function LeadsList() {
               answers={answers.length > 0 ? answers : ["No answers"]}
               location={
                 (() => {
-                  const postcodeDisplay = item?.postcode
-                    ? `${(item.postcode.split(" ")[0]?.slice(0, 4) || item.postcode.slice(0, 4)) + "**"}`
+                  // Format postcode first (adds correct spacing for UK postcodes)
+                  const formattedPostcode = formatUKPostcode(item?.postcode);
+                  const postcodeDisplay = formattedPostcode
+                    ? `${(formattedPostcode.split(" ")[0]?.slice(0, 4) || formattedPostcode.slice(0, 4)) + "**"}`
                     : "";
                   
                   // If town_name is available, show it before postcode
