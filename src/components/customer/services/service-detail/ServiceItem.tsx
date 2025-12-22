@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import Heading from "../../../UI/Heading";
 import GoldStar from "../../../../assets/GoldStar.svg";
 import Star from "../../../../assets/Star.svg";
@@ -18,6 +18,8 @@ import {
   serverTimestamp,
   getDoc,
   addDoc,
+  limit,
+  onSnapshot,
 } from "firebase/firestore";
 import { db } from "../../../../Firebase";
 import { useAuth } from "../../../../store/customer/auth-context";
@@ -44,6 +46,8 @@ function DangerousHTML({
 function ServiceCard(props: any) {
   const navigate = useNavigate();
   const [showFullDescription, setShowFullDescription] = useState(false);
+  const [hasProSentMessage, setHasProSentMessage] = useState(false);
+  const unsubscribeRef = useRef<(() => void) | null>(null);
 
   const handleClick = () => {
     setShowFullDescription(!showFullDescription);
@@ -77,6 +81,87 @@ function ServiceCard(props: any) {
     fullName: anotherUserDetail?.full_name,
     photoURL: props?.icon,
   };
+
+  // Check if pro has sent any messages - using real-time listener
+  useEffect(() => {
+    // Cleanup previous listener if exists
+    if (unsubscribeRef.current) {
+      unsubscribeRef.current();
+      unsubscribeRef.current = null;
+    }
+
+    if (!user?.uid || !currentUser?.uid) {
+      setHasProSentMessage(false);
+      return;
+    }
+
+    let combinedId: any;
+    if (user?.uid && currentUser?.uid) {
+      combinedId =
+        +currentUser?.uid < user?.uid
+          ? currentUser?.uid + "-" + user?.uid
+          : user?.uid + "-" + currentUser?.uid;
+    }
+    if (!combinedId) {
+      setHasProSentMessage(false);
+      return;
+    }
+
+    const checkProMessages = async () => {
+      try {
+        const getChatQuery = query(
+          collection(db, "chats"),
+          where("chat_id", "==", combinedId)
+        );
+        const getChatDocument = await getDocs(getChatQuery);
+
+        if (getChatDocument?.docs?.length > 0) {
+          const chatRef = collection(
+            db,
+            "chats",
+            getChatDocument.docs[0].id,
+            "messages"
+          );
+
+          // Use real-time listener to check if there are any messages from the pro
+          // sender_id is stored as the user ID (number or string, depending on how it's saved)
+          const proUserId = currentUser?.uid;
+          const messagesQuery = query(
+            chatRef,
+            where("sender_id", "==", proUserId),
+            limit(1)
+          );
+          
+          unsubscribeRef.current = onSnapshot(
+            messagesQuery,
+            (snapshot) => {
+              // Check if there are any messages from the pro
+              setHasProSentMessage(snapshot?.docs?.length > 0);
+            },
+            (err) => {
+              console.log("Error listening to pro messages:", err);
+              setHasProSentMessage(false);
+            }
+          );
+        } else {
+          setHasProSentMessage(false);
+        }
+      } catch (err) {
+        console.log("Error checking pro messages:", err);
+        setHasProSentMessage(false);
+      }
+    };
+
+    checkProMessages();
+
+    // Cleanup function to unsubscribe from listener
+    return () => {
+      if (unsubscribeRef.current) {
+        unsubscribeRef.current();
+        unsubscribeRef.current = null;
+      }
+    };
+  }, [user?.uid, currentUser?.uid]);
 
   const handleSelect = async () => {
     //check whether the group(chats in firestore) exists, if not create
@@ -187,8 +272,8 @@ function ServiceCard(props: any) {
             "blur-sm  !cursor-not-allowed"
           }`}
         >
-          {/* Mail Icon - Show when Pro has sent message */}
-          {props.isResponded && (
+          {/* Mail Icon - Show only when Pro has sent message */}
+          {props.isResponded && hasProSentMessage && (
             <div className="absolute bottom-4 right-4">
               <MailIcon color={theme === "dark" ? "#3b82f6" : "#3b82f6"} />
             </div>
