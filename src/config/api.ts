@@ -63,6 +63,7 @@ export const API_ENDPOINTS = {
   REVIEWS_DELETE: 'reviews/delete',
   REVIEWS_FLAG: 'reviews/flag',
   REVIEWS_ADD_RESPONSE: 'reviews/addresponse',
+  REVIEWS_DETAIL: 'reviews',
   
   // Notifications
   NOTIFICATION: 'notification',
@@ -81,6 +82,7 @@ export const API_ENDPOINTS = {
   QUOTES_EDIT: 'quotes/edit',
   
   // Notes
+  NOTE: 'note',
   NOTE_ADD: 'note/add',
   
   // Postcodes
@@ -89,6 +91,7 @@ export const API_ENDPOINTS = {
   
   // Questions
   QUESTIONS: 'questions',
+  QUESTIONS_SUGGEST: 'questions/suggest',
   
   // Forgot password
   FORGOT_PASSWORD: 'user/forgot-password'

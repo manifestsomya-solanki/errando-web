@@ -63,6 +63,7 @@ function LeadsList() {
               mincredits={6}
               maxcredits={3}
               id={item?.id}
+              userId={item?.user?.id}
               leads_count={item?.leads_count}
               interested={item?.intrests?.length > 0 ? true : false}
               quoteRequested={item?.quote_requests?.length > 0 ? true : false}

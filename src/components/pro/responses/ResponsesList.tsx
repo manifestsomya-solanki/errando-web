@@ -53,6 +53,7 @@ function ResponsesList() {
                 return "--";
               })()}
               id={item?.id}
+              userId={item?.user?.id}
               is_outright={item?.leads[0]?.is_outright ? true : false}
               interested={item?.intrests?.length > 0 ? true : false}
               quoteRequested={item?.quote_requests?.length > 0 ? true : false}

@@ -12,8 +12,23 @@ import BlackRoundTick from "../../../assets/BlackRoundTick.svg";
 import { useTheme } from "../../../store/theme-context";
 import Dustbin from "../../../assets/Dustbin";
 import DeleteLeadModal from "../../../layout/pro-models/DeleteLeadModal";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import dayjs from "dayjs";
+import MailIcon from "../../../assets/MailIcon";
+import {
+  collection,
+  query,
+  where,
+  getDocs,
+  limit,
+  onSnapshot,
+} from "firebase/firestore";
+import { db } from "../../../Firebase";
+import { useAuth } from "../../../store/pro/auth-pro-context";
+import useSWR from "swr";
+import { fetcher } from "../../../store/customer/home-context";
+import { buildApiUrl, API_ENDPOINTS } from "../../../config/api";
+import { UserData } from "../../../models/user";
 
 function getTimeDifferenceString(time: any) {
   const currentTime = dayjs();
@@ -53,11 +68,110 @@ function LeadsListItem(props: {
   is_messaged: boolean;
   is_email_verified: boolean;
   is_mobile_verified: boolean;
+  userId?: number;
 }) {
   const { theme } = useTheme();
   const [openMenu, setOpenMenu] = useState(false);
+  const [hasCustomerSentMessage, setHasCustomerSentMessage] = useState(false);
+  const unsubscribeRef = useRef<(() => void) | null>(null);
+  const { userData } = useAuth();
+  
   console.log(props?.is_messaged, "adf");
   const timeDifferenceString = getTimeDifferenceString(props?.time);
+
+  // Check if customer has sent any messages - using real-time listener
+  useEffect(() => {
+    // Cleanup previous listener if exists
+    if (unsubscribeRef.current) {
+      unsubscribeRef.current();
+      unsubscribeRef.current = null;
+    }
+
+    if (!userData?.id || !props?.userId) {
+      setHasCustomerSentMessage(false);
+      return;
+    }
+
+    let combinedId: any;
+    if (userData?.id && props?.userId) {
+      combinedId =
+        +props.userId < userData.id
+          ? props.userId + "-" + userData.id
+          : userData.id + "-" + props.userId;
+    }
+    if (!combinedId) {
+      setHasCustomerSentMessage(false);
+      return;
+    }
+
+    const checkCustomerMessages = async () => {
+      try {
+        const getChatQuery = query(
+          collection(db, "chats"),
+          where("chat_id", "==", combinedId)
+        );
+        const getChatDocument = await getDocs(getChatQuery);
+
+        if (getChatDocument?.docs?.length > 0) {
+          const chatRef = collection(
+            db,
+            "chats",
+            getChatDocument.docs[0].id,
+            "messages"
+          );
+
+          // Use real-time listener to check if there are any messages from the customer
+          // Listen to all messages and filter in JavaScript to handle type mismatches
+          const customerUserId = props.userId;
+          const customerUserIdStr = String(customerUserId);
+          const customerUserIdNum = Number(customerUserId);
+          
+          unsubscribeRef.current = onSnapshot(
+            chatRef,
+            (snapshot) => {
+              // Check if any message has sender_id matching customer (try both string and number)
+              const hasMessage = snapshot.docs.some((doc) => {
+                const data = doc.data();
+                const senderId = data.sender_id;
+                // Compare with both string and number formats
+                return (
+                  senderId === customerUserId ||
+                  senderId === customerUserIdStr ||
+                  senderId === customerUserIdNum ||
+                  String(senderId) === customerUserIdStr ||
+                  Number(senderId) === customerUserIdNum
+                );
+              });
+              setHasCustomerSentMessage(hasMessage);
+            },
+            (err) => {
+              console.log("Error listening to customer messages:", err, {
+                customerUserId,
+                customerUserIdStr,
+                customerUserIdNum,
+                combinedId
+              });
+              setHasCustomerSentMessage(false);
+            }
+          );
+        } else {
+          setHasCustomerSentMessage(false);
+        }
+      } catch (err) {
+        console.log("Error checking customer messages:", err);
+        setHasCustomerSentMessage(false);
+      }
+    };
+
+    checkCustomerMessages();
+
+    // Cleanup function to unsubscribe from listener
+    return () => {
+      if (unsubscribeRef.current) {
+        unsubscribeRef.current();
+      }
+    };
+  }, [userData?.id, props?.userId]);
 
   return (
     <NavLink
@@ -71,7 +185,13 @@ function LeadsListItem(props: {
           : { color: "#334155" }
       }
     >
-      <HomeCard className="px-3 pt-5 pb-3">
+      <HomeCard className="px-3 pt-5 pb-3 relative">
+        {/* Mail Icon - Show only when Customer has sent message */}
+        {props.is_messaged && hasCustomerSentMessage && (
+          <div className="absolute bottom-4 right-4">
+            <MailIcon color={theme === "dark" ? "#3b82f6" : "#3b82f6"} />
+          </div>
+        )}
         {props.is_read && (
           <div className="w-2 h-2 bg-blue-500 text-transparent rounded-full -ml-1 -mt-3 mb-2"></div>
         )}

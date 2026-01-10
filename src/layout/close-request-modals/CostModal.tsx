@@ -32,14 +32,18 @@ function CostModal(props: {
 
     onSubmit: async (values) => {
       const formData = new FormData();
-      formData.set("businessId", props?.businessId);
+      if (props?.businessId) {
+        formData.set("business_id", props?.businessId);
+      }
       formData.set("close_answer", props?.closeAnswer);
       if (values?.price.length === 0) {
         formData.set("price", "0");
       } else {
         formData.set("price", values?.price);
       }
-      formData.set("price_type", values?.price_type);
+      if (values?.price_type) {
+        formData.set("price_type", values?.price_type);
+      }
       if (requestId?.id) await closeRequestHandler(formData, +requestId?.id);
       await isCurrentMutate();
       await isCompleteMutate();

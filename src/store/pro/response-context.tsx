@@ -204,6 +204,7 @@ const LeadsResponseProvider = (props: { children: React.ReactNode }) => {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
+          Accept: "application/json",
         },
         body: formData,
       }
@@ -218,19 +219,26 @@ const LeadsResponseProvider = (props: { children: React.ReactNode }) => {
           hideProgressBar: false,
           position: "bottom-left",
         });
-        navigate(-1);
+        // Don't navigate immediately, let the user see the success message
+        setTimeout(() => {
+          navigate(-1);
+        }, 1000);
         setIsNoteLoading(false);
       } else {
         setError(data.message);
-        toast.error("error", {
+        toast.error(data.message || "Failed to save note", {
           hideProgressBar: false,
           position: "bottom-left",
         });
       }
     } else {
       const data: any = await res.json();
-      setError(data.message);
+      setError(data.message || "Failed to save note");
       setIsNoteLoading(false);
+      toast.error(data.message || "Failed to save note", {
+        hideProgressBar: false,
+        position: "bottom-left",
+      });
     }
   };
 

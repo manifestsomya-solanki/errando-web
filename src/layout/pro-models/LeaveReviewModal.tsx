@@ -29,7 +29,7 @@ function LeaveReviewModal(props: {
   const { data } = useSWR(url, fetcher);
   const serviceData: ServiceList = data?.data;
 
-  const detailUrl = buildApiUrl(`${API_ENDPOINTS.REVIEWS_DETAIL}/${props.id}`);
+  const detailUrl = buildApiUrl(`${API_ENDPOINTS.REVIEWS_DETAIL}/${props.id}/detail`);
   const { data: reviewData } = useSWR(props.id ? detailUrl : null, fetcher);
   const { state } = useLocation();
   const [checked, setChecked] = useState(false);
@@ -45,12 +45,35 @@ function LeaveReviewModal(props: {
 
   const location = useLocation();
   console.log(props.dealerId);
+  
+  // Update starRating and formik values when reviewData loads (edit mode)
+  useEffect(() => {
+    if (props.id && reviewData?.data) {
+      const rating = reviewData.data.rating;
+      if (rating) {
+        setStarRating(rating.toString());
+        formik.setFieldValue("rating", rating.toString());
+      }
+      if (reviewData.data.description) {
+        formik.setFieldValue("description", reviewData.data.description);
+      }
+      if (reviewData.data.service_id) {
+        formik.setFieldValue("serviceId", reviewData.data.service_id);
+      }
+      if (reviewData.data.user_business_id) {
+        formik.setFieldValue("userBusinessId", reviewData.data.user_business_id);
+      }
+      // Auto-check checkbox in edit mode since data is already confirmed
+      setChecked(true);
+    }
+  }, [reviewData?.data, props.id]);
+  
   const formik = useFormik({
     initialValues: {
       userBusinessId: dealerId?.id,
       serviceId: state?.serviceId,
-      description: props.id ? reviewData?.description : "",
-      rating: props.id ? reviewData?.rating : "",
+      description: "",
+      rating: "",
     },
     validate: (values: createReview) => {
       const errors: any = {};
@@ -126,6 +149,7 @@ function LeaveReviewModal(props: {
           </div>
           <div className="flex flex-col gap-3 xl:w-[450px] justify-center items-center xs:w-[350px]">
             <StarRatings
+              initialRating={props.id && reviewData?.data?.rating ? parseInt(reviewData.data.rating) : undefined}
               onClick={(key: number) => {
                 setStarRating(key.toString());
               }}
@@ -134,7 +158,7 @@ function LeaveReviewModal(props: {
           <div className="pb-7 xs:w-full xl:pl-0 md:pl-3">
             <Heading
               variant="headingTitle"
-              text={state?.serviceName}
+              text={props.id && reviewData?.data?.service?.name ? reviewData.data.service.name : state?.serviceName}
               headingclassname="xs:text-md text-center"
             />
           </div>
@@ -163,6 +187,7 @@ function LeaveReviewModal(props: {
             <input
               id="default-checkbox"
               type="checkbox"
+              checked={checked}
               onChange={() => setChecked(!checked)}
               className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
             />

@@ -55,7 +55,7 @@ const MyReviewContextProvider = (props: { children: React.ReactNode }) => {
     setIsLoading(true);
 
     const res = await fetch(
-      buildApiUrl(`${API_ENDPOINTS.REVIEWS_EDIT}/${id}`),
+      buildApiUrl(`${API_ENDPOINTS.REVIEWS}/${id}/edit`),
       {
         method: "POST",
         headers: {

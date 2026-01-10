@@ -66,7 +66,8 @@ function ServiceSection() {
                 return (
                   <div key={key}>
                     <ServiceItem
-                      serviceId={item?.id}
+                      serviceId={item?.service_id || item?.service?.id}
+                      businessServiceId={item?.id}
                       title={item?.service?.name}
                       business={item?.user_bussiness?.name}
                         locationOne={

@@ -22,9 +22,11 @@ function NotesDetail({ onCancel }: { onCancel: () => void }) {
   const loginUser = JSON.parse(localStorage.getItem("data") || "{}");
   console.log(loginUser?.id, "loginUser");
 
-  const url = buildApiUrl(`${API_ENDPOINTS.NOTE}?user_request_id=${requestId?.id}&user_id=${loginUser?.id}`);
-  const { data, isLoading } = useSWR(url, fetcher);
-  const notesDetail: NotesList[] = data?.data ?? "";
+  const url = requestId?.id && loginUser?.id 
+    ? buildApiUrl(`${API_ENDPOINTS.NOTE}?user_request_id=${requestId.id}&user_id=${loginUser.id}`)
+    : null;
+  const { data, isLoading, mutate } = useSWR(url, fetcher);
+  const notesDetail: NotesList[] = data?.data ?? [];
   console.log(requestId, "reqid");
 
   console.log(notesDetail[0]?.note, "notesDetail");
@@ -80,7 +82,11 @@ function NotesDetail({ onCancel }: { onCancel: () => void }) {
             const formData = new FormData(); //initialize formdata
             formData.set("note", values.note);
             formData.set("user_request_id", String(values.user_request_id));
-            notes(formData);
+            await notes(formData);
+            // Refresh the notes data after save
+            if (mutate) {
+              await mutate();
+            }
           }}
           validate={validate}
         >

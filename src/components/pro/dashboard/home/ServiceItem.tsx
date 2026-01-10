@@ -10,9 +10,12 @@ import EditServiceModal from "../../../../layout/pro-models/EditServiceModal.tsx
 import { PostCode } from "../../../../models/home.ts";
 import { Postcode2 } from "../../../../models/pro/business.ts";
 import DeleteBusinessServiceModal from "../../../../layout/pro-models/DeleteBusinessServiceModal.tsx";
+import QuestionSuggestionModal from "../../../../layout/pro-models/QuestionSuggestionModal.tsx";
+import LightBulb from "../../../../assets/LightBulb.tsx";
 
 function ServiceItem(props: {
   serviceId: number;
+  businessServiceId?: number;
   title: string;
   business: string;
   request_count: number;
@@ -29,19 +32,27 @@ function ServiceItem(props: {
   const { theme } = useTheme();
   const [openEditModal, setOpenEditModal] = useState(false);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
+  const [openSuggestionModal, setOpenSuggestionModal] = useState(false);
 
   return (
     <>
       {openEditModal && (
         <EditServiceModal
           onCancel={() => setOpenEditModal(false)}
-          serviceId={props?.serviceId}
+          serviceId={props?.businessServiceId || props?.serviceId}
         />
       )}
       {openDeleteModal && (
         <DeleteBusinessServiceModal
           onCancel={() => setOpenDeleteModal(false)}
-          id={props?.serviceId}
+          id={props?.businessServiceId || props?.serviceId}
+        />
+      )}
+      {openSuggestionModal && (
+        <QuestionSuggestionModal
+          onCancel={() => setOpenSuggestionModal(false)}
+          serviceId={props?.serviceId}
+          serviceName={props?.title}
         />
       )}
       <HomeCard
@@ -64,7 +75,13 @@ function ServiceItem(props: {
                 </div>
                 <div className="flex gap-0">
                   <div className=" hover:bg-slate-100 dark:hover:bg-slate-700 w-10 h-10 flex items-center justify-center rounded-full">
-                    <button onClick={() => setOpenEditModal(true)}>
+                    <button onClick={() => setOpenSuggestionModal(true)} title="Suggest Question">
+                      {theme === "light" && <LightBulb color="black" />}
+                      {theme === "dark" && <LightBulb color="white" />}
+                    </button>
+                  </div>
+                  <div className=" hover:bg-slate-100 dark:hover:bg-slate-700 w-10 h-10 flex items-center justify-center rounded-full">
+                    <button onClick={() => setOpenEditModal(true)} title="Edit Service">
                       <img src={Edit} />
                     </button>
                   </div>
@@ -72,7 +89,7 @@ function ServiceItem(props: {
                     <button onClick={() => {
                       console.log('Delete button clicked for service ID:', props.serviceId);
                       setOpenDeleteModal(true);
-                    }}>
+                    }} title="Delete Service">
                       <img src={Delete} className="w-h h-5" />
                     </button>
                   </div>
