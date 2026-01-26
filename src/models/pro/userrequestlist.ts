@@ -37,6 +37,9 @@ export interface UserRequestList {
   leads_count: number;
   request_quotes: Requestquote[];
   quote_requests: Quoterequest[];
+  calculated_base_credits?: number;
+  calculated_outright_credits?: number;
+  total_add_on_credits?: number;
 }
 
 export interface Lead {

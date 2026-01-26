@@ -39,8 +39,13 @@ function AddServiceModal({
   const url = buildApiUrl(API_ENDPOINTS.SERVICES);
   const dummy_data: ServiceData[] = [];
   let datarender: ServiceData[] = [];
-  const { data: dataa, isLoading: isServiceLoading } = useSWR(url, fetcher);
+  const { data: dataa, isLoading: isServiceLoading, mutate: mutateServices } = useSWR(url, fetcher);
   datarender = dataa?.data || dummy_data;
+  
+  // Refresh services list when modal opens to get latest services
+  useEffect(() => {
+    mutateServices();
+  }, [mutateServices]);
   const [locationNumber, setlocationNumber] = useState(1);
   let service_name: { value: number; label: string }[] = [];
   datarender?.flatMap((item) =>

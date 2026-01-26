@@ -329,7 +329,7 @@ function LeadsListItem(props: {
                   <img src={Credit} />
                 </div>
                 <Heading
-                  text={`${6} Credits`}
+                  text={`${props.mincredits} Credits`}
                   variant="smallTitle"
                   headingclassname="!font-semibold !text-xs   tracking-wide dark:text-white text-textColor"
                 />
@@ -343,7 +343,7 @@ function LeadsListItem(props: {
                 <img src={Credit} />
               </div>
               <Heading
-                text={`${3} Credits`}
+                text={`${props.maxcredits} Credits`}
                 variant="smallTitle"
                 headingclassname="!font-semibold !text-xs   tracking-wide dark:text-white text-textColor"
               />

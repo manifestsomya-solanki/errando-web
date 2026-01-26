@@ -60,8 +60,8 @@ function LeadsList() {
                   return "--";
                 })()
               }
-              mincredits={6}
-              maxcredits={3}
+              mincredits={item?.calculated_outright_credits ?? 6}
+              maxcredits={item?.calculated_base_credits ?? 3}
               id={item?.id}
               userId={item?.user?.id}
               leads_count={item?.leads_count}

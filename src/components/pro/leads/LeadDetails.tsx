@@ -198,7 +198,7 @@ function LeadDetails() {
             <div className="flex w-full items-center gap-3">
               <img src={Credit} className="w-5 h-5 object-cover" />
               <Heading
-                text={`3 credits`}
+                text={`${leadsDetail?.calculated_base_credits ?? 3} credits`}
                 variant="subHeader"
                 headingclassname="!font-normal !text-sm mx-1 text-textColor tracking-wide dark:text-white"
               />
@@ -220,7 +220,7 @@ function LeadDetails() {
               <div className="flex w-full items-center gap-3 relative">
                 <img src={Credit} className="w-5 h-5 object-cover" />
                 <Heading
-                  text={`6 credits`}
+                  text={`${leadsDetail?.calculated_outright_credits ?? 6} credits`}
                   variant="subHeader"
                   headingclassname="!font-normal !text-sm mx-1 text-textColor tracking-wide dark:text-white"
                 />
