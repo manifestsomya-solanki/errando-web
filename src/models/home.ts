@@ -57,7 +57,8 @@ export interface QuestionData {
   id: number;
   title: string;
   service_id: number;
-  answers: string[];
+  answers: (string | { answer: string; add_on_credit?: number })[];
+  allow_custom_answer?: number;
   created_at: string;
   updated_at: string;
 }

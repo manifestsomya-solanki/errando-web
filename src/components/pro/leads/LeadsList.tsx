@@ -6,9 +6,6 @@ import { formatUKPostcode } from "../../../utils/postcodeFormatter";
 function LeadsList() {
   const { leads, page, handlePrevPage, handleNextPage, total } = useLead();
 
-  //handling max next page
-  const min = new Date().getMinutes();
-
   return (
     <div className="flex flex-col gap-3 ">
       {leads && leads?.length > 0 ? (
@@ -16,6 +13,7 @@ function LeadsList() {
           const answers = item?.answers.map((answerItem) => answerItem.answer);
 
           const createdAt = item?.created_at ? new Date(item.created_at) : null;
+          
           return (
             <LeadsListItem
               key={key}

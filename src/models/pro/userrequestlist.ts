@@ -133,6 +133,8 @@ export interface Service {
   id: number;
   name: string;
   image: string;
+  base_credit?: number;
+  outright_credit?: number;
   created_at: string;
   updated_at: string;
 }

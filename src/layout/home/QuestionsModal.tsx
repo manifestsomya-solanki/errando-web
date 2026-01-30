@@ -6,7 +6,7 @@ import { useFormik } from "formik";
 import CommentsModal from "./CommentsModal";
 import { BusinessData, Question, QuestionData } from "../../models/home";
 import useSWR from "swr";
-import { fetcher, publicFetcher } from "../../store/customer/home-context.tsx";
+import { publicFetcher } from "../../store/customer/home-context.tsx";
 import FullPageLoading from "../../components/UI/FullPageLoading";
 import Error from "../../components/UI/Error";
 import NotFoundModal from "./NotFoundModal";
@@ -15,7 +15,7 @@ import { useTheme } from "../../store/theme-context";
 import NearlyThere from "./NearlyThere.tsx";
 import Input from "../../components/UI/Input.tsx";
 import { useAuth } from "../../store/customer/auth-context.tsx";
-import { API_BASE_URL, buildApiUrl, API_ENDPOINTS } from "../../config/api";
+import { buildApiUrl, API_ENDPOINTS } from "../../config/api";
 
 let ids: { question: number; answer: string; custom: boolean }[] = JSON.parse(
   localStorage.getItem("question") ?? "[]"
@@ -32,7 +32,6 @@ function QuestionsModal(props: {
     ? JSON.parse(localStorage.getItem("service") ?? "").id
     : "";
   const postCode = localStorage.getItem("post_code");
-  const token = localStorage.getItem("token");
   const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
   const businessUrl = buildApiUrl(`${API_ENDPOINTS.BUSINESSES}?postcode=${postCode}&service_id=${service}`);
   let datarenderForBusiness: BusinessData[] = [];
@@ -90,8 +89,6 @@ function QuestionsModal(props: {
   });
   const [questionNumber, setQuestionNumber] = useState(0);
   const [openModal, setOpenModal] = useState(false);
-  const [checked, setChecked] = useState(false);
-  const [extraAnswer, setExtraAnswer] = useState(false);
   const [inputValue, setInputValue] = useState<string>(
     ids.length > 0
       ? ids.find((d) => d.question === (datarender[questionNumber]?.id || questionNumber) && d.custom === true)?.answer || ""
@@ -234,8 +231,18 @@ function QuestionsModal(props: {
                               <div className="grid xl:grid-cols-4 md:grid-cols-3 xs:grid-cols-2 items-center gap-3 xl:w-[550px] md:w-[450px] p-2 dark:text-white">
                                 {datarender[questionNumber]?.answers?.length >
                                   0 &&
-                                  datarender[questionNumber]?.answers?.map(
-                                    (d, key) => {
+                                  datarender[questionNumber]?.answers
+                                    ?.filter((d: string | { answer: string; add_on_credit?: number }) => {
+                                      // Filter out "Your answer" option - it will be shown separately below
+                                      const answerText = typeof d === 'string' ? d : (d?.answer || '');
+                                      return answerText.toLowerCase() !== 'your answer';
+                                    })
+                                    ?.map(
+                                    (d: string | { answer: string; add_on_credit?: number }, key: number) => {
+                                      // Handle both string and object formats for answers
+                                      const answerText = typeof d === 'string' ? d : (d?.answer || '');
+                                      const answerId = typeof d === 'string' ? d : (d?.answer || `answer-${key}`);
+                                      
                                       return (
                                         <div
                                           className="flex items-center gap-2"
@@ -244,43 +251,41 @@ function QuestionsModal(props: {
                                           <input
                                             key={key}
                                             checked={
-                                              d === ids.find(item => item.question === (datarender[questionNumber]?.id || questionNumber))?.answer
+                                              answerText === ids.find(item => item.question === (datarender[questionNumber]?.id || questionNumber))?.answer
                                                 ? true
                                                 : false
                                             }
                                             onClick={() => {
-                                              setChecked(true);
                                               setInputValue("");
-                                              setExtraAnswer(false);
                                               const currentQuestionId = datarender[questionNumber]?.id || questionNumber;
                                               const existingIndex = ids.findIndex(item => item.question === currentQuestionId);
                                               
                                               if (existingIndex !== -1) {
-                                                ids[existingIndex].answer = d;
+                                                ids[existingIndex].answer = answerText;
                                                 ids[existingIndex].custom = false;
                                               } else {
                                                 ids.push({
                                                   question: currentQuestionId,
-                                                  answer: d,
+                                                  answer: answerText,
                                                   custom: false,
                                                 });
                                               }
                                             }}
-                                            id={d}
+                                            id={answerId}
                                             type="radio"
-                                            value={d}
+                                            value={answerText}
                                             name="content"
                                             onChange={() => {
                                               formik.setFieldValue(
                                                 "content",
-                                                d
+                                                answerText
                                               );
                                               if (ids[questionNumber]) {
-                                                ids[questionNumber].answer = d;
+                                                ids[questionNumber].answer = answerText;
                                               } else {
                                                 ids.push({
                                                   question: datarender[questionNumber]?.id || questionNumber,
-                                                  answer: d,
+                                                  answer: answerText,
                                                   custom: false,
                                                 });
                                               }
@@ -289,9 +294,9 @@ function QuestionsModal(props: {
                                           />
                                           <label
                                             className="xl:mr-3 md:mr-2 xl:text-md  md:text-sm xs:text-xs"
-                                            htmlFor={d}
+                                            htmlFor={answerId}
                                           >
-                                            {d}
+                                            {answerText}
                                           </label>
                                         </div>
                                       );
@@ -299,53 +304,51 @@ function QuestionsModal(props: {
                                   )}
                               </div>
                                
-                              <div className="mt-4 p-2 border-t border-gray-200 dark:border-gray-600">
-                                <div className="flex items-center gap-3">
-                                  <input
-                                    onClick={() => {
-                                      setChecked(false);
-                                      setExtraAnswer(true);
-                                      if (
-                                        ids.length > 0 &&
-                                        ids[ids.length - 1]?.question ===
-                                        questionNumber
-                                      ) {
-                                        ids.pop();
-                                      } else {
+                              {/* Show "Write your own answer" field only if allow_custom_answer is enabled (explicitly 1) */}
+                              {Number(datarender[questionNumber]?.allow_custom_answer) === 1 && (
+                                <div className="mt-4 p-2 border-t border-gray-200 dark:border-gray-600">
+                                  <div className="flex items-center gap-3">
+                                    <input
+                                      onChange={() => {
                                         const currentQuestionId = datarender[questionNumber]?.id || questionNumber;
                                         const existingIndex = ids.findIndex(item => item.question === currentQuestionId);
                                         
                                         if (existingIndex !== -1) {
-                                          ids[existingIndex].answer = inputValue.toString();
+                                          ids[existingIndex].answer = inputValue.toString() || "";
                                           ids[existingIndex].custom = true;
                                         } else {
                                           ids.push({
                                             question: currentQuestionId,
-                                            answer: inputValue.toString(),
+                                            answer: inputValue.toString() || "",
                                             custom: true,
                                           });
                                         }
+                                        formik.setFieldValue("content", inputValue.toString() || "");
+                                      }}
+                                      checked={ids.find(item => item.question === (datarender[questionNumber]?.id || questionNumber))?.custom || false}
+                                      type="radio"
+                                      name="content"
+                                      className="xl:w-4 xl:h-4 md:w-3 md:h-3 xs:w-3 xs:h-3 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800  dark:bg-gray-700 dark:border-gray-600"
+                                    />
+                                    <Input
+                                      type="text"
+                                      value={inputValue}
+                                      disabled={
+                                        // Disable if allow_custom_answer is not enabled (not 1) OR custom answer is not selected
+                                        Number(datarender[questionNumber]?.allow_custom_answer) !== 1 || 
+                                        !(ids.find(item => item.question === (datarender[questionNumber]?.id || questionNumber))?.custom === true)
                                       }
-                                    }}
-                                    checked={ids.find(item => item.question === (datarender[questionNumber]?.id || questionNumber))?.custom || false}
-                                    type="radio"
-                                    name="content"
-                                    className="xl:w-4 xl:h-4 md:w-3 md:h-3 xs:w-3 xs:h-3 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800  dark:bg-gray-700 dark:border-gray-600"
-                                  />
-                                  <Input
-                                    type="text"
-                                    value={inputValue}
-                                    disabled={!extraAnswer}
-                                    onChange={(e: any) => {
-                                      newAnswerHandler(e.target.value);
-                                    }}
-                                    className="p-1 pl-2 rounded-lg w-full"
-                                    placeholder="Write your own answer"
-                                  />
+                                      onChange={(e: any) => {
+                                        newAnswerHandler(e.target.value);
+                                      }}
+                                      className="p-1 pl-2 rounded-lg w-full"
+                                      placeholder="Write your own answer"
+                                    />
+                                  </div>
                                 </div>
-                              </div>
+                              )}
                             </div>
-                            <div className="flex gap-5 xl:w-[550px] md:w-[450px] justify-center">
+                            <div className={`flex gap-5 xl:w-[550px] md:w-[450px] justify-center ${Number(datarender[questionNumber]?.allow_custom_answer) !== 1 ? 'mt-6' : ''}`}>
                               <button
                                 type="button"
                                 onClick={() => {
@@ -368,7 +371,6 @@ function QuestionsModal(props: {
                                 type="submit"
                                 onClick={() => {
                                   setInputValue("");
-                                  setExtraAnswer(false);
                                 }}
                                 buttonClassName="  xl:text-lg md:text-sm rounded-xl xl:h-12 lg:h-10 xs:h-10 md:px-8 xs:px-5 text-center mr-3 md:mr-0 disabled:text-slate-600"
                               >

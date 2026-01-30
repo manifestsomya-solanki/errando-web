@@ -76,7 +76,6 @@ function LeadsListItem(props: {
   const unsubscribeRef = useRef<(() => void) | null>(null);
   const { userData } = useAuth();
   
-  console.log(props?.is_messaged, "adf");
   const timeDifferenceString = getTimeDifferenceString(props?.time);
 
   // Check if customer has sent any messages - using real-time listener
@@ -145,12 +144,7 @@ function LeadsListItem(props: {
               setHasCustomerSentMessage(hasMessage);
             },
             (err) => {
-              console.log("Error listening to customer messages:", err, {
-                customerUserId,
-                customerUserIdStr,
-                customerUserIdNum,
-                combinedId
-              });
+              // Error listening to customer messages - silently handle
               setHasCustomerSentMessage(false);
             }
           );
@@ -158,7 +152,7 @@ function LeadsListItem(props: {
           setHasCustomerSentMessage(false);
         }
       } catch (err) {
-        console.log("Error checking customer messages:", err);
+        // Error checking customer messages - silently handle
         setHasCustomerSentMessage(false);
       }
     };

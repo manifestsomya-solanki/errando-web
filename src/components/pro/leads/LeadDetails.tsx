@@ -37,18 +37,6 @@ function LeadDetails() {
   );
   const leadsDetail: UserRequestList = leadsDetailData?.data;
   
-  // Debug logging
-  console.log("LeadDetails Debug:", {
-    leadsId: leadsId?.id,
-    url: dealerdetailurl,
-    isLoading,
-    apiError,
-    responseStatus: leadsDetailData?.status,
-    hasData: !!leadsDetail,
-    answersCount: leadsDetail?.answers?.length,
-    hasUser: !!leadsDetail?.user,
-    fullResponse: leadsDetailData
-  });
   
   if (apiError) {
     console.error("LeadDetails API Error:", apiError);

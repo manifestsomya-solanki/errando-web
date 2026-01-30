@@ -48,17 +48,6 @@ function MyLeads(props: any) {
   );
   const leadsDetail: UserRequestList = leadsDetailData?.data;
   
-  // Debug logging
-  console.log("MyLeads Debug:", {
-    leadsId: leadsId?.id,
-    url: dealerdetailurl,
-    isLoading,
-    apiError,
-    responseStatus: leadsDetailData?.status,
-    hasData: !!leadsDetail,
-    dataKeys: leadsDetail ? Object.keys(leadsDetail) : null,
-    fullResponse: leadsDetailData
-  });
   
   if (apiError) {
     console.error("MyLeads API Error:", apiError);
