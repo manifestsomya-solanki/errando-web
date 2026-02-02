@@ -88,11 +88,14 @@ export const publicFetcher = async (url: string) => {
 
     // Handle error responses
     if (!response.ok) {
-      console.error("API Error:", {
-        url,
-        status: response.status,
-        data,
-      });
+      // Don't log 401 errors to console as they're expected when user is not authenticated
+      if (response.status !== 401) {
+        console.error("API Error:", {
+          url,
+          status: response.status,
+          data,
+        });
+      }
       return {
         status: "0",
         message: data.message || "Failed to load data",
@@ -154,12 +157,32 @@ export const fetcher = async (url: string) => {
         Authorization: `Bearer ${parsedToken}`,
         Accept: "application/json",
       },
+    }).catch(() => {
+      // Silently catch fetch errors (network issues, 401s, etc.)
+      return null;
     });
+
+    if (!response) {
+      return {
+        status: "0",
+        message: "Network error",
+        data: null,
+      };
+    }
 
     const data = await response.json();
 
-    // Handle error responses
+    // Handle error responses - silently for 401
     if (!response.ok) {
+      // Silently handle 401 errors (user not authenticated or token expired)
+      if (response.status === 401) {
+        return {
+          status: "0",
+          message: "Unauthorized",
+          data: null,
+        };
+      }
+      // Log other errors only
       console.error("API Error:", {
         url,
         status: response.status,
@@ -174,7 +197,7 @@ export const fetcher = async (url: string) => {
 
     return data;
   } catch (error) {
-    console.error("Fetcher Error:", error);
+    // Silently handle all errors - don't log to console
     return {
       status: "0",
       message: "Network error",

@@ -83,8 +83,7 @@ const ServiceContextProvider = (props: { children: React.ReactNode }) => {
   let datarender: ServiceData[] = [];
   const { data, mutate, isLoading: isServiceLoading } = useSWR(url, fetcher);
   datarender = data?.data || dummy_data;
-  const total = data?.total;
-  console.log(total, "total");
+  const total = data?.total ?? 0;
 
   //add business
   const AddBusiness = async (formData: FormData) => {

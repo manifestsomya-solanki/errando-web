@@ -94,5 +94,13 @@ export const API_ENDPOINTS = {
   QUESTIONS_SUGGEST: 'questions/suggest',
   
   // Forgot password
-  FORGOT_PASSWORD: 'user/forgot-password'
+  FORGOT_PASSWORD: 'user/forgot-password',
+  
+  // Credit Packages
+  CREDIT_PACKAGES: 'credit-packages/list',
+  CREDIT_PACKAGES_CALCULATE: 'credit-packages/calculate-custom-price',
+  CREDIT_PACKAGES_PURCHASE: 'credit-packages/purchase',
+  
+  // Promo Codes
+  PROMO_CODE_VERIFY: 'promo-codes/verify'
 };

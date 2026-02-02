@@ -61,14 +61,6 @@ function ContactDetailFormPro() {
         }}
         enableReinitialize
         onSubmit={async (values) => {
-          if (isVerifying) {
-            return;
-          }
-          
-          if (emailChanged && !isEmailVerified) {
-            return;
-          }
-          
           const formData = new FormData();
           if (values.email) {
             formData.set("email", values.email);
@@ -108,11 +100,14 @@ function ContactDetailFormPro() {
                   size="normal"
                   buttonClassName={`!py-0.5 !px-5  
                   ${
-                    emailChanged || !isEmailVerified
+                    !isEmailVerified
                       ? "bg-slate-300 text-white hover:bg-slate-400"
                       : "!bg-green-500 !text-white"
                   }  rounded-md`}
                   onClick={async () => {
+                    if (isEmailVerified) {
+                      return; // Don't allow verification if already verified
+                    }
                     setIsVerifying(true);
                     const formData = new FormData(); //initialize formdata
                     formData.set("email", props.values.email ?? "");
@@ -147,7 +142,7 @@ function ContactDetailFormPro() {
                     }, 300000);
                   }}
                 >
-                  {emailChanged || !isEmailVerified ? "Verify" : "Verified"}
+                  {isEmailVerified ? "Verified" : "Verify"}
                 </Button>
               </div>
               <Input
@@ -216,14 +211,7 @@ function ContactDetailFormPro() {
                 centerClassName="flex justify-center items-center text-white"
                 type="submit"
                 disabled={
-                  !props.values.email ||
-                  !props.values.mobile_number ||
-                  (userData &&
-                    userData.email === props.values.email &&
-                    userData?.mobile_number === props.values.mobile_number) ||
-                  (emailChanged && userData?.is_email_verified === "0") ||
-                  (props.values.email !== userData?.email && userData?.is_email_verified === "0") ||
-                  (props.values.email !== userData?.email && emailChanged)
+                  !props.values.email
                 }
               >
                 Save
