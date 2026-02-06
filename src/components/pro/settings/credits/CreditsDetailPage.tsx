@@ -370,27 +370,19 @@ function CreditsDetailPage() {
       </div>
       <div className="grid xl:grid-cols-4 xs:grid-cols-1 md:grid-cols-2 gap-6">
         {isLoadingPackages ? (
-          Array.from({ length: 8 }).map((_, index) => (
-            <CreditsDetailItemSection
-              key={index}
-              packageId={0}
-              creditscore={0}
-              amount={0}
-              perCreditAmount={0}
-              percentage=""
-              onBuyClick={() => {}}
-              isLoading={true}
-            />
-          ))
+          // Show loading text instead of skeleton cards
+          <div className="col-span-full text-center py-10 text-gray-500">
+            Loading packages...
+          </div>
         ) : displayPackages.length > 0 ? (
-          displayPackages.map((pkg) => (
+          displayPackages.map((pkg, index) => (
             <CreditsDetailItemSection
               key={pkg.id}
               packageId={pkg.id}
               creditscore={pkg.credits}
               amount={pkg.price}
               perCreditAmount={pkg.price_per_credit}
-              percentage={pkg.discount_percentage > 0 ? `${pkg.discount_percentage}%` : ""}
+              percentage={index === 0 ? "" : (pkg.discount_percentage > 0 ? `${pkg.discount_percentage}%` : "")}
               onBuyClick={() => handleBuyPackage(pkg)}
               isLoading={false}
             />
