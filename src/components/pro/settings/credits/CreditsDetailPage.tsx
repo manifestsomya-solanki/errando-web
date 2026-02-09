@@ -406,25 +406,25 @@ function CreditsDetailPage() {
     <div className="flex items-center">
       <img src={CreditIcon} alt="Credit" className="w-5 h-5 mr-1 flex-shrink-0" />
       <input
-        type="number"
-        value={customCredits}
-        onChange={(e) => {
-          const value = e.target.value === "" ? "" : parseInt(e.target.value) || "";
-          setCustomCredits(value);
-          setPromoApplied(false);
-          setPromoDiscount(0);
-        }}
-        onBlur={() => {
-          const credits = typeof customCredits === 'number' ? customCredits : (typeof customCredits === 'string' ? parseInt(customCredits) || 0 : 0);
-          if (credits > 0) {
-            handleCalculateCustomPrice();
-          }
-        }}
+              type="number"
+              value={customCredits}
+              onChange={(e) => {
+                const value = e.target.value === "" ? "" : parseInt(e.target.value) || "";
+                setCustomCredits(value);
+                setPromoApplied(false);
+                setPromoDiscount(0);
+              }}
+              onBlur={() => {
+                const credits = typeof customCredits === 'number' ? customCredits : (typeof customCredits === 'string' ? parseInt(customCredits) || 0 : 0);
+                if (credits > 0) {
+                  handleCalculateCustomPrice();
+                }
+              }}
         className="w-16 sm:w-20 h-8 px-2 text-center border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
-        min="1"
-        placeholder=""
-      />
-    </div>
+              min="1"
+              placeholder=""
+        />
+          </div>
   </div>
   <span className="text-gray-400 text-lg mt-7">-</span>
   <div className="flex flex-col min-w-[120px]">
@@ -432,19 +432,19 @@ function CreditsDetailPage() {
     <div className="flex items-center">
       <span className="text-sm font-medium text-gray-700 mr-1 flex-shrink-0">£</span>
       <input
-        type="text"
+              type="text"
         value={customPrice > 0 ? customPrice.toFixed(2) : ""}
-        readOnly
+              readOnly
         placeholder=""
         className="w-16 sm:w-20 h-8 px-2 text-center border border-gray-300 rounded bg-gray-50 focus:outline-none"
-      />
-    </div>
+        />
+          </div>
   </div>
   <div className="flex flex-col min-w-[80px]">
     <span className="text-sm font-medium text-gray-700 mb-2">Discount</span>
     <span className="text-sm font-bold text-green-600 h-8 flex items-center">{customDiscount || "-"}</span>
-  </div>
-</div>
+          </div>
+        </div>
         <div className="mb-4 flex gap-3 items-center">
           <Input
             placeholder="Have a promo code?"
