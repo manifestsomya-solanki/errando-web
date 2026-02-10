@@ -2,10 +2,17 @@ import CreditCard from "../../../../assets/creditspro.jpg";
 
 function CreditsCard(props: { children: React.ReactNode }) {
   return (
-    <div className="w-full items-center flex justify-center py-5">
-      <div className="flex flex-col dark:bg-dimGray xl:w-full xs:w-full dark:text-white relative">
-        <img src={CreditCard} alt="Credit Card" />
-        <div className="absolute top-0 left-0 right-0 bottom-0">
+    <div className="w-full">
+      {/* Card with fixed aspect ratio */}
+      <div className="relative w-full overflow-hidden rounded-lg" style={{ paddingBottom: '62.5%' }}>
+        {/* Background Image */}
+        <img 
+          src={CreditCard} 
+          alt="Credit Card" 
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+        {/* Content Overlay */}
+        <div className="absolute inset-0 flex flex-col justify-center items-center p-3 sm:p-4">
           {props.children}
         </div>
       </div>

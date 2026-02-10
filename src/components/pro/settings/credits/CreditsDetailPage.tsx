@@ -334,7 +334,7 @@ function CreditsDetailPage() {
   const displayPackages = packages;
 
   return (
-    <div>
+    <div className="px-4 sm:px-5">
       {isPurchaseModalOpen && (
         <PurchaseCreditsModal
           onCancel={() => {
@@ -361,91 +361,106 @@ function CreditsDetailPage() {
         />
       )}
 
-      <div className="tracking-wider px-5 py-2">
+      {/* Available Credits Header */}
+      <div className="tracking-wider py-2 mb-4">
         <Heading
           variant="headingTitle"
           text={`Available Credits : ${availableCredits}`}
           headingclassname="!text-xl text-primaryYellow"
         />
       </div>
-      <div className="grid xl:grid-cols-4 xs:grid-cols-1 md:grid-cols-2 gap-6">
+
+      {/* Credit Packages Grid - Auto-Fill Responsive (Same as Admin Panel) */}
+      <div className="rounded-lg py-4">
         {isLoadingPackages ? (
-          // Show loading text instead of skeleton cards
-          <div className="col-span-full text-center py-10 text-gray-500">
+          <div className="text-center py-10 text-gray-500">
             Loading packages...
           </div>
         ) : displayPackages.length > 0 ? (
-          displayPackages.map((pkg, index) => (
-            <CreditsDetailItemSection
-              key={pkg.id}
-              packageId={pkg.id}
-              creditscore={pkg.credits}
-              amount={pkg.price}
-              perCreditAmount={pkg.price_per_credit}
-              percentage={index === 0 ? "" : (pkg.discount_percentage > 0 ? `${pkg.discount_percentage}%` : "")}
-              onBuyClick={() => handleBuyPackage(pkg)}
-              isLoading={false}
-            />
-          ))
+          <div 
+            className="grid gap-4 sm:gap-5 md:gap-6"
+            style={{
+              gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))'
+            }}
+          >
+            {displayPackages.map((pkg, index) => (
+              <CreditsDetailItemSection
+                key={pkg.id}
+                packageId={pkg.id}
+                creditscore={pkg.credits}
+                amount={pkg.price}
+                perCreditAmount={pkg.price_per_credit}
+                percentage={index === 0 ? "" : (pkg.discount_percentage > 0 ? `${pkg.discount_percentage}%` : "")}
+                onBuyClick={() => handleBuyPackage(pkg)}
+                isLoading={false}
+              />
+            ))}
+          </div>
         ) : (
-          <div className="col-span-full text-center py-10 text-gray-500">
+          <div className="text-center py-10 text-gray-500">
             No credit packages available. Please contact admin.
           </div>
         )}
       </div>
 
-      <div className="mt-10 px-5">
+      {/* Credit/Price Calculator Section */}
+      <div className="mt-10">
         <Heading
           variant="subTitle"
           text="Credit/ Price Calculator"
           headingclassname="!text-lg mb-4 font-bold"
         />
+        
         <div className="flex flex-wrap items-start gap-4 sm:gap-6 mb-4">
-  <div className="flex flex-col min-w-[100px]">
-    <span className="text-sm ml-6 font-medium text-gray-700 mb-2">Credits</span>
-    <div className="flex items-center">
-      <img src={CreditIcon} alt="Credit" className="w-5 h-5 mr-1 flex-shrink-0" />
-      <input
-              type="number"
-              value={customCredits}
-              onChange={(e) => {
-                const value = e.target.value === "" ? "" : parseInt(e.target.value) || "";
-                setCustomCredits(value);
-                setPromoApplied(false);
-                setPromoDiscount(0);
-              }}
-              onBlur={() => {
-                const credits = typeof customCredits === 'number' ? customCredits : (typeof customCredits === 'string' ? parseInt(customCredits) || 0 : 0);
-                if (credits > 0) {
-                  handleCalculateCustomPrice();
-                }
-              }}
-        className="w-16 sm:w-20 h-8 px-2 text-center border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
-              min="1"
-              placeholder=""
-        />
+          <div className="flex flex-col min-w-[100px]">
+            <span className="text-sm ml-6 font-medium text-gray-700 mb-2">Credits</span>
+            <div className="flex items-center">
+              <img src={CreditIcon} alt="Credit" className="w-5 h-5 mr-1 flex-shrink-0" />
+              <input
+                type="number"
+                value={customCredits}
+                onChange={(e) => {
+                  const value = e.target.value === "" ? "" : parseInt(e.target.value) || "";
+                  setCustomCredits(value);
+                  setPromoApplied(false);
+                  setPromoDiscount(0);
+                }}
+                onBlur={() => {
+                  const credits = typeof customCredits === 'number' ? customCredits : (typeof customCredits === 'string' ? parseInt(customCredits) || 0 : 0);
+                  if (credits > 0) {
+                    handleCalculateCustomPrice();
+                  }
+                }}
+                className="w-16 sm:w-20 h-8 px-2 text-center border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                min="1"
+                placeholder=""
+              />
+            </div>
           </div>
-  </div>
-  <span className="text-gray-400 text-lg mt-7">-</span>
-  <div className="flex flex-col min-w-[120px]">
-    <span className="text-sm ml-3 font-medium text-gray-700 mb-2">Price</span>
-    <div className="flex items-center">
-      <span className="text-sm font-medium text-gray-700 mr-1 flex-shrink-0">£</span>
-      <input
-              type="text"
-        value={customPrice > 0 ? customPrice.toFixed(2) : ""}
-              readOnly
-        placeholder=""
-        className="w-16 sm:w-20 h-8 px-2 text-center border border-gray-300 rounded bg-gray-50 focus:outline-none"
-        />
+          
+          <span className="text-gray-400 text-lg mt-7">-</span>
+          
+          <div className="flex flex-col min-w-[120px]">
+            <span className="text-sm ml-3 font-medium text-gray-700 mb-2">Price</span>
+            <div className="flex items-center">
+              <span className="text-sm font-medium text-gray-700 mr-1 flex-shrink-0">£</span>
+              <input
+                type="text"
+                value={customPrice > 0 ? customPrice.toFixed(2) : ""}
+                readOnly
+                placeholder=""
+                className="w-16 sm:w-20 h-8 px-2 text-center border border-gray-300 rounded bg-gray-50 focus:outline-none"
+              />
+            </div>
           </div>
-  </div>
-  <div className="flex flex-col min-w-[80px]">
-    <span className="text-sm font-medium text-gray-700 mb-2">Discount</span>
-    <span className="text-sm font-bold text-green-600 h-8 flex items-center">{customDiscount || "-"}</span>
+          
+          <div className="flex flex-col min-w-[80px]">
+            <span className="text-sm font-medium text-gray-700 mb-2">Discount</span>
+            <span className="text-sm font-bold text-green-600 h-8 flex items-center">{customDiscount || "-"}</span>
           </div>
         </div>
-        <div className="mb-4 flex gap-3 items-center">
+        
+        <div className="mb-4 flex flex-wrap gap-3 items-center">
           <Input
             placeholder="Have a promo code?"
             type="text"
@@ -456,7 +471,7 @@ function CreditsDetailPage() {
               setPromoDiscount(0);
               setPromoDiscountAmount(0);
             }}
-            className="bg-slate-200 xs:w-64"
+            className="bg-slate-200 w-full xs:w-64"
             disabled={isVerifyingPromo || !customCredits || (typeof customCredits === 'number' && customCredits < 1) || (typeof customCredits === 'string' && customCredits === "")}
           />
           <Button 
@@ -474,6 +489,7 @@ function CreditsDetailPage() {
           )}
         </div>
         
+        {/* Payment Summary */}
         {customCredits && (typeof customCredits === 'number' ? customCredits > 0 : false) && customPrice > 0 && (
           <div className="mb-4 w-full max-w-md bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 shadow-sm">
             <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-3 pb-2 border-b border-gray-200 dark:border-gray-700">
