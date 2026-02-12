@@ -383,18 +383,25 @@ function CreditsDetailPage() {
               gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))'
             }}
           >
-            {displayPackages.map((pkg, index) => (
-              <CreditsDetailItemSection
-                key={pkg.id}
-                packageId={pkg.id}
-                creditscore={pkg.credits}
-                amount={pkg.price}
-                perCreditAmount={pkg.price_per_credit}
-                percentage={index === 0 ? "" : (pkg.discount_percentage > 0 ? `${pkg.discount_percentage}%` : "")}
-                onBuyClick={() => handleBuyPackage(pkg)}
-                isLoading={false}
-              />
-            ))}
+            {displayPackages.map((pkg, index) => {
+              // Calculate actual price (before discount) for display
+              const actualPrice = pkg.discount_percentage > 0 
+                ? pkg.price / (1 - pkg.discount_percentage / 100)
+                : pkg.price;
+              
+              return (
+                <CreditsDetailItemSection
+                  key={pkg.id}
+                  packageId={pkg.id}
+                  creditscore={pkg.credits}
+                  amount={actualPrice}
+                  perCreditAmount={pkg.price_per_credit}
+                  percentage={index === 0 ? "" : (pkg.discount_percentage > 0 ? `${pkg.discount_percentage}%` : "")}
+                  onBuyClick={() => handleBuyPackage(pkg)}
+                  isLoading={false}
+                />
+              );
+            })}
           </div>
         ) : (
           <div className="text-center py-10 text-gray-500">
@@ -446,7 +453,7 @@ function CreditsDetailPage() {
               <span className="text-sm font-medium text-gray-700 mr-1 flex-shrink-0">£</span>
               <input
                 type="text"
-                value={customPrice > 0 ? customPrice.toFixed(2) : ""}
+                value={basePrice > 0 ? basePrice.toFixed(2) : (customPrice > 0 ? customPrice.toFixed(2) : "")}
                 readOnly
                 placeholder=""
                 className="w-16 sm:w-20 h-8 px-2 text-center border border-gray-300 rounded bg-gray-50 focus:outline-none"
