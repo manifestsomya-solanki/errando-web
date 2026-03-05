@@ -426,7 +426,7 @@ function ServiceCard(props: any) {
               <div children={<LocationIcon color="white" />} />
             )}
             <Heading
-              text={`${props.location ?? 0.0} miles away`}
+              text={`${props.location ? Math.round(parseFloat(props.location.toString())) : 0} miles away`}
               variant="subHeader"
               headingclassname="text-textColor !font-semibold tracking-wide !text-xs dark:text-darktextColor"
             />

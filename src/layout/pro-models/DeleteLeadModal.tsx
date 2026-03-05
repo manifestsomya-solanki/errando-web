@@ -10,8 +10,10 @@ function DeleteLeadModal(props: { onCancel: () => void; id: number }) {
   const { deleteHandler, isDeleteLoading } = useLead();
 
   const deleteLeadhandler = async () => {
-    deleteHandler(props.id.toString());
-    props.onCancel();
+    const success = await deleteHandler(props.id.toString());
+    if (success) {
+      props.onCancel();
+    }
   };
 
   const { theme } = useTheme();

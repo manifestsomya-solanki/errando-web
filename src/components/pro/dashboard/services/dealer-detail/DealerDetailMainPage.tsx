@@ -49,6 +49,7 @@ function DealerDetailMainPage() {
             title={businessDetail?.name ?? "No Name"}
             services={businessDetail?.services ?? ([] as Service[])}
             ratingCount={businessDetail?.reviews_avg_rating ?? 0}
+            reviewsCount={data?.length ?? 0}
             icon={businessDetail?.image}
             description={businessDetail?.description ?? "No Description"}
           />

@@ -1,5 +1,5 @@
 import CreditsCard from "./CreditsCard";
-import Heading from "../../../UI/Heading";
+// import Heading from "../../../UI/Heading";
 
 function CreditsDetailItemSection(props: {
   packageId?: number;

@@ -3,7 +3,6 @@ import HomeCard from "../dashboard/home/HomeCard";
 import { NavLink } from "react-router-dom";
 import LocationIcon from "../../../assets/LocationIcon";
 import Outright from "../../../assets/outright.svg";
-import Credit from "../../../assets/Credit.png";
 
 import { useTheme } from "../../../store/theme-context";
 import { useState, useEffect, useRef } from "react";
@@ -17,7 +16,6 @@ import {
   query,
   where,
   getDocs,
-  limit,
   onSnapshot,
 } from "firebase/firestore";
 import { db } from "../../../Firebase";
@@ -60,7 +58,6 @@ function ResponsesListItem(props: {
 }) {
   const { theme } = useTheme();
   const { userData } = useAuth();
-  const [err, setErr] = useState(false);
   const [hasCustomerSentMessage, setHasCustomerSentMessage] = useState(false);
   const unsubscribeRef = useRef<(() => void) | null>(null);
   
@@ -233,12 +230,6 @@ function ResponsesListItem(props: {
       // onClick={handleSelect}
     >
       <HomeCard className="px-3 pt-5 pb-3 relative">
-        {/* Mail Icon - Show only when Customer has sent message */}
-        {hasCustomerSentMessage && (
-          <div className="absolute bottom-4 right-4">
-            <MailIcon color={theme === "dark" ? "#3b82f6" : "#3b82f6"} />
-          </div>
-        )}
         {openMenu && (
           <DeleteChatModal
             onCancel={() => {
@@ -319,7 +310,7 @@ function ResponsesListItem(props: {
           {props.is_outright && (
             <div className="flex justify-between w-full items-center mt-2">
               <div className="flex gap-1 ">
-                <div className="  w-5 h-5 mt-1 rounded-full">
+                <div className="w-5 h-5 mt-1 rounded-full">
                   <img src={Outright} />
                 </div>
                 <Heading
@@ -330,32 +321,46 @@ function ResponsesListItem(props: {
               </div>
             </div>
           )}
-          <div className="flex">
-            {props.quoteRequested && (
-              <div className="w-full  text-transparent  border-t-[0.5px] border-t-slate-200 flex items-center gap-5 justify-start">
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-green-500 text-transparent rounded-full"></div>
-                  <Heading
-                    text={`Requested quote`}
-                    variant="smallTitle"
-                    headingclassname="!font-semibold !text-xs tracking-wide dark:text-green-500 text-green-500 py-2 rounded-lg"
-                  />
-                </div>
+
+          {/* Bottom status row: Requested quote | Mail icon | Interest shown */}
+          {(props.quoteRequested || props.interested || hasCustomerSentMessage) && (
+            <div className="flex items-center border-t-[0.5px] border-t-slate-200 mt-2 pt-2 justify-between gap-4">
+              {/* Left: Requested quote */}
+              <div className="flex-1 flex items-center gap-2 min-w-0">
+                {props.quoteRequested && (
+                  <>
+                    <div className="w-2 h-2 bg-green-500 text-transparent rounded-full"></div>
+                    <Heading
+                      text={`Requested quote`}
+                      variant="smallTitle"
+                      headingclassname="!font-semibold !text-xs tracking-wide dark:text-green-500 text-green-500 py-1 rounded-lg whitespace-nowrap"
+                    />
+                  </>
+                )}
               </div>
-            )}
-            {props.interested && (
-              <div className="w-full  text-transparent  border-t-[0.5px] border-t-slate-200 flex items-center gap-5 justify-end">
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-green-500 text-transparent rounded-full"></div>
-                  <Heading
-                    text={`Interest shown`}
-                    variant="smallTitle"
-                    headingclassname="!font-semibold !text-xs tracking-wide dark:text-green-500 text-green-500 py-2 rounded-lg"
-                  />
+
+              {/* Center: Mail icon (only when customer has sent message) */}
+              {hasCustomerSentMessage && (
+                <div className="flex-shrink-0 mx-2">
+                  <MailIcon color={theme === "dark" ? "#3b82f6" : "#3b82f6"} />
                 </div>
+              )}
+
+              {/* Right: Interest shown */}
+              <div className="flex-1 flex items-center justify-end gap-2 min-w-0">
+                {props.interested && (
+                  <>
+                    <div className="w-2 h-2 bg-green-500 text-transparent rounded-full"></div>
+                    <Heading
+                      text={`Interest shown`}
+                      variant="smallTitle"
+                      headingclassname="!font-semibold !text-xs tracking-wide dark:text-green-500 text-green-500 py-1 rounded-lg whitespace-nowrap text-right"
+                    />
+                  </>
+                )}
               </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </HomeCard>
     </NavLink>

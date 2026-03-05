@@ -13,6 +13,41 @@ import { useState } from "react";
 import EditNameDescriptionModal from "../../../../../layout/pro-models/EditNameDescriptionModalt";
 import "./check.css"; // Replace with your CSS file path
 
+// Utility function to format rating according to rules
+const formatRating = (rating: number): number => {
+  // If rating is 4.91-4.99, show as 5.0
+  if (rating >= 4.91 && rating <= 4.99) {
+    return 5.0;
+  }
+  // If rating is 4.81-4.90, show as 4.9
+  else if (rating >= 4.81 && rating <= 4.90) {
+    return 4.9;
+  }
+  // For all other ratings, round to 1 decimal place
+  else {
+    return Math.round(rating * 10) / 10;
+  }
+};
+
+// Utility function to calculate star display
+const getStarDisplay = (rating: number): { fullStars: number; hasHalfStar: boolean; emptyStars: number } => {
+  // If rating is 4.91-4.99, show 5 full stars
+  if (rating >= 4.91 && rating <= 4.99) {
+    return { fullStars: 5, hasHalfStar: false, emptyStars: 0 };
+  }
+  // If rating is 4.1-4.9 (including 4.81-4.90), show 4 full stars + 1 half star
+  else if (rating >= 4.1 && rating <= 4.9) {
+    return { fullStars: 4, hasHalfStar: true, emptyStars: 0 };
+  }
+  // For ratings below 4.1, show full stars based on integer part
+  else {
+    const fullStars = Math.floor(rating);
+    const hasHalfStar = rating - fullStars >= 0.5 && rating < 4.1;
+    const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+    return { fullStars, hasHalfStar, emptyStars };
+  }
+};
+
 export function DangerousHTML({
   dangerouslySetInnerHTML,
 }: {
@@ -33,6 +68,7 @@ function DealerDetailSection(props: {
   description: string;
   year: any;
   ratingCount: number;
+  reviewsCount?: number;
 }) {
   const isLoading = false;
   const [show, setShow] = useState(false);
@@ -93,18 +129,35 @@ function DealerDetailSection(props: {
                 headingclassname="text-textColor !font-bold tracking-wide !text-lg dark:text-darktextColor"
               />
 
-              <div className="lg:my-2 xs:my-2 flex gap-1 text-gray-500 !font-normal tracking-wide !text-xs ">
-                {Array.from({ length: props.ratingCount }, () => (
-                  <img src={GoldStar} />
-                ))}
-                {Array.from({ length: 5 - props.ratingCount }, () => (
-                  <img src={Star} />
-                ))}
-                <Heading
-                  text={`${props.ratingCount} of 5 / 120`}
-                  variant="subHeader"
-                  headingclassname="text-gray-500 !font-normal tracking-wide !text-xs mx-1 dark:text-darktextColor"
-                />
+              <div className="lg:my-2 xs:my-2 flex gap-1 text-gray-500 !font-normal tracking-wide !text-xs items-center">
+                {(() => {
+                  const { fullStars, hasHalfStar, emptyStars } = getStarDisplay(props.ratingCount);
+                  const formattedRating = formatRating(props.ratingCount);
+                  
+                  return (
+                    <>
+                      {Array.from({ length: fullStars }, (_, i) => (
+                        <img key={`gold-${i}`} src={GoldStar} alt="Full star" className="w-4 h-4" />
+                      ))}
+                      {hasHalfStar && (
+                        <div className="relative inline-block w-4 h-4">
+                          <img src={Star} alt="Empty star" className="absolute inset-0 w-4 h-4" />
+                          <div className="absolute inset-0 overflow-hidden" style={{ width: '50%' }}>
+                            <img src={GoldStar} alt="Half star" className="w-4 h-4" />
+                          </div>
+                        </div>
+                      )}
+                      {Array.from({ length: emptyStars }, (_, i) => (
+                        <img key={`empty-${i}`} src={Star} alt="Empty star" className="w-4 h-4" />
+                      ))}
+                      <Heading
+                        text={`${formattedRating.toFixed(1)} of 5 / ${props.reviewsCount ?? 0}`}
+                        variant="subHeader"
+                        headingclassname="text-gray-500 !font-normal tracking-wide !text-xs mx-1 dark:text-darktextColor"
+                      />
+                    </>
+                  );
+                })()}
               </div>
               <div className="lg:mt-3 xs:mt-10 lg:flex xs:flex xs:flex-wrap gap-2 ">
                 {props.services.map((item, key) => {

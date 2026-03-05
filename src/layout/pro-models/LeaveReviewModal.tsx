@@ -44,37 +44,28 @@ function LeaveReviewModal(props: {
   const { editReview: editMyReview, mutate: editMutate } = useMyReview();
 
   const location = useLocation();
-  console.log(props.dealerId);
   
-  // Update starRating and formik values when reviewData loads (edit mode)
-  useEffect(() => {
+  // Calculate initial values based on reviewData (for edit mode) or defaults (for create mode)
+  const getInitialValues = () => {
     if (props.id && reviewData?.data) {
-      const rating = reviewData.data.rating;
-      if (rating) {
-        setStarRating(rating.toString());
-        formik.setFieldValue("rating", rating.toString());
-      }
-      if (reviewData.data.description) {
-        formik.setFieldValue("description", reviewData.data.description);
-      }
-      if (reviewData.data.service_id) {
-        formik.setFieldValue("serviceId", reviewData.data.service_id);
-      }
-      if (reviewData.data.user_business_id) {
-        formik.setFieldValue("userBusinessId", reviewData.data.user_business_id);
-      }
-      // Auto-check checkbox in edit mode since data is already confirmed
-      setChecked(true);
+      return {
+        userBusinessId: reviewData.data.user_business_id?.toString() || dealerId?.id?.toString() || "",
+        serviceId: reviewData.data.service_id?.toString() || state?.serviceId?.toString() || "",
+        description: reviewData.data.description || "",
+        rating: reviewData.data.rating?.toString() || "",
+      };
     }
-  }, [reviewData?.data, props.id]);
-  
-  const formik = useFormik({
-    initialValues: {
-      userBusinessId: dealerId?.id,
-      serviceId: state?.serviceId,
+    return {
+      userBusinessId: dealerId?.id?.toString() || "",
+      serviceId: state?.serviceId?.toString() || "",
       description: "",
       rating: "",
-    },
+    };
+  };
+  
+  const formik = useFormik({
+    enableReinitialize: true,
+    initialValues: getInitialValues(),
     validate: (values: createReview) => {
       const errors: any = {};
       if (values.description.length === 0) {
@@ -85,11 +76,11 @@ function LeaveReviewModal(props: {
     onSubmit: async (values) => {
       const formData = new FormData();
       if (location.pathname.endsWith("reviews")) {
-        console.log("reviews");
         formData.set("description", values.description);
         formData.set("rating", starRating);
         await editMyReview(formData, props.id ?? 0);
         await editMutate();
+        props.onCancel();
       } else {
         if (values.userBusinessId)
           formData.set("user_business_id", values.userBusinessId);
@@ -97,22 +88,41 @@ function LeaveReviewModal(props: {
         formData.set("description", values.description);
         formData.set("rating", starRating);
         if (!props.id) {
-          console.log(props.id, "dffw");
-          await createReview(formData);
+          const success = await createReview(formData);
+          if (success) {
+            await mutate();
+            props.onCancel();
+          }
         } else {
-          console.log("jere");
-
           await editReview(formData, props.id ?? 0);
+          await mutate();
+          props.onCancel();
         }
-        await mutate();
       }
-      props.onCancel();
     },
   });
 
-  // let starRating:string
+  // Update starRating when reviewData loads (edit mode)
   useEffect(() => {
-    formik.setFieldValue("rating", starRating);
+    if (props.id && reviewData?.data?.rating) {
+      setStarRating(reviewData.data.rating.toString());
+    }
+  }, [reviewData?.data?.rating, props.id]);
+  
+  // Auto-check checkbox in edit mode since data is already confirmed
+  useEffect(() => {
+    if (props.id && reviewData?.data) {
+      setChecked(true);
+    } else {
+      setChecked(false);
+    }
+  }, [reviewData?.data, props.id]);
+  
+  // Update formik rating when starRating changes
+  useEffect(() => {
+    if (starRating) {
+      formik.setFieldValue("rating", starRating);
+    }
   }, [starRating]);
 
   return (

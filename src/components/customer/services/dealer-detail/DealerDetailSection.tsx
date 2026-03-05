@@ -295,7 +295,7 @@ function DealerDetailSection(props: {
                   <div children={<LocationIcon color="white" />} />
                 )}
                 <Heading
-                  text={`${props.location ?? 0} miles away`}
+                  text={`${props.location ? Math.round(parseFloat(props.location.toString())) : 0} miles away`}
                   variant="subHeader"
                   headingclassname="text-primaryYellow !font-semibold tracking-wide lg:text-xs text-md "
                 />

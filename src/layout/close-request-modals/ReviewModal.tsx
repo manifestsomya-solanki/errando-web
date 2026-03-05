@@ -25,9 +25,10 @@ function ReviewModal(props: {
   const { closeRequestReview } = useReview();
   const [starRating, setStarRating] = useState("");
   const [checked, setChecked] = useState(false);
-  const url = props?.businessId ? buildApiUrl(`${API_ENDPOINTS.BUSINESSES_DETAIL}/${props?.businessId}`) : null;
+  // Fix: Correct URL format should be businesses/{id}/detail not businesses/detail/{id}
+  const url = props?.businessId ? buildApiUrl(`${API_ENDPOINTS.BUSINESSES}/${props?.businessId}/detail`) : null;
   const { data, isLoading } = useSWR(url, fetcher);
-  const serviceData: ServiceList = data?.data;
+  const serviceData: ServiceList = data?.data || null;
 
   const formik = useFormik({
     initialValues: {
@@ -90,7 +91,7 @@ function ReviewModal(props: {
                         Leave{" "}
                         {
                           <span className="text-primaryYellow">
-                            {serviceData.name}
+                            {serviceData?.name || "Business"}
                           </span>
                         }{" "}
                         a review

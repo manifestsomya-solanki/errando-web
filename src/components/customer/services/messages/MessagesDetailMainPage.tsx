@@ -94,6 +94,8 @@ const MessagesDetailMainPage = () => {
     }
     return null;
   }, [user?.uid, currentUser?.uid]);
+  const unsubscribeRef = useRef<(() => void) | null>(null);
+
   //handle scroll
   const fetchData = async (bool?: boolean) => {
     if (!combinedId) return;
@@ -128,20 +130,68 @@ const MessagesDetailMainPage = () => {
     setPageSize((v) => v + initialPageSize);
   };
 
+  // Real-time listener for messages
   useEffect(() => {
-    if (combinedId && pageSize > initialPageSize) {
-      fetchData(false);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pageSize]);
+    if (!combinedId) return;
 
-  useEffect(() => {
-    if (combinedId) {
-      console.log("fetch");
-      fetchData(true);
+    // Cleanup previous listener
+    if (unsubscribeRef.current) {
+      unsubscribeRef.current();
+      unsubscribeRef.current = null;
     }
+
+    const setupRealtimeListener = async () => {
+      const getChatQuery = query(
+        collection(db, "chats"),
+        where("chat_id", "==", combinedId)
+      );
+      const getChatDocument = await getDocs(getChatQuery);
+      
+      if (getChatDocument?.docs?.length > 0) {
+        const chatRef = collection(
+          db,
+          "chats",
+          getChatDocument.docs[0].id,
+          "messages"
+        );
+
+        const getMessagesQuery = query(
+          chatRef,
+          orderBy("timestamp", "desc"),
+          limit(pageSize)
+        );
+
+        // Set up real-time listener
+        unsubscribeRef.current = onSnapshot(
+          getMessagesQuery,
+          (snapshot) => {
+            const messages = snapshot.docs.map((doc) => doc?.data()).reverse();
+            setOldChats(messages);
+            setLoading(false);
+          },
+          (error) => {
+            console.error("Error listening to messages:", error);
+            setLoading(false);
+          }
+        );
+      } else {
+        setOldChats([]);
+        setLoading(false);
+      }
+    };
+
+    setLoading(true);
+    setupRealtimeListener();
+
+    // Cleanup on unmount
+    return () => {
+      if (unsubscribeRef.current) {
+        unsubscribeRef.current();
+        unsubscribeRef.current = null;
+      }
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [combinedId]);
+  }, [combinedId, pageSize]);
 
   const handleScroll = () => {
     setMoreLoading(true);

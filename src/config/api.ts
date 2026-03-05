@@ -73,6 +73,12 @@ export const API_ENDPOINTS = {
   // Settings
   SETTINGS_CHANGE_PASSWORD: 'settings/change-password',
   
+  // Card Details
+  CARD_DETAILS: 'card-details',
+  CARD_DETAILS_CREATE: 'card-details/create',
+  CARD_DETAILS_UPDATE: 'card-details',
+  CARD_DETAILS_DELETE: 'card-details',
+  
   // Chat
   CHAT_SEND_NOTIFICATION: 'chat/send-notification',
   CHAT_DELETE: 'chat/delete',
@@ -102,5 +108,8 @@ export const API_ENDPOINTS = {
   CREDIT_PACKAGES_PURCHASE: 'credit-packages/purchase',
   
   // Promo Codes
-  PROMO_CODE_VERIFY: 'promo-codes/verify'
+  PROMO_CODE_VERIFY: 'promo-codes/verify',
+  
+  // Transactions
+  TRANSACTIONS: 'transactions'
 };

@@ -69,32 +69,37 @@ const ReviewContextProvider = (props: { children: React.ReactNode }) => {
     setError("");
     const token = localStorage.getItem("token");
 
-    const res = await fetch(
-      buildApiUrl(API_ENDPOINTS.REVIEWS_CREATE),
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        body: formData,
-      }
-    );
-    if (res.status === 200) {
-      setError("");
-
-      setIsLoading(false);
-
+    try {
+      const res = await fetch(
+        buildApiUrl(API_ENDPOINTS.REVIEWS_CREATE),
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: formData,
+        }
+      );
+      
       const data: any = await res.json();
-      if (data.status === "1") {
-        // toast.success("Email has been successfully sent !");
+      
+      if (res.status === 200 && data.status === "1") {
+        setError("");
+        setIsLoading(false);
+        await mutate();
+        toast.success("Review created successfully");
+        return true;
       } else {
-        setError(data.message);
-        // toast.error(data.error);
+        setError(data.message || "Failed to create review");
+        setIsLoading(false);
+        toast.error(data.message || "Failed to create review");
+        return false;
       }
-    } else {
-      const data: any = await res.json();
-      setError(data.message);
+    } catch (error: any) {
+      setError(error.message || "Failed to create review");
       setIsLoading(false);
+      toast.error(error.message || "Failed to create review");
+      return false;
     }
   };
 
@@ -193,15 +198,17 @@ const ReviewContextProvider = (props: { children: React.ReactNode }) => {
 
       const data: any = await res.json();
       if (data.status === "1") {
-        // toast.success("Email has been successfully sent !");
+        await mutate();
+        toast.success("Review deleted successfully");
       } else {
         setError(data.message);
-        // toast.error(data.error);
+        toast.error(data.message || "Failed to delete review");
       }
     } else {
       const data: any = await res.json();
       setError(data.message);
       setIsLoading(false);
+      toast.error(data.message || "Failed to delete review");
     }
   };
 

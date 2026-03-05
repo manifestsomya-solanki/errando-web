@@ -221,20 +221,19 @@ const LeadContextProProvider = (props: { children: React.ReactNode }) => {
       }
     );
 
-    if (res.status === 200) {
-      const data = await res.json();
+    const data = await res.json();
 
-      if (data.status === "1") {
-        navigate("/pro/leads");
-        setIsLoading(false);
-        mutate();
-      } else {
-        setError(data.message);
-      }
-    } else {
-      const data = await res.json();
+    if (res.status === 200 && data.status === "1") {
       setIsLoading(false);
-      setError(data.message);
+      toast.success("Lead deleted successfully");
+      // Force revalidate to get fresh data (will exclude deleted lead for this user)
+      await mutate({ revalidate: true });
+      return true;
+    } else {
+      setIsLoading(false);
+      setError(data.message || "Failed to delete lead");
+      toast.error(data.message || "Failed to delete lead");
+      return false;
     }
   };
 
