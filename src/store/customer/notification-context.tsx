@@ -47,7 +47,9 @@ export const NotificationContext = React.createContext<NotificationType>({
 
 const NotificationContextProvider = (props: { children: ReactNode }) => {
   let userId;
-  const perPage = 100;
+  // Keep pagination size consistent across initial load + "load more".
+  // Customer/Pro pages both request `per_page=13`, and UI logic expects /13.
+  const perPage = 13;
   let role;
   if (localStorage.getItem("isLoggedIn") === "true") {
     const userData = localStorage.getItem("data");

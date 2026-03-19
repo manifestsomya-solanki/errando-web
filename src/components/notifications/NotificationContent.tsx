@@ -3,7 +3,7 @@ import dot from "../../assets/goldendot.svg";
 import { useNotification } from "../../store/customer/notification-context";
 import FullPageLoading from "../UI/FullPageLoading";
 import Heading from "../UI/Heading";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 function NotificationContent() {
   const {
@@ -16,38 +16,32 @@ function NotificationContent() {
   const divRef = useRef<HTMLDivElement>(null); //ref to set the height
   const [moreloading, setMoreLoading] = useState(false);
 
+  // Reset "load more" guard whenever page changes.
+  useEffect(() => {
+    setMoreLoading(false);
+  }, [currentPage]);
+
   const handleScroll = () => {
-    setMoreLoading(true);
     const container = divRef.current;
     if (container) {
       const { scrollTop, scrollHeight, clientHeight } = container;
-      console.log(scrollTop, clientHeight, scrollHeight);
       const isNearBottom =
         Math.floor(scrollHeight - scrollTop) === clientHeight;
 
-      if (isNearBottom) {
-        setMoreLoading(false);
-        setInterval(() => handleNextPage(), 100);
+      if (isNearBottom && !moreloading) {
+        // Prevent double-fetch while the previous page is loading.
+        setMoreLoading(true);
+        handleNextPage();
       }
     }
   };
-  const oldNotifications = [...notification];
-  console.log(oldNotifications);
-  console.log(Math.ceil(total / 11), "ceil");
-  console.log(moreloading, total, currentPage);
   return (
     <div className="w-full items-center flex justify-center ">
       {isNotificationLoading && !moreloading && currentPage === 1 ? (
         <FullPageLoading className="!h-24" />
       ) : (
         <div
-          onScroll={
-            Math.ceil(total / 13) === currentPage + 1
-              ? handleScroll
-              : () => {
-                  console.log("disbaled");
-                }
-          }
+          onScroll={Math.ceil(total / 13) > currentPage ? handleScroll : undefined}
           className="bg-white py-5  xs:px-5 flex flex-col dark:bg-dimGray rounded-lg xl:w-max xs:w-full dark:text-white overflow-y-scroll h-[58vh] soft-searchbar shadow-md border-t-slate-100 border-t-[0.5px] "
           ref={divRef}
         >
@@ -61,7 +55,7 @@ function NotificationContent() {
             <div className="flex flex-col gap-2">
               {notification.map((item) => {
                 return (
-                  <div className="md:flex flex-row gap-5">
+                      <div key={item.id} className="md:flex flex-row gap-5">
                     <div className="flex flex-row gap-4">
                       <img src={dot}></img>
                       <div>{`${new Date(

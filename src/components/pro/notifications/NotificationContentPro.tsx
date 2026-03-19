@@ -31,7 +31,7 @@ function NotificationContentPro() {
             <div className="flex flex-col gap-2">
               {notification.map((item) => {
                 return (
-                  <div className="md:flex flex-row gap-5">
+                  <div key={item.id} className="md:flex flex-row gap-5">
                     <div className="flex flex-row gap-4">
                       <img src={dot}></img>
                       <div>{`${new Date(
