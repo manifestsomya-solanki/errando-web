@@ -61,7 +61,8 @@ function CommentsModal(props: {
           formData.set(`data[${i}][answer]`, questions[i].answer.toString());
         }
 
-        await addRequest(formData);
+        const isSuccess = await addRequest(formData);
+        if (!isSuccess) return;
         // addRequest handles navigation internally, no need for hard redirect
       } else {
         // Check if this is a registration flow with pending request data
@@ -87,7 +88,8 @@ function CommentsModal(props: {
           const latestToken = localStorage.getItem("token") || pendingRequestToken;
           
           // Call addRequest with the latest token
-          await addRequest(formData, latestToken);
+          const isSuccess = await addRequest(formData, latestToken);
+          if (!isSuccess) return;
           
           // Clear pending data after use
           localStorage.removeItem("pending_request_data");
@@ -100,7 +102,8 @@ function CommentsModal(props: {
           if (values?.img) formData.set("file", values?.img);
           formData.set("comment", values.comment);
 
-          await editRequest(formData, props.requestId?.toString() ?? "");
+          const isSuccess = await editRequest(formData, props.requestId?.toString() ?? "");
+          if (!isSuccess) return;
           // editRequest also handles navigation internally
         }
       }

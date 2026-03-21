@@ -50,6 +50,7 @@ function SeviceDetailMainPage() {
   const services = [businessesData];
 
   const [openModal, setOpenModal] = useState(false);
+  const customerPostingPaused = !!serviceRequestData?.customer_posting_paused;
 
   return (
     <>
@@ -112,48 +113,66 @@ function SeviceDetailMainPage() {
               buttonClassName="!px-4 py-2 text-sm tracking-wide md:hidden  w-full"
               onClick={() => setOpenModal(true)}
             />
-            <FilterSection
-              latitude={serviceRequestData?.postcode?.latitude}
-              longitude={serviceRequestData?.postcode?.longitude}
-              serviceId={serviceId}
-              userRequestId={userRequestId}
-              list={services}
-              onChange={(sort: string) => {
-                console.log(sort, "sort");
-                if (sort === "Highest overall score") {
-                  sortHandler(
-                    "reviews_avg_rating",
-                    serviceRequestData?.service_id
-                  );
-                } else if (sort === "Registration date") {
-                  sortHandler("created_at", serviceRequestData?.service_id);
-                } else if (sort === "Highest reviews") {
-                  console.log("here");
-                  sortHandler("highest_rating", serviceRequestData?.service_id);
-                }
-              }}
-            />
-            {businessListLoading ? (
-              <ServiceDetailSkeleton limit={3} />
+            {customerPostingPaused ? (
+              <div className="w-full flex flex-col items-center justify-center py-10 gap-4">
+                <div className="w-14 h-14 rounded-full bg-red-50 dark:bg-red-900/30 flex items-center justify-center">
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <circle cx="12" cy="12" r="9" stroke="#DC2626" strokeWidth="2" />
+                    <path d="M7 17L17 7" stroke="#DC2626" strokeWidth="2" strokeLinecap="round" />
+                  </svg>
+                </div>
+                <Heading
+                  text="We couldn't process your request. Please contact customer support if the problem persists."
+                  variant="subHeader"
+                  headingclassname="text-red-500 dark:text-red-300 !font-semibold tracking-wide text-center"
+                />
+              </div>
             ) : (
-              <div>
-                {datarender.length > 0 ? (
-                  <ServiceItemsSection
-                    services={services}
-                    id={serviceRequestData?.service?.id}
-                    name={serviceRequestData?.service?.name}
-                    isLoading={businessListLoading}
-                  />
+              <>
+                <FilterSection
+                  latitude={serviceRequestData?.postcode?.latitude}
+                  longitude={serviceRequestData?.postcode?.longitude}
+                  serviceId={serviceId}
+                  userRequestId={userRequestId}
+                  list={services}
+                  onChange={(sort: string) => {
+                    console.log(sort, "sort");
+                    if (sort === "Highest overall score") {
+                      sortHandler(
+                        "reviews_avg_rating",
+                        serviceRequestData?.service_id
+                      );
+                    } else if (sort === "Registration date") {
+                      sortHandler("created_at", serviceRequestData?.service_id);
+                    } else if (sort === "Highest reviews") {
+                      console.log("here");
+                      sortHandler("highest_rating", serviceRequestData?.service_id);
+                    }
+                  }}
+                />
+                {businessListLoading ? (
+                  <ServiceDetailSkeleton limit={3} />
                 ) : (
-                  <div className="!mt-10">
-                    <Heading
-                      text={"There is no response from the pros"}
-                      variant="subHeader"
-                      headingclassname="text-textColor dark:text-white !font-semibold tracking-wide flex justify-center lg:h-24  xs:h-24 items-center"
-                    />
+                  <div>
+                    {datarender.length > 0 ? (
+                      <ServiceItemsSection
+                        services={services}
+                        id={serviceRequestData?.service?.id}
+                        name={serviceRequestData?.service?.name}
+                        isLoading={businessListLoading}
+                      />
+                    ) : (
+                      <div className="!mt-10">
+                        <Heading
+                          text={"There is no response from the pros"}
+                          variant="subHeader"
+                          headingclassname="text-textColor dark:text-white !font-semibold tracking-wide flex justify-center lg:h-24  xs:h-24 items-center"
+                        />
+                      </div>
+                    )}
                   </div>
                 )}
-              </div>
+              </>
             )}
           </div>
         </div>

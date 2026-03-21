@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import PostCodeModal from "../../../layout/home/PostCodeModal";
-import { fetcher, useHomeServices } from "../../../store/customer/home-context";
+import { publicFetcher, useHomeServices } from "../../../store/customer/home-context";
 import useSWR from "swr";
 import { Service } from "../../../models/home";
 import SearchBar from "./SearchBar";
@@ -14,19 +14,22 @@ import Button from "../../UI/Button";
 import { useNavigate } from "react-router";
 import NoImage from "../../../assets/no-photo.png";
 import { buildApiUrl, API_ENDPOINTS } from "../../../config/api";
+import { resolveAssetUrl } from "../../../utils/resolveAssetUrl";
+
+const resolveServiceImageUrl = (image?: string | null) => {
+  const url = resolveAssetUrl(image);
+  return url || NoImage;
+};
 
 const HomePageDetails = () => {
   const { datarender, searchHandler, isLoading } = useHomeServices();
   const isLoggedIn = localStorage.getItem("isLoggedIn");
   const url = buildApiUrl(API_ENDPOINTS.SERVICES);
-  const { data, isLoading: isServiceLoading } = useSWR(url, (url) => 
-    fetch(url).then((r) => r.json()),
-    {
-      revalidateOnFocus: false,
-      revalidateOnReconnect: false,
-      dedupingInterval: 60000,
-    }
-  );
+  const { data, isLoading: isServiceLoading } = useSWR(url, publicFetcher, {
+    revalidateOnFocus: true,
+    revalidateOnReconnect: true,
+    dedupingInterval: 0,
+  });
   const serviceData: Service[] = data?.data ?? [];
   // const imageStorageUrl = "https://erranddo.kodecreators.com/storage";
   const [openMenu, setOpenMenu] = useState(false);
@@ -144,11 +147,7 @@ const HomePageDetails = () => {
                 return (
                   <SwiperSlide key={d.id || i}>
                     <Card
-                      image={`${
-                        d.image
-                          ? `https://erranddo.s3.eu-west-2.amazonaws.com/${d?.image}`
-                          : NoImage
-                      }   `}
+                      image={resolveServiceImageUrl(d?.image)}
                       desc={d?.name}
                     />
                   </SwiperSlide>
@@ -167,9 +166,7 @@ const HomePageDetails = () => {
               <Card
                 key={d.id || index}
                 image={
-                  d?.image
-                    ? `https://erranddo.s3.eu-west-2.amazonaws.com/${d?.image}`
-                    : NoImage
+                  resolveServiceImageUrl(d?.image)
                 }
                 desc={d?.name}
               />
