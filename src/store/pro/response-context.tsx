@@ -1,11 +1,11 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useMemo, useState } from "react";
 import { UserRequestList } from "../../models/pro/userrequestlist";
 import useSWR from "swr";
 import { fetcher } from "../customer/home-context";
 import { UserResponseList } from "../../models/pro/userresponselist";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
-import { API_BASE_URL, buildApiUrl, API_ENDPOINTS } from "../../config/api";
+import { buildApiUrl, API_ENDPOINTS } from "../../config/api";
 
 type LeadsResponseType = {
   leadsResponse?: UserResponseList[];
@@ -22,6 +22,9 @@ type LeadsResponseType = {
   total: number;
   isNoteLoading: boolean;
   search: (key: string) => void;
+  /** false = active responses (30-day window), true = closed / history */
+  showClosedLeads: boolean;
+  setShowClosedLeads: (closed: boolean) => void;
 
   setPage: React.Dispatch<React.SetStateAction<number>>;
 };
@@ -59,53 +62,66 @@ export const LeadResponseContext = createContext<LeadsResponseType>({
     console.log();
   },
   total: 0,
+  showClosedLeads: false,
+  setShowClosedLeads: () => {
+    console.log();
+  },
 });
 
 const LeadsResponseProvider = (props: { children: React.ReactNode }) => {
   const [error, setError] = useState("");
   const perPage = 10;
   const [currentPage, setCurrentPage] = useState(1);
-  const [url, setUrl] = useState(
-    buildApiUrl(`${API_ENDPOINTS.USER_REQUESTS}?page=${currentPage}&per_page=${perPage}&for_pro=1&with_leads=1`)
-  );
+  const [showClosedLeads, setShowClosedLeadsState] = useState(false);
+  const [serviceIds, setServiceIds] = useState<number[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const url = useMemo(() => {
+    const params = new URLSearchParams();
+    params.set("page", String(currentPage));
+    params.set("per_page", String(perPage));
+    params.set("for_pro", "1");
+    params.set("with_leads", "1");
+    // Active tab: omit is_closed so API treats open as 0 / '0' / NULL.
+    if (showClosedLeads) {
+      params.set("is_closed", "1");
+    }
+    if (searchQuery.trim()) {
+      params.set("search", searchQuery.trim());
+    }
+    serviceIds.forEach((id, i) => {
+      params.set(`service_ids[${i}]`, String(id));
+    });
+    return buildApiUrl(
+      `${API_ENDPOINTS.USER_REQUESTS}?${params.toString()}`
+    );
+  }, [currentPage, perPage, showClosedLeads, searchQuery, serviceIds]);
+
+  const setShowClosedLeads = (closed: boolean) => {
+    setShowClosedLeadsState(closed);
+    setCurrentPage(1);
+  };
 
   const search = (key: string) => {
-    const params = new URLSearchParams(url);
-    params.set("search", key);
-    setUrl(decodeURIComponent(params.toString()));
+    setSearchQuery(key);
+    setCurrentPage(1);
   };
   const filter = (ids: number[]) => {
-    const params = new URLSearchParams(url);
-    params.set("page", `${1}`);
-    params.set("per_page", `${perPage}`);
-    ids.forEach((id, i) => {
-      params.set(`service_ids[${i}]`, `${id}`);
-    });
-    setUrl(decodeURIComponent(params.toString()));
+    setServiceIds(ids);
+    setCurrentPage(1);
   };
 
   const handleNextPage = () => {
     setCurrentPage((c) => c + 1);
-    const params = new URLSearchParams(url);
-    params.set("page", `${currentPage + 1}`);
-    params.set("per_page", `${perPage}`);
-    setUrl(decodeURIComponent(params.toString()));
   };
 
   const handlePreviousPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
-      const params = new URLSearchParams(url);
-      params.set("page", `${currentPage - 1}`);
-      params.set("per_page", `${perPage}`);
-      setUrl(decodeURIComponent(params.toString()));
-    }
+    setCurrentPage((c) => (c > 1 ? c - 1 : 1));
   };
   const dummy_data: UserResponseList[] = [];
   let datarender: UserResponseList[] = [];
   const { data, isLoading: isRequestLoading } = useSWR(url, fetcher);
   datarender = data?.data || dummy_data;
-  console.log(datarender);
   const total = datarender?.filter((item) => item?.is_outright).length;
 
   const [isQuoteLoading, setIsQuoteLoading] = useState(false);
@@ -260,6 +276,8 @@ const LeadsResponseProvider = (props: { children: React.ReactNode }) => {
         total: total,
         search: search,
         setPage: setCurrentPage,
+        showClosedLeads,
+        setShowClosedLeads,
       }}
     >
       {props.children}

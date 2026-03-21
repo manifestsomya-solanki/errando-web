@@ -16,6 +16,7 @@ import { useState } from "react";
 import DeleteLeadModal from "../../../layout/pro-models/DeleteLeadModal";
 import { API_BASE_URL, buildApiUrl, API_ENDPOINTS } from "../../../config/api";
 import { formatUKPostcode } from "../../../utils/postcodeFormatter";
+import { getLeadPurchaseSlotCount } from "../../../utils/leadSlots";
 
 function getTimeDifferenceString(time: any) {
   const currentTime = dayjs();
@@ -76,6 +77,7 @@ function MyLeads(props: any) {
   const { theme } = useTheme();
 
   const [openMenu, setOpenMenu] = useState(false);
+  const purchasedSlots = getLeadPurchaseSlotCount(leadsDetail);
 
   return (
     <div>
@@ -300,10 +302,10 @@ function MyLeads(props: any) {
               headingclassname="!font-normal !text-lg mx-1 text-textColor tracking-wide dark:text-white"
             />
             <div className="flex gap-2 my-1 ml-1">
-              {Array.from({ length: leadsDetail?.leads_count || 0 }, () => (
+              {Array.from({ length: purchasedSlots }, () => (
                 <img src={GreenRoundTick} alt="filled" />
               ))}
-              {Array.from({ length: Math.max(0, 4 - (leadsDetail?.leads_count || 0)) }, () => (
+              {Array.from({ length: Math.max(0, 4 - purchasedSlots) }, () => (
                 <img src={BlackRoundTick} alt="empty" />
               ))}
             </div>
