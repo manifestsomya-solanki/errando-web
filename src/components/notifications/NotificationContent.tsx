@@ -13,10 +13,9 @@ function NotificationContent() {
     currentPage,
     total,
   } = useNotification();
-  const divRef = useRef<HTMLDivElement>(null); //ref to set the height
+  const divRef = useRef<HTMLDivElement>(null);
   const [moreloading, setMoreLoading] = useState(false);
 
-  // Reset "load more" guard whenever page changes.
   useEffect(() => {
     setMoreLoading(false);
   }, [currentPage]);
@@ -29,20 +28,22 @@ function NotificationContent() {
         Math.floor(scrollHeight - scrollTop) === clientHeight;
 
       if (isNearBottom && !moreloading) {
-        // Prevent double-fetch while the previous page is loading.
         setMoreLoading(true);
         handleNextPage();
       }
     }
   };
+
   return (
-    <div className="w-full items-center flex justify-center ">
+    <div className="w-full items-center flex justify-center">
       {isNotificationLoading && !moreloading && currentPage === 1 ? (
         <FullPageLoading className="!h-24" />
       ) : (
         <div
-          onScroll={Math.ceil(total / 13) > currentPage ? handleScroll : undefined}
-          className="bg-white py-5  xs:px-5 flex flex-col dark:bg-dimGray rounded-lg xl:w-max xs:w-full dark:text-white overflow-y-scroll h-[58vh] soft-searchbar shadow-md border-t-slate-100 border-t-[0.5px] "
+          onScroll={
+            Math.ceil(total / 13) > currentPage ? handleScroll : undefined
+          }
+          className="bg-white py-5 xs:px-5 flex flex-col dark:bg-dimGray rounded-lg w-full max-w-4xl mx-auto dark:text-white overflow-y-scroll h-[58vh] soft-searchbar shadow-md border-t-slate-100 border-t-[0.5px]"
           ref={divRef}
         >
           {total === 0 ? (
@@ -50,39 +51,72 @@ function NotificationContent() {
               headingclassname="text-textColor font-poppins text-lg justify-center mx-auto"
               variant="subHeader"
               text="No Notifications"
-            ></Heading>
+            />
           ) : (
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-3">
               {notification.map((item) => {
+                const parts = String(item.message ?? "").split("<br>");
+                const primaryText = parts?.[0] ?? "";
+                const secondaryText = parts?.[1] ?? "";
+                let otherLink = "";
+                try {
+                  otherLink = `${
+                    JSON.parse(item.meta_data)?.other_data?.link ?? ""
+                  }${JSON.parse(item.meta_data)?.other_data?.id ?? ""}`;
+                } catch {
+                  otherLink = "";
+                }
+
+                const date = new Date(item?.created_at);
+                const timeStr = `${date.getUTCHours()}:${date
+                  .getUTCMinutes()
+                  .toString()
+                  .padStart(2, "0")}:${date
+                  .getUTCSeconds()
+                  .toString()
+                  .padStart(2, "0")}`;
+                const dateStr = String(item.created_at ?? "").split("T")[0];
+
                 return (
-                      <div key={item.id} className="md:flex flex-row gap-5">
-                    <div className="flex flex-row gap-4">
-                      <img src={dot}></img>
-                      <div>{`${new Date(
-                        item?.created_at
-                      ).getUTCHours()}:${new Date(item?.created_at)
-                        .getUTCMinutes()
-                        .toString()
-                        .padStart(2, "0")}:${new Date(item?.created_at)
-                        .getUTCSeconds()
-                        .toString()
-                        .padStart(2, "0")}`}</div>
-                      <div>{item.created_at.split("T")[0]}</div>
-                    </div>
-                    <div className="xs:hidden md:flex">|</div>
-                    <div className="sm:flex md:flex flex-row gap-3">
+                  <div key={item.id} className="flex flex-col px-2">
+
+                    {/* ✅ ROW 1 — dot + time + primary text all on same line */}
+                    <div className="flex items-center gap-3">
+                      {/* Dot */}
+                      <img src={dot} alt="" className="shrink-0" />
+
+                      {/* Time */}
+                      <span className="text-xs text-slate-500 dark:text-slate-300 whitespace-nowrap w-[68px] shrink-0">
+                        {timeStr}
+                      </span>
+
+                      {/* Primary Text */}
                       <NavLink
-                        className="text-primaryBlue capitalize flex-nowrap"
-                        to={`${JSON.parse(item.meta_data)?.other_data?.link}${
-                          JSON.parse(item.meta_data)?.other_data?.id
-                        }`}
+                        className="text-xs text-primaryBlue capitalize break-words whitespace-normal leading-snug"
+                        to={otherLink}
                       >
-                        {item.message.split("<br>")[0]}
+                        {primaryText}
                       </NavLink>
-                      <div className=" flex-nowrap">
-                        {item.message.split("<br>")[1]}
-                      </div>
                     </div>
+
+                    {/* ✅ ROW 2 — (dot placeholder) + date + secondary text all on same line */}
+                    <div className="flex items-center gap-3">
+                      {/* Dot placeholder to keep alignment */}
+                      <span className="shrink-0" style={{ width: "10px" }} />
+
+                      {/* Date */}
+                      <span className="text-xs text-slate-500 dark:text-slate-300 whitespace-nowrap w-[68px] shrink-0">
+                        {dateStr}
+                      </span>
+
+                      {/* Secondary Text */}
+                      {secondaryText ? (
+                        <div className="text-xs text-primaryBlue capitalize break-words whitespace-normal leading-snug">
+                          {secondaryText}
+                        </div>
+                      ) : null}
+                    </div>
+
                   </div>
                 );
               })}
@@ -90,7 +124,7 @@ function NotificationContent() {
           )}
 
           {isNotificationLoading && (
-            <FullPageLoading className="!h-8 xl:w-[90vh] xs:w-full " />
+            <FullPageLoading className="!h-8 xl:w-[90vh] xs:w-full" />
           )}
         </div>
       )}
