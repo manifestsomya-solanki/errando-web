@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import NoImage from "../../../assets/no-photo.png";
 
 function Card(props: { image: string; desc: string }) {
   const navigate = useNavigate();
@@ -9,6 +10,9 @@ function Card(props: { image: string; desc: string }) {
         src={props.image}
         alt=""
         className="2xl:h-48 xl:h-40 lg:h-32 xs:h-32 rounded-xl object-cover w-full "
+        onError={(event) => {
+          event.currentTarget.src = NoImage;
+        }}
       />
       <p className="font-medium 2xl:text-xl xl:text-lg md:text-md xs:text-sm dark:text-white text-center">
         {props.desc}

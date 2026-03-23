@@ -35,8 +35,8 @@ type AuthResponseType = {
   isLoginCustomerLoading: boolean;
   logout: () => void;
   forgotPassword: (formData: FormData) => Promise<void>;
-  addRequest: (formData: FormData, tokenFromApi?: string) => Promise<void>;
-  editRequest: (formData: FormData, id: string) => Promise<void>;
+  addRequest: (formData: FormData, tokenFromApi?: string) => Promise<boolean>;
+  editRequest: (formData: FormData, id: string) => Promise<boolean>;
 
   manageLoading: (boolean: boolean) => Promise<void>;
   resetPassword: (formData: FormData) => void;
@@ -64,9 +64,11 @@ export const AuthContext = createContext<AuthResponseType>({
   },
   addRequest: async (data) => {
     console.log(data);
+    return false;
   },
   editRequest: async (data, id) => {
     console.log(data, id);
+    return false;
   },
   verifyOtp: async (data, key) => {
     console.log(data, key);
@@ -590,7 +592,7 @@ const AuthContextProvider = (props: { children: React.ReactNode }) => {
     }
   };
 
-  const addRequest = async (formData: FormData, tokenFromApi?: string) => {
+  const addRequest = async (formData: FormData, tokenFromApi?: string): Promise<boolean> => {
     setIsLoading(true);
     setError("");
     
@@ -601,7 +603,7 @@ const AuthContextProvider = (props: { children: React.ReactNode }) => {
     if (!token) {
       setError("No authentication token available");
       setIsLoading(false);
-      return;
+      return false;
     }
 
     const res = await fetch(
@@ -621,6 +623,7 @@ const AuthContextProvider = (props: { children: React.ReactNode }) => {
       setrequestData(responseData);
       if (responseData.status === "0") {
         setError(responseData.message);
+        return false;
       } else {
         // Auto-login after successful request submission
         if (responseData.data?.token) {
@@ -665,14 +668,16 @@ const AuthContextProvider = (props: { children: React.ReactNode }) => {
         } else {
           console.log("No token received in response:", responseData);
         }
+        return true;
       }
     } else {
       setIsLoading(false);
       const data: any = await res.json();
       setError(data.message);
+      return false;
     }
   };
-  const editRequest = async (formData: FormData, id: string) => {
+  const editRequest = async (formData: FormData, id: string): Promise<boolean> => {
     setIsLoading(true);
     setError("");
     const token = localStorage.getItem("token");
@@ -693,6 +698,7 @@ const AuthContextProvider = (props: { children: React.ReactNode }) => {
       const data: RegisterUser = await res.json();
       if (data.status === "0") {
         setError(data.message);
+        return false;
       } else {
         setIsLoggedIn(true);
         localStorage.removeItem("service");
@@ -702,12 +708,14 @@ const AuthContextProvider = (props: { children: React.ReactNode }) => {
         localStorage.setItem("isLoggedIn", "true");
         navigate("/projects");
         await mutate("project_contect_api");
+        return true;
       }
     } else {
       setIsLoading(false);
       const data: any = await res.json();
 
       setError(data.message);
+      return false;
     }
   };
 

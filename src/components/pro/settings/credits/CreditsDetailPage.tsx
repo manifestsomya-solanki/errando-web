@@ -454,17 +454,9 @@ function CreditsDetailPage() {
           onConfirm={handleConfirmPurchase}
           credits={selectedPackage?.credits || (typeof customCredits === 'number' ? customCredits : 0)}
           price={selectedPackage?.price || customPrice}
-          basePrice={selectedPackage
-            ? (selectedPackage.discount_percentage > 0
-              ? selectedPackage.price / (1 - selectedPackage.discount_percentage / 100)
-              : selectedPackage.price)
-            : basePrice}
-          tierDiscountAmount={selectedPackage
-            ? (selectedPackage.discount_percentage > 0
-              ? (selectedPackage.price / (1 - selectedPackage.discount_percentage / 100)) - selectedPackage.price
-              : 0)
-            : tierDiscountAmount}
-          tierDiscountPercentage={selectedPackage ? selectedPackage.discount_percentage : tierDiscountPercentage}
+          basePrice={selectedPackage ? selectedPackage.price : basePrice}
+          tierDiscountAmount={selectedPackage ? 0 : tierDiscountAmount}
+          tierDiscountPercentage={selectedPackage ? 0 : tierDiscountPercentage}
           promoDiscount={promoApplied ? promoDiscount : 0}
           promoCode={promoApplied ? promoCode : ""}
           isLoading={isPurchasing}
@@ -488,15 +480,12 @@ function CreditsDetailPage() {
             style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))' }}
           >
             {displayPackages.map((pkg, index) => {
-              const actualPrice = pkg.discount_percentage > 0
-                ? pkg.price / (1 - pkg.discount_percentage / 100)
-                : pkg.price;
               return (
                 <CreditsDetailItemSection
                   key={pkg.id}
                   packageId={pkg.id}
                   creditscore={pkg.credits}
-                  amount={actualPrice}
+                  amount={pkg.price}
                   perCreditAmount={pkg.price_per_credit}
                   percentage={index === 0 ? "" : (pkg.discount_percentage > 0 ? `${pkg.discount_percentage}%` : "")}
                   onBuyClick={() => handleBuyPackage(pkg)}
