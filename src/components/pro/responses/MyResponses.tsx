@@ -35,6 +35,7 @@ import Outright from "../../../assets/outright.svg";
 import Flagman from "../../../assets/flagman.jpg";
 import dayjs from "dayjs";
 import { API_BASE_URL, buildApiUrl, API_ENDPOINTS } from "../../../config/api";
+import { getLeadPurchaseSlotCount } from "../../../utils/leadSlots";
 
 function getTimeDifferenceString(time: any) {
   const currentTime = dayjs();
@@ -204,6 +205,7 @@ function MyResponses() {
   const timeDifferenceString = getTimeDifferenceString(
     leadsDetail?.leads[0]?.created_at
   );
+  const purchasedSlots = getLeadPurchaseSlotCount(leadsDetail);
 
   return (
     <div>
@@ -484,13 +486,13 @@ function MyResponses() {
                     headingclassname="!font-normal !text-lg mx-1 text-textColor tracking-wide dark:text-white"
                   />
                   <div className="flex gap-2 my-1 ml-1">
-                    {Array.from({ length: leadsDetail?.leads_count }, () => (
-                      <img src={GreenRoundTick} />
+                    {Array.from({ length: purchasedSlots }, () => (
+                      <img src={GreenRoundTick} alt="" />
                     ))}
                     {Array.from(
-                      { length: 4 - leadsDetail?.leads_count },
+                      { length: Math.max(0, 4 - purchasedSlots) },
                       () => (
-                        <img src={BlackRoundTick} />
+                        <img src={BlackRoundTick} alt="" />
                       )
                     )}
                   </div>

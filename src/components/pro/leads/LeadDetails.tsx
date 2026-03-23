@@ -12,6 +12,7 @@ import { UserRequestList } from "../../../models/pro/userrequestlist";
 import { useLead } from "../../../store/pro/lead-context";
 import { useAuth } from "../../../store/pro/auth-pro-context";
 import { buildApiUrl, API_ENDPOINTS } from "../../../config/api";
+import { getLeadPurchaseSlotCount } from "../../../utils/leadSlots";
 import "../dashboard/services/dealer-detail/check.css";
 
 function DangerousHTML({
@@ -50,6 +51,7 @@ function LeadDetails() {
   const { mutate } = useSWR(baseUrl, fetcher);
 
   const navigate = useNavigate();
+  const purchasedSlots = getLeadPurchaseSlotCount(leadsDetail);
 
   const disableEmailsAndLinks = (text: any) => {
     if (!text || typeof text !== 'string') {
@@ -204,7 +206,7 @@ function LeadDetails() {
                 loading={isBuyLeadLoading}
               />
             </div>
-            {(leadsDetail?.leads_count ?? 0) === 0 && (
+            {purchasedSlots === 0 && (
               <div className="flex w-full items-center gap-3 relative">
                 <img src={Credit} className="w-5 h-5 object-cover" />
                 <Heading
@@ -214,7 +216,7 @@ function LeadDetails() {
                 />
                 <Button
                   disabled={
-                    (leadsDetail?.leads_count ?? 0) > 0 ||
+                    purchasedSlots > 0 ||
                     (userData?.available_credits ?? 0) == 0
                   }
                   variant="filled"
@@ -234,7 +236,7 @@ function LeadDetails() {
                   <Heading
                     text={`BUY OUTRIGHT`}
                     variant="subHeader"
-                    headingclassname="!font-normal !text-sm mx-1 text-primaryYellow tracking-wide dark:text-primaryYellow"
+                    headingclassname="!font-normal !text-sm mx-1 text-primaryGreen tracking-wide dark:text-primaryGreen"
                   />
                 </div>
               </div>

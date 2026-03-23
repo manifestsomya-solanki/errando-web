@@ -15,7 +15,7 @@ import SearchLeadsModal from "../../../layout/pro-models/SearchLeadsModal";
 import { API_BASE_URL, buildApiUrl, API_ENDPOINTS } from "../../../config/api";
 
 function ResponsesBar() {
-  const { isLoading } = useLeadResponse();
+  const { isLoading, showClosedLeads, setShowClosedLeads } = useLeadResponse();
   const url = buildApiUrl(`${API_ENDPOINTS.USER_REQUESTS}?for_pro=1&show_only_count=1`);
   let { data: count } = useSWR(url, fetcher);
   count = count?.data;
@@ -80,6 +80,30 @@ function ResponsesBar() {
                 variant="subHeader"
                 headingclassname="!font-semibold my-2  text-primaryGreen   tracking-wide "
               />
+            </HomeCard>
+            <HomeCard className="rounded-md py-2 px-3 w-full flex gap-2 my-2">
+              <button
+                type="button"
+                onClick={() => setShowClosedLeads(false)}
+                className={`flex-1 rounded-lg py-2 text-sm font-semibold transition-colors ${
+                  !showClosedLeads
+                    ? "bg-primaryBlue text-white"
+                    : "bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-200"
+                }`}
+              >
+                Active responses
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowClosedLeads(true)}
+                className={`flex-1 rounded-lg py-2 text-sm font-semibold transition-colors ${
+                  showClosedLeads
+                    ? "bg-primaryBlue text-white"
+                    : "bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-200"
+                }`}
+              >
+                Closed leads
+              </button>
             </HomeCard>
           </div>
           <ResponsesList />
