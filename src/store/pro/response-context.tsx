@@ -22,7 +22,7 @@ type LeadsResponseType = {
   total: number;
   isNoteLoading: boolean;
   search: (key: string) => void;
-  /** false = active responses (30-day window), true = closed / history */
+  /** false = all purchased responses, true = closed-only responses */
   showClosedLeads: boolean;
   setShowClosedLeads: (closed: boolean) => void;
 
@@ -82,7 +82,7 @@ const LeadsResponseProvider = (props: { children: React.ReactNode }) => {
     params.set("per_page", String(perPage));
     params.set("for_pro", "1");
     params.set("with_leads", "1");
-    // Active tab: omit is_closed so API treats open as 0 / '0' / NULL.
+    // Default tab: no is_closed filter, so purchased responses include open + closed.
     if (showClosedLeads) {
       params.set("is_closed", "1");
     }
