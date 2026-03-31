@@ -13,39 +13,27 @@ import { useState } from "react";
 import EditNameDescriptionModal from "../../../../../layout/pro-models/EditNameDescriptionModalt";
 import "./check.css"; // Replace with your CSS file path
 
-// Utility function to format rating according to rules
-const formatRating = (rating: number): number => {
-  // If rating is 4.91-4.99, show as 5.0
-  if (rating >= 4.91 && rating <= 4.99) {
-    return 5.0;
-  }
-  // If rating is 4.81-4.90, show as 4.9
-  else if (rating >= 4.81 && rating <= 4.90) {
-    return 4.9;
-  }
-  // For all other ratings, round to 1 decimal place
-  else {
-    return Math.round(rating * 10) / 10;
-  }
+const normalizeRating = (rating: number): number => {
+  if (!Number.isFinite(rating)) return 0;
+  return Math.min(5, Math.max(0, rating));
 };
 
-// Utility function to calculate star display
-const getStarDisplay = (rating: number): { fullStars: number; hasHalfStar: boolean; emptyStars: number } => {
-  // If rating is 4.91-4.99, show 5 full stars
-  if (rating >= 4.91 && rating <= 4.99) {
-    return { fullStars: 5, hasHalfStar: false, emptyStars: 0 };
-  }
-  // If rating is 4.1-4.9 (including 4.81-4.90), show 4 full stars + 1 half star
-  else if (rating >= 4.1 && rating <= 4.9) {
-    return { fullStars: 4, hasHalfStar: true, emptyStars: 0 };
-  }
-  // For ratings below 4.1, show full stars based on integer part
-  else {
-    const fullStars = Math.floor(rating);
-    const hasHalfStar = rating - fullStars >= 0.5 && rating < 4.1;
-    const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
-    return { fullStars, hasHalfStar, emptyStars };
-  }
+// Rating count text should be integer only: 1,2,3,4,5
+const getDisplayCount = (rating: number): number => {
+  const safe = normalizeRating(rating);
+  return Math.round(safe);
+};
+
+// Stars should follow normal half-step rounding.
+const getStarDisplay = (
+  rating: number
+): { fullStars: number; hasHalfStar: boolean; emptyStars: number } => {
+  const safe = normalizeRating(rating);
+  const roundedToHalf = Math.round(safe * 2) / 2;
+  const fullStars = Math.floor(roundedToHalf);
+  const hasHalfStar = roundedToHalf - fullStars === 0.5;
+  const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+  return { fullStars, hasHalfStar, emptyStars };
 };
 
 export function DangerousHTML({
@@ -132,7 +120,7 @@ function DealerDetailSection(props: {
               <div className="lg:my-2 xs:my-2 flex gap-1 text-gray-500 !font-normal tracking-wide !text-xs items-center">
                 {(() => {
                   const { fullStars, hasHalfStar, emptyStars } = getStarDisplay(props.ratingCount);
-                  const formattedRating = formatRating(props.ratingCount);
+                  const displayCount = getDisplayCount(props.ratingCount);
                   
                   return (
                     <>
@@ -151,7 +139,7 @@ function DealerDetailSection(props: {
                         <img key={`empty-${i}`} src={Star} alt="Empty star" className="w-4 h-4" />
                       ))}
                       <Heading
-                        text={`${formattedRating.toFixed(1)} of 5 / ${props.reviewsCount ?? 0}`}
+                        text={`${displayCount} of 5 / ${props.reviewsCount ?? 0}`}
                         variant="subHeader"
                         headingclassname="text-gray-500 !font-normal tracking-wide !text-xs mx-1 dark:text-darktextColor"
                       />

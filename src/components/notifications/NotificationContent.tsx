@@ -86,13 +86,13 @@ function NotificationContent() {
                       <img src={dot} alt="" className="shrink-0" />
 
                       {/* Time */}
-                      <span className="text-xs text-slate-500 dark:text-slate-300 whitespace-nowrap w-[68px] shrink-0">
+                      <span className="text-base text-slate-500 dark:text-slate-300 whitespace-nowrap w-[92px] shrink-0">
                         {timeStr}
                       </span>
 
                       {/* Primary Text */}
                       <NavLink
-                        className="text-xs text-primaryBlue capitalize break-words whitespace-normal leading-snug"
+                        className="text-base text-primaryBlue capitalize break-words whitespace-normal leading-snug"
                         to={otherLink}
                       >
                         {primaryText}
@@ -105,13 +105,13 @@ function NotificationContent() {
                       <span className="shrink-0" style={{ width: "10px" }} />
 
                       {/* Date */}
-                      <span className="text-xs text-slate-500 dark:text-slate-300 whitespace-nowrap w-[68px] shrink-0">
+                      <span className="text-base text-slate-500 dark:text-slate-300 whitespace-nowrap w-[92px] shrink-0">
                         {dateStr}
                       </span>
 
                       {/* Secondary Text */}
                       {secondaryText ? (
-                        <div className="text-xs text-primaryBlue capitalize break-words whitespace-normal leading-snug">
+                        <div className="text-base text-primaryBlue capitalize break-words whitespace-normal leading-snug">
                           {secondaryText}
                         </div>
                       ) : null}
