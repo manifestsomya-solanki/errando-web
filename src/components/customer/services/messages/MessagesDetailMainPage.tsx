@@ -42,7 +42,6 @@ import useSWR from "swr";
 import { fetcher } from "../../../../store/customer/home-context";
 import { UserData } from "../../../../models/user";
 import BackArrow from "../../../../assets/BackArrow";
-import { useNotification } from "../../../../store/customer/notification-context";
 import { API_BASE_URL, buildApiUrl, API_ENDPOINTS } from "../../../../config/api";
 
 const initialPageSize = 12;
@@ -53,7 +52,6 @@ const MessagesDetailMainPage = () => {
   const quote = useLocation()?.state?.quote;
   const requestId = useLocation()?.state?.requestId;
 
-  const { create } = useNotification();
   const businessDisplayPhoto = useLocation()?.state?.displayPhoto;
   const [loading, setLoading] = useState(false);
   const [moreloading, setMoreLoading] = useState(false);
@@ -217,11 +215,6 @@ const MessagesDetailMainPage = () => {
     setMore(false);
     setShow(false);
     setUserInput("");
-    const formData = new FormData();
-    formData.set("user_id", currentUser?.uid?.toString() ?? "");
-    formData.set("for_pro", "0");
-    formData.set("id", requestId);
-    create(formData);
     //return when spaces
     const nonWhiteSpaceRegex = /\S/;
     if (!nonWhiteSpaceRegex.test(userInput)) {

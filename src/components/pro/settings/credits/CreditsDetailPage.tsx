@@ -42,6 +42,19 @@ function CreditsDetailPage() {
   const [transactionsPage, setTransactionsPage] = useState(1);
   const transactionsPerPage = 10; // Fixed at 10 items per page as requested
 
+  const resetManualCalculator = () => {
+    setCustomCredits("");
+    setCustomPrice(0);
+    setCustomDiscount("");
+    setBasePrice(0);
+    setTierDiscountAmount(0);
+    setTierDiscountPercentage(0);
+    setPromoCode("");
+    setPromoDiscount(0);
+    setPromoDiscountAmount(0);
+    setPromoApplied(false);
+  };
+
   const url = buildApiUrl(`${API_ENDPOINTS.USER_REQUESTS}?for_pro=1&show_only_count=1`);
   let { data: count } = useSWR(url, fetcher);
   count = count?.data;
@@ -109,6 +122,11 @@ function CreditsDetailPage() {
       setPromoApplied(false);
       setPromoDiscount(0);
       setPromoDiscountAmount(0);
+      setCustomPrice(0);
+      setCustomDiscount("");
+      setBasePrice(0);
+      setTierDiscountAmount(0);
+      setTierDiscountPercentage(0);
     }
   }, [customCredits]);
 
@@ -312,6 +330,7 @@ function CreditsDetailPage() {
       } catch (e) {
         parsedToken = token?.trim();
       }
+      const selectedCard = savedCards.find((card) => card.id === selectedCardId);
       const requestBody: any = {};
       if (selectedPackage) {
         requestBody.package_id = selectedPackage.id;
@@ -323,6 +342,17 @@ function CreditsDetailPage() {
       if (promoApplied && promoCode) {
         requestBody.promo_code = promoCode.toUpperCase().trim();
       }
+      if (selectedCard) {
+        const parsedSelectedCardId = parseInt(selectedCard.id, 10);
+        if (!Number.isNaN(parsedSelectedCardId)) {
+          requestBody.selected_card_id = parsedSelectedCardId;
+        }
+        if (selectedCard.userBusinessId !== undefined && selectedCard.userBusinessId !== null) {
+          requestBody.user_business_id = selectedCard.userBusinessId;
+        }
+        requestBody.payment_method = selectedCard.type || "Card";
+      }
+      requestBody.idempotency_key = `purchase-${Date.now()}-${Math.floor(Math.random() * 1000000)}`;
       const response = await fetch(buildApiUrl(API_ENDPOINTS.CREDIT_PACKAGES_PURCHASE), {
         method: "POST",
         headers: {
@@ -341,7 +371,11 @@ function CreditsDetailPage() {
       if (response.ok && data.status === "1") {
         toast.success(`Successfully purchased ${data.data.credits_purchased} credits!`);
         setIsPurchaseModalOpen(false);
+        const wasManualPurchase = !selectedPackage;
         setSelectedPackage(null);
+        if (wasManualPurchase) {
+          resetManualCalculator();
+        }
         mutate(url);
         mutatePackages();
       } else if (response.status === 401) {
@@ -357,7 +391,8 @@ function CreditsDetailPage() {
     }
   };
 
-  const displayPackages = packages;
+  // Hide first/base package on pro credits cards.
+  const displayPackages = packages.slice(1);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -479,7 +514,7 @@ function CreditsDetailPage() {
             className="grid gap-4 sm:gap-5 md:gap-6"
             style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))' }}
           >
-            {displayPackages.map((pkg, index) => {
+            {displayPackages.map((pkg) => {
               return (
                 <CreditsDetailItemSection
                   key={pkg.id}
@@ -487,7 +522,7 @@ function CreditsDetailPage() {
                   creditscore={pkg.credits}
                   amount={pkg.price}
                   perCreditAmount={pkg.price_per_credit}
-                  percentage={index === 0 ? "" : (pkg.discount_percentage > 0 ? `${pkg.discount_percentage}%` : "")}
+                  percentage={pkg.discount_percentage > 0 ? `${pkg.discount_percentage}%` : ""}
                   onBuyClick={() => handleBuyPackage(pkg)}
                   isLoading={false}
                 />
@@ -519,10 +554,24 @@ function CreditsDetailPage() {
                   setCustomCredits(value);
                   setPromoApplied(false);
                   setPromoDiscount(0);
+                  if (value === "") {
+                    setCustomPrice(0);
+                    setCustomDiscount("");
+                    setBasePrice(0);
+                    setTierDiscountAmount(0);
+                    setTierDiscountPercentage(0);
+                    setPromoCode("");
+                    setPromoDiscountAmount(0);
+                  }
                 }}
-                onBlur={() => {
-                  const credits = typeof customCredits === 'number' ? customCredits : (typeof customCredits === 'string' ? parseInt(customCredits) || 0 : 0);
-                  if (credits > 0) handleCalculateCustomPrice();
+                onBlur={(e) => {
+                  const raw = e.target.value;
+                  const credits = raw === "" ? 0 : parseInt(raw, 10) || 0;
+                  if (credits > 0) {
+                    handleCalculateCustomPrice();
+                  } else {
+                    resetManualCalculator();
+                  }
                 }}
                 className="w-16 sm:w-20 h-8 px-2 text-center border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
                 min="1"

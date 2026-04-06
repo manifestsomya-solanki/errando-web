@@ -23,7 +23,7 @@ function NotificationContentPro() {
               text="No Notifications"
             />
           ) : (
-            <div className="flex flex-col gap-3">
+            <div className="w-full mx-auto flex flex-col items-center gap-3">
               {notification.map((item) => {
                 const parts = String(item.message ?? "").split("<br>");
                 const primaryText = parts?.[0] ?? "";
@@ -49,19 +49,15 @@ function NotificationContentPro() {
                 const dateStr = String(item.created_at ?? "").split("T")[0];
 
                 return (
-                  <div key={item.id} className="flex flex-col px-2">
+                  <div key={item.id} className="w-fit mx-auto flex flex-col">
 
-                    {/* ✅ ROW 1 — dot + time + primary text on same line */}
                     <div className="flex items-center gap-3">
-                      {/* Dot */}
                       <img src={dot} alt="" className="shrink-0" />
 
-                      {/* Time */}
                       <span className="text-base text-slate-500 dark:text-slate-300 whitespace-nowrap w-[92px] shrink-0">
                         {timeStr}
                       </span>
 
-                      {/* Primary Text */}
                       <NavLink
                         className="text-base text-primaryBlue capitalize break-words whitespace-normal leading-snug"
                         to={otherLink}
@@ -70,17 +66,13 @@ function NotificationContentPro() {
                       </NavLink>
                     </div>
 
-                    {/* ✅ ROW 2 — placeholder + date + secondary text on same line */}
                     <div className="flex items-center gap-3">
-                      {/* Dot placeholder to keep alignment */}
                       <span className="shrink-0" style={{ width: "10px" }} />
 
-                      {/* Date */}
                       <span className="text-base text-slate-500 dark:text-slate-300 whitespace-nowrap w-[92px] shrink-0">
                         {dateStr}
                       </span>
 
-                      {/* Secondary Text */}
                       {secondaryText ? (
                         <div className="text-base text-primaryBlue capitalize break-words whitespace-normal leading-snug">
                           {secondaryText}

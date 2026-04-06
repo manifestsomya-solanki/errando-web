@@ -33,11 +33,9 @@ import Download from "../../../../assets/Download";
 import { useChat } from "../../../../store/pro/chat-context";
 import { useLocation, useNavigate } from "react-router";
 import { useAuth } from "../../../../store/pro/auth-pro-context";
-import { useNotification } from "../../../../store/customer/notification-context";
 
 const initialPageSize = 12;
 function ChatItems() {
-  const { create } = useNotification();
   const [loading, setLoading] = useState(false);
   const [moreloading, setMoreLoading] = useState(false);
   const [more, setMore] = useState(false);
@@ -468,11 +466,6 @@ function ChatItems() {
             <form
               onSubmit={(e: React.FormEvent) => {
                 e.preventDefault();
-                const formData = new FormData();
-                formData.set("user_id", currentUser?.uid);
-                formData.set("for_pro", "1");
-                formData.set("id", state?.businessId ?? 0);
-                create(formData);
                 handleSendMessage();
               }}
             >

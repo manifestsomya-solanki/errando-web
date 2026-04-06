@@ -111,5 +111,9 @@ export const API_ENDPOINTS = {
   PROMO_CODE_VERIFY: 'promo-codes/verify',
   
   // Transactions
-  TRANSACTIONS: 'transactions'
+  TRANSACTIONS: 'transactions',
+
+  // Invoices
+  INVOICES: 'invoices',
+  INVOICES_DOWNLOAD: 'invoices'
 };
