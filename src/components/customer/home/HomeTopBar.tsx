@@ -34,6 +34,36 @@ function HomeTopBar(props: { isSettingDisabled?: boolean }) {
   const { data } = useSWR(url, fetcher);
   const profileData: UserData = data?.data ?? "";
   const profilePhoto = `https://erranddo.s3.eu-west-2.amazonaws.com/${profileData?.img_avatar}`;
+  const switchToPro = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      localStorage.setItem("role", "pro");
+      navigate("/pro/dashboard");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.set("role", "pro");
+
+    try {
+      const res = await fetch(buildApiUrl(API_ENDPOINTS.USER_EDIT), {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to update role");
+      }
+    } catch {
+      // Keep UX consistent even if request fails, as role switch is a navigation action too.
+    } finally {
+      localStorage.setItem("role", "pro");
+      navigate("/pro/dashboard");
+    }
+  };
   const topbarClassName =
     "bg-white dark:bg-black fixed top-0 py-4 xl:px-36 lg:px-12 md:px-12 xs:px-3 flex shadow-md justify-between w-screen items-center lg:h-[9.651474530831099vh] xl:h-[8.651474530831099vh] xs:h-[9.051474530831099vh] z-[100]";
   return (
@@ -121,20 +151,14 @@ function HomeTopBar(props: { isSettingDisabled?: boolean }) {
                 size="normal"
                 children="Register as a Pro"
                 buttonClassName="!px-7 text-sm xs:hidden lg:flex"
-                onClick={() => {
-                  navigate("/pro/dashboard");
-                  localStorage.setItem("role", "pro");
-                }}
+                onClick={switchToPro}
               />) : (<Button
                 variant="filled"
                 color="primary"
                 size="normal"
                 children="Switch to Pro"
                 buttonClassName="!px-7 text-sm xs:hidden lg:flex"
-                onClick={() => {
-                  navigate("/pro/dashboard");
-                  localStorage.setItem("role", "pro");
-                }}
+                onClick={switchToPro}
               />)}
 
             <div className="hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full h-7 w-7 flex items-center justify-center">
