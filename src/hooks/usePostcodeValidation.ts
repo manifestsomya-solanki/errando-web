@@ -26,6 +26,21 @@ export const usePostcodeValidation = () => {
       };
     }
 
+    // Validate postcode format before calling API
+    // Supports: UK postcodes (e.g. SE15 6RU), Indian pincodes (e.g. 452010),
+    // US ZIP codes (e.g. 10001), and other common alphanumeric formats
+    const postcodeRegex = /^[A-Z0-9][A-Z0-9\s\-]{1,9}[A-Z0-9]$/i;
+    if (!postcodeRegex.test(postcode.trim())) {
+      return {
+        isValid: false,
+        status: '0',
+        data: null,
+        message: 'Invalid postcode format',
+        isLoading: false,
+        error: 'Invalid postcode format'
+      };
+    }
+
     setIsLoading(true);
     setError(null);
 
@@ -37,9 +52,9 @@ export const usePostcodeValidation = () => {
           'Content-Type': 'application/json',
         }
       });
-      
+
       const data = await response.json();
-      
+
       const result: PostcodeValidationResult = {
         isValid: data?.status === '1',
         status: data?.status || '0',
@@ -53,7 +68,7 @@ export const usePostcodeValidation = () => {
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to validate postcode';
       setError(errorMessage);
-      
+
       return {
         isValid: false,
         status: '0',

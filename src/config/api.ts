@@ -1,6 +1,6 @@
 // API Configuration
 // Read environment from .env file
-const NODE_ENV = import.meta.env.VITE_NODE_ENV ;
+const NODE_ENV = import.meta.env.VITE_NODE_ENV;
 
 // API Base URLs from environment variables
 const API_BASE_URLS = {
@@ -29,7 +29,7 @@ export const API_ENDPOINTS = {
   USER_LOGOUT: 'user/logout',
   USER_DELETE: 'user/delete',
   USER_DELETE_PROFILE: 'user/delete-profile',
-  
+
   // Business related
   BUSINESSES: 'businesses',
   BUSINESSES_CREATE: 'businesses/create',
@@ -37,14 +37,14 @@ export const API_ENDPOINTS = {
   BUSINESSES_EDIT: 'businesses/edit',
   BUSINESSES_DELETE: 'businesses/delete',
   BUSINESSES_COUNT: 'businesses/count',
-  
+
   // Services related
   SERVICES: 'services',
   BUSINESS_SERVICES: 'business-services',
   BUSINESS_SERVICES_CREATE: 'business-services/create',
   BUSINESS_SERVICES_EDIT: 'business-services',
   BUSINESS_SERVICES_DELETE: 'business-services',
-  
+
   // User requests
   USER_REQUESTS: 'user-requests',
   USER_REQUESTS_ADD: 'user-requests/add',
@@ -55,7 +55,7 @@ export const API_ENDPOINTS = {
   USER_REQUESTS_REQUEST_QUOTE: 'user-requests/request-quote',
   USER_REQUESTS_CLOSE: 'user-requests/close',
   USER_REQUESTS_LEAD_DELETE: 'user-requests/lead-delete',
-  
+
   // Reviews
   REVIEWS: 'reviews',
   REVIEWS_CREATE: 'reviews/create',
@@ -64,52 +64,52 @@ export const API_ENDPOINTS = {
   REVIEWS_FLAG: 'reviews/flag',
   REVIEWS_ADD_RESPONSE: 'reviews/addresponse',
   REVIEWS_DETAIL: 'reviews',
-  
+
   // Notifications
   NOTIFICATION: 'notification',
   NOTIFICATION_CREATE: 'notification/create',
   NOTIFICATION_EDIT: 'notification/edit',
-  
+
   // Settings
   SETTINGS_CHANGE_PASSWORD: 'settings/change-password',
-  
+
   // Card Details
   CARD_DETAILS: 'card-details',
   CARD_DETAILS_CREATE: 'card-details/create',
   CARD_DETAILS_UPDATE: 'card-details',
   CARD_DETAILS_DELETE: 'card-details',
-  
+
   // Chat
   CHAT_SEND_NOTIFICATION: 'chat/send-notification',
-  CHAT_DELETE: 'chat/delete',
-  
+  CHAT_DELETE: 'chat',
+
   // Quotes
   QUOTES_CREATE: 'quotes/create',
   QUOTES_EDIT: 'quotes/edit',
-  
+
   // Notes
   NOTE: 'note',
   NOTE_ADD: 'note/add',
-  
+
   // Postcodes
   POSTCODES: 'postcodes',
   POSTCODES_VALIDATE: 'postcodes/validate',
-  
+
   // Questions
   QUESTIONS: 'questions',
   QUESTIONS_SUGGEST: 'questions/suggest',
-  
+
   // Forgot password
   FORGOT_PASSWORD: 'user/forgot-password',
-  
+
   // Credit Packages
   CREDIT_PACKAGES: 'credit-packages/list',
   CREDIT_PACKAGES_CALCULATE: 'credit-packages/calculate-custom-price',
   CREDIT_PACKAGES_PURCHASE: 'credit-packages/purchase',
-  
+
   // Promo Codes
   PROMO_CODE_VERIFY: 'promo-codes/verify',
-  
+
   // Transactions
   TRANSACTIONS: 'transactions',
 

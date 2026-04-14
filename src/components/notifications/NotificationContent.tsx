@@ -43,7 +43,7 @@ function NotificationContent() {
           onScroll={
             Math.ceil(total / 13) > currentPage ? handleScroll : undefined
           }
-          className="bg-white py-5 xs:px-5 flex flex-col dark:bg-dimGray rounded-lg w-full max-w-4xl mx-auto dark:text-white overflow-y-scroll h-[58vh] soft-searchbar shadow-md border-t-slate-100 border-t-[0.5px]"
+          className="bg-white py-5 xs:px-24 flex flex-col dark:bg-dimGray rounded-lg w-full max-w-4xl mx-auto dark:text-white overflow-y-scroll h-[58vh] soft-searchbar shadow-md border-t-slate-100 border-t-[0.5px]"
           ref={divRef}
         >
           {total === 0 ? (
@@ -53,7 +53,7 @@ function NotificationContent() {
               text="No Notifications"
             />
           ) : (
-            <div className="w-full mx-auto flex flex-col items-center gap-3">
+            <div className="w-full flex flex-col gap-3">
               {notification.map((item) => {
                 const parts = String(item.message ?? "").split("<br>");
                 const primaryText = parts?.[0] ?? "";
@@ -78,37 +78,32 @@ function NotificationContent() {
                 const dateStr = String(item.created_at ?? "").split("T")[0];
 
                 return (
-                  <div key={item.id} className="w-fit mx-auto flex flex-col">
-
-                    <div className="flex items-center gap-3">
-                      <img src={dot} alt="" className="shrink-0" />
-
-                      <span className="text-base text-slate-500 dark:text-slate-300 whitespace-nowrap w-[92px] shrink-0">
-                        {timeStr}
-                      </span>
-
-                      <NavLink
-                        className="text-base text-primaryBlue capitalize break-words whitespace-normal leading-snug"
-                        to={otherLink}
-                      >
-                        {primaryText}
-                      </NavLink>
-                    </div>
-
-                    <div className="flex items-center gap-3">
-                      <span className="shrink-0" style={{ width: "10px" }} />
-
-                      <span className="text-base text-slate-500 dark:text-slate-300 whitespace-nowrap w-[92px] shrink-0">
-                        {dateStr}
-                      </span>
-
-                      {secondaryText ? (
-                        <div className="text-base text-primaryBlue capitalize break-words whitespace-normal leading-snug">
-                          {secondaryText}
-                        </div>
-                      ) : null}
-                    </div>
-
+                  <div
+                    key={item.id}
+                    className="w-full grid grid-cols-[8px_92px_1fr] grid-rows-[auto_auto] gap-x-3 gap-y-1 items-start text-left"
+                  >
+                    <img
+                      src={dot}
+                      alt=""
+                      className="w-2 h-2 shrink-0 row-span-2 col-start-1 self-start mt-1.5"
+                    />
+                    <span className="col-start-2 row-start-1 text-base text-slate-500 dark:text-slate-300 whitespace-nowrap shrink-0">
+                      {timeStr}
+                    </span>
+                    <NavLink
+                      className="col-start-3 row-start-1 text-base text-primaryBlue capitalize break-words whitespace-normal leading-snug min-w-0"
+                      to={otherLink}
+                    >
+                      {primaryText}
+                    </NavLink>
+                    <span className="col-start-2 row-start-2 text-base text-slate-500 dark:text-slate-300 whitespace-nowrap shrink-0">
+                      {dateStr}
+                    </span>
+                    {secondaryText ? (
+                      <div className="col-start-3 row-start-2 text-base text-primaryBlue capitalize break-words whitespace-normal leading-snug min-w-0">
+                        {secondaryText}
+                      </div>
+                    ) : null}
                   </div>
                 );
               })}

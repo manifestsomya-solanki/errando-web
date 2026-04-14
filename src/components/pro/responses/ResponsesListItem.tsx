@@ -32,9 +32,8 @@ function getTimeDifferenceString(time: any) {
   if (diffInMinutes < 1) {
     return "Purchased less than a minute ago";
   } else if (diffInMinutes < 60) {
-    return `Purchased ${diffInMinutes} minute${
-      diffInMinutes === 1 ? "" : "s"
-    } ago`;
+    return `Purchased ${diffInMinutes} minute${diffInMinutes === 1 ? "" : "s"
+      } ago`;
   } else if (diffInHours < 24) {
     return `Purchased ${diffInHours} hour${diffInHours === 1 ? "" : "s"} ago`;
   } else {
@@ -60,7 +59,7 @@ function ResponsesListItem(props: {
   const { userData } = useAuth();
   const [hasCustomerSentMessage, setHasCustomerSentMessage] = useState(false);
   const unsubscribeRef = useRef<(() => void) | null>(null);
-  
+
   // Check if customer has sent any messages - using real-time listener
   useEffect(() => {
     // Cleanup previous listener if exists
@@ -107,7 +106,7 @@ function ResponsesListItem(props: {
           const customerUserId = props.userId;
           const customerUserIdStr = String(customerUserId);
           const customerUserIdNum = Number(customerUserId);
-          
+
           unsubscribeRef.current = onSnapshot(
             chatRef,
             (snapshot) => {
@@ -227,7 +226,7 @@ function ResponsesListItem(props: {
       style={({ isActive }) =>
         isActive ? { color: "#DF994F" } : { color: "black" }
       }
-      // onClick={handleSelect}
+    // onClick={handleSelect}
     >
       <HomeCard className="px-3 pt-5 pb-3 relative">
         {openMenu && (
@@ -235,7 +234,7 @@ function ResponsesListItem(props: {
             onCancel={() => {
               setOpenMenu(false);
             }}
-            user_id={props.userId ?? 0}
+            lead_id={props.id}
           />
         )}
 

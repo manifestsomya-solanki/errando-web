@@ -1,13 +1,14 @@
 import Close from "../../../../assets/close";
 import Modal from "../../../../layout/home/Modal";
-import { useAuth } from "../../../../store/customer/auth-context";
-import { useChat } from "../../../../store/pro/chat-context";
+import { useLeadResponse } from "../../../../store/pro/response-context";
 import { useTheme } from "../../../../store/theme-context";
 import Button from "../../../UI/Button";
+import { useNavigate, useLocation } from "react-router-dom";
 
-function DeleteChatModal(props: { onCancel: () => void; user_id: number }) {
-  const { logout, isLoading } = useAuth();
-  const { deleteChat } = useChat();
+function DeleteChatModal(props: { onCancel: () => void; lead_id: number }) {
+  const { deleteHandler, isDeleteLoading } = useLeadResponse();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const { theme } = useTheme();
   return (
@@ -24,7 +25,7 @@ function DeleteChatModal(props: { onCancel: () => void; user_id: number }) {
       </button>
       <div className="flex flex-col w-full gap-5 ">
         <h1 className="text-black dark:text-white xl:text-lg md:text-md font-medium text-center mt-7 mb-3 ">
-          Are you sure you want to Delete Chat ?
+          Are you sure you want to delete lead ?
         </h1>
 
         <div className="flex gap-2 items-center justify-center px-5 ">
@@ -41,11 +42,18 @@ function DeleteChatModal(props: { onCancel: () => void; user_id: number }) {
             Cancel
           </Button>
           <Button
-            loading={isLoading}
+            loading={isDeleteLoading}
             variant="filled"
             color="primary"
-            onClick={() => {
-              deleteChat(props.user_id);
+            onClick={async () => {
+              const success = await deleteHandler(String(props.lead_id));
+              if (success) {
+                // If viewing the detail page of the deleted lead, navigate back to list
+                if (location.pathname === `/pro/responses/${props.lead_id}`) {
+                  navigate("/pro/responses", { replace: true });
+                }
+                props.onCancel();
+              }
             }}
             type="button"
             centerClassName="flex justify-center dark:text-white"

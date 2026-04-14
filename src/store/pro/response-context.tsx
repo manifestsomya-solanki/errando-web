@@ -25,6 +25,8 @@ type LeadsResponseType = {
   /** false = all purchased responses, true = closed-only responses */
   showClosedLeads: boolean;
   setShowClosedLeads: (closed: boolean) => void;
+  deleteHandler: (key: string) => Promise<boolean>;
+  isDeleteLoading: boolean;
 
   setPage: React.Dispatch<React.SetStateAction<number>>;
 };
@@ -66,6 +68,11 @@ export const LeadResponseContext = createContext<LeadsResponseType>({
   setShowClosedLeads: () => {
     console.log();
   },
+  deleteHandler: async (key: string) => {
+    console.log(key);
+    return false;
+  },
+  isDeleteLoading: false,
 });
 
 const LeadsResponseProvider = (props: { children: React.ReactNode }) => {
@@ -120,11 +127,11 @@ const LeadsResponseProvider = (props: { children: React.ReactNode }) => {
   };
   const dummy_data: UserResponseList[] = [];
   let datarender: UserResponseList[] = [];
-  const { data, isLoading: isRequestLoading } = useSWR(url, fetcher);
+  const [isQuoteLoading, setIsQuoteLoading] = useState(false);
+  const [isDeleteLoading, setIsDeleteLoading] = useState(false);
+  const { data, isLoading: isRequestLoading, mutate } = useSWR(url, fetcher);
   datarender = data?.data || dummy_data;
   const total = datarender?.filter((item) => item?.is_outright).length;
-
-  const [isQuoteLoading, setIsQuoteLoading] = useState(false);
 
   const sendQuote = async (formData: FormData) => {
     const token = localStorage.getItem("token");
@@ -258,6 +265,36 @@ const LeadsResponseProvider = (props: { children: React.ReactNode }) => {
     }
   };
 
+  const deleteHandler = async (id: string) => {
+    setIsDeleteLoading(true);
+    setError("");
+    const token = localStorage.getItem("token");
+
+    const res = await fetch(
+      buildApiUrl(`${API_ENDPOINTS.USER_REQUESTS_LEAD_DELETE}/${id}`),
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    const resData = await res.json();
+
+    if (res.status === 200 && resData.status === "1") {
+      setIsDeleteLoading(false);
+      toast.success("Lead deleted successfully");
+      await mutate();
+      return true;
+    } else {
+      setIsDeleteLoading(false);
+      setError(resData.message || "Failed to delete lead");
+      toast.error(resData.message || "Failed to delete lead");
+      return false;
+    }
+  };
+
   return (
     <LeadResponseContext.Provider
       value={{
@@ -278,6 +315,8 @@ const LeadsResponseProvider = (props: { children: React.ReactNode }) => {
         setPage: setCurrentPage,
         showClosedLeads,
         setShowClosedLeads,
+        deleteHandler,
+        isDeleteLoading,
       }}
     >
       {props.children}

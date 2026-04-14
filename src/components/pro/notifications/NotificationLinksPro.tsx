@@ -3,8 +3,8 @@ import Heading from "../../UI/Heading";
 
 function NotificationLinksPro() {
   return (
-    <div className="w-full items-center flex justify-center">
-      <div className=" grid grid-cols-2 md:py-10 xs:py-5 xs:w-full md:w-5/6 lg:w-[55%]  xs:gap-2 lg:gap-0">
+    <div className="w-full max-w-4xl mx-auto px-5">
+      <div className="grid grid-cols-2 md:py-10 xs:py-5 w-full xs:gap-2 lg:gap-0">
         <div className="w-full">
           <NavLink
             className="hover:text-primaryBlue  flex  w-fit "

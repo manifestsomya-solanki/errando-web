@@ -11,8 +11,8 @@ function NotificationSettingPro(props: {
   const userId = JSON.parse(localStorage.getItem("data") ?? "").id;
   const { edit } = useNotification();
   return (
-    <div className="w-full items-center flex justify-center ">
-      <div className="bg-white py-2 lg:px-16 sm:px-10 flex flex-col dark:bg-dimGray xl:w-3/5 xs:w-full dark:text-white">
+    <div className="w-full max-w-4xl mx-auto px-5">
+      <div className="bg-white py-2 flex flex-col dark:bg-dimGray w-full dark:text-white">
         <div className="border-b-2">
           <div className="flex flex-row justify-between pb-2">
             <div>{props.question}</div>

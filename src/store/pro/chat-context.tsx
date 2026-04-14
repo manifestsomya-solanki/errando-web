@@ -40,7 +40,7 @@ const ChatContextProvider = (props: { children: React.ReactNode }) => {
   const DeleteChat = async (user_id: number) => {
     const token = localStorage.getItem("token") ?? "{}";
     const res = await fetch(
-      buildApiUrl(`${API_ENDPOINTS.CHAT_DELETE}/${user_id}`),
+      buildApiUrl(`${API_ENDPOINTS.CHAT_DELETE}/${user_id}/delete`),
       {
         method: "DELETE",
         headers: {

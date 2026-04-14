@@ -270,78 +270,66 @@ const InvoicePro = () => {
     // BILLING INFO SECTION
     // ════════════════════════════════════════════
 
-    let billingY = 58;
+    const billingHeaderY = 58;
 
-    // "Billed To" header
+    // "Billed To" / "Date Issued" / "Invoice Number" headers (row 1)
     doc.setFont("helvetica", "bold");
     doc.setFontSize(10);
     doc.setTextColor(40, 40, 40);
-    doc.text("Billed To", leftMargin, billingY);
+    doc.text("Billed To", leftMargin, billingHeaderY);
 
-    // "Date Issued" header
     const dateLabelX = 90;
-    doc.text("Date Issued", dateLabelX, billingY);
+    doc.text("Date Issued", dateLabelX, billingHeaderY);
 
-    // "Invoice Number" header
     const invoiceNumLabelX = 145;
-    doc.text("Invoice Number", invoiceNumLabelX, billingY);
+    doc.text("Invoice Number", invoiceNumLabelX, billingHeaderY);
 
-    billingY += 6;
-
-    // Billed To details
+    // Values (row 2)
+    const billingFirstLineY = billingHeaderY + 6;
     doc.setFont("helvetica", "normal");
     doc.setFontSize(9);
     doc.setTextColor(60, 60, 60);
 
     const billedToName = invoice.billed_to_name || invoice.business_name || "-";
-    const billedToAddress = invoice.billed_to_address || "";
     const billedToCity = invoice.billed_to_city || "";
     const billedToPostcode = invoice.billed_to_postcode || "";
 
-    doc.text(billedToName, leftMargin, billingY);
+    doc.text(billedToName, leftMargin, billingFirstLineY);
+    doc.text(formatDatePDF(invoice), dateLabelX, billingFirstLineY);
+    doc.text(invoice.invoice_number || "-", invoiceNumLabelX, billingFirstLineY);
 
-    // Date Issued value
-    doc.text(formatDatePDF(invoice), dateLabelX, billingY);
-
-    // Invoice Number value
-    doc.text(invoice.invoice_number || "-", invoiceNumLabelX, billingY);
-
-    billingY += 5;
-
-    if (billedToAddress) {
-      doc.text(billedToAddress, leftMargin, billingY);
-      billingY += 5;
-    }
+    // Payment Method (dedicated rows, so it never overlaps Date Issued)
+    const paymentHeaderY = billingFirstLineY + 6;
+    const paymentValueY = paymentHeaderY + 5;
 
     doc.setFont("helvetica", "bold");
     doc.setFontSize(10);
     doc.setTextColor(40, 40, 40);
-    doc.text("Payment Method", dateLabelX, billingY - 5);
+    doc.text("Payment Method", dateLabelX, paymentHeaderY);
 
     doc.setFont("helvetica", "normal");
     doc.setFontSize(9);
     doc.setTextColor(60, 60, 60);
-    doc.text(
-      invoice.payment_method || "Visa ****0478",
-      dateLabelX,
-      billingY
-    );
+    doc.text(invoice.payment_method || "Visa ****0478", dateLabelX, paymentValueY);
 
+    // Billed To left details (city/postcode)
+    let billedToLeftY = billingFirstLineY + 5;
     if (billedToCity) {
-      doc.text(billedToCity, leftMargin, billingY);
-      billingY += 5;
+      doc.text(billedToCity, leftMargin, billedToLeftY);
+      billedToLeftY += 5;
+    }
+    if (billedToPostcode) {
+      doc.text(billedToPostcode, leftMargin, billedToLeftY);
+      billedToLeftY += 5;
     }
 
-    if (billedToPostcode) {
-      doc.text(billedToPostcode, leftMargin, billingY);
-      billingY += 5;
-    }
+    const billingBottomY = Math.max(billedToLeftY, paymentValueY);
 
     // ════════════════════════════════════════════
     // LINE ITEMS TABLE
     // ════════════════════════════════════════════
 
-    let tableY = billingY + 10;
+    let tableY = billingBottomY + 10;
 
     // Horizontal line above header
     doc.setDrawColor(200, 200, 200);
