@@ -3,7 +3,7 @@ import Close from "../../assets/close.tsx";
 
 import Label from "../../components/UI/Label";
 import Button from "../../components/UI/Button";
-import { Formik, FormikErrors } from "formik";
+import { Formik, FormikErrors, FormikProps } from "formik";
 import Error from "../../components/UI/Error";
 import Heading from "../../components/UI/Heading";
 import { AddBusinessService, ServiceData } from "../../models/pro/business";
@@ -19,6 +19,34 @@ import { BusinessData } from "../../models/home.ts";
 import { useEffect, useState } from "react";
 import { useService } from "../../store/pro/service-context.tsx";
 import { API_BASE_URL, buildApiUrl, API_ENDPOINTS } from "../../config/api";
+
+function LiveServiceVisibilityGuard({
+  formik,
+  serviceOptions,
+}: {
+  formik: FormikProps<AddBusinessService>;
+  serviceOptions: { value: number; label: string }[];
+}) {
+  useEffect(() => {
+    const selectedServiceId = Number(formik.values.service_id);
+    const selectedServiceStillPublic =
+      selectedServiceId > 0 &&
+      serviceOptions.some((service) => service.value === selectedServiceId);
+    const isSelectedServiceNoLongerPublic =
+      selectedServiceId > 0 && !selectedServiceStillPublic;
+
+    if (!isSelectedServiceNoLongerPublic) return;
+
+    formik.setFieldValue("service_id", 0, false);
+    formik.setFieldTouched("service_id", true, false);
+    formik.setFieldError(
+      "service_id",
+      "This service is no longer public and cannot be selected."
+    );
+  }, [formik, serviceOptions]);
+
+  return null;
+}
 
 function AddServiceModal({
   onCancel,
@@ -36,10 +64,17 @@ function AddServiceModal({
     setError,
   } = useBusiness();
   //handling service dropdown
-  const url = buildApiUrl(API_ENDPOINTS.SERVICES);
+  const url = buildApiUrl(`${API_ENDPOINTS.SERVICES}?for_pro=1`);
   const dummy_data: ServiceData[] = [];
   let datarender: ServiceData[] = [];
-  const { data: dataa, isLoading: isServiceLoading, mutate: mutateServices } = useSWR(url, fetcher);
+  const {
+    data: dataa,
+    isLoading: isServiceLoading,
+    mutate: mutateServices,
+  } = useSWR(url, fetcher, {
+    refreshInterval: 3000,
+    revalidateOnFocus: true,
+  });
   datarender = dataa?.data || dummy_data;
   
   // Refresh services list when modal opens to get latest services
@@ -85,7 +120,8 @@ function AddServiceModal({
       errors.user_business_id = "Please include a valid  Business";
     }
     if (!values.service_id) {
-      errors.service_id = "Please include a valid  Service";
+      errors.service_id =
+        "Please change the service. Your selected service is not available.";
     }
     if (values.postcode.length === 0) {
       errors.postcode = "Please include a valid  location";
@@ -167,6 +203,10 @@ function AddServiceModal({
               onSubmit={props.handleSubmit}
               className=" w-full overflow-y-scroll h-[25rem] "
             >
+              <LiveServiceVisibilityGuard
+                formik={props}
+                serviceOptions={service_name}
+              />
               <div className="py-3">
                 <Label required label="Choose Business" />
                 <DropdownCompoenet
@@ -205,6 +245,7 @@ function AddServiceModal({
                   }
                   onChange={(newValue) => {
                     props.setFieldValue("service_id", newValue.value);
+                    props.setFieldError("service_id", undefined);
                   }}
                 />
                 {props?.touched?.service_id && props?.errors?.service_id ? (

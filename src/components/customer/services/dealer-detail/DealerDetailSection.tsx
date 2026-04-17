@@ -1,4 +1,5 @@
 import Heading from "../../../UI/Heading";
+import { HalfStarCut } from "../../../UI/HalfStarCut";
 import GoldStar from "../../../../assets/GoldStar.svg";
 import Star from "../../../../assets/Star.svg";
 import Button from "../../../UI/Button";
@@ -26,6 +27,10 @@ import useSWR, { KeyedMutator } from "swr";
 import { fetcher } from "../../../../store/customer/home-context";
 import { UserData } from "../../../../models/user";
 import { API_BASE_URL, buildApiUrl, API_ENDPOINTS } from "../../../../config/api";
+import {
+  formatProAggregateRatingLabel,
+  getProAggregateStarLayoutFromRaw,
+} from "../../../../utils/proReviewAggregateDisplay";
 
 function DangerousHTML({
   dangerouslySetInnerHTML,
@@ -41,29 +46,6 @@ function DangerousHTML({
   );
 }
 
-const normalizeRating = (rating: number): number => {
-  if (!Number.isFinite(rating)) return 0;
-  return Math.min(5, Math.max(0, rating));
-};
-
-// Rating count text should be integer only: 1,2,3,4,5
-const getDisplayCount = (rating: number): number => {
-  const safe = normalizeRating(rating);
-  return Math.round(safe);
-};
-
-// Stars should follow normal half-step rounding.
-const getStarDisplay = (
-  rating: number
-): { fullStars: number; hasHalfStar: boolean; emptyStars: number } => {
-  const safe = normalizeRating(rating);
-  const roundedToHalf = Math.round(safe * 2) / 2;
-  const fullStars = Math.floor(roundedToHalf);
-  const hasHalfStar = roundedToHalf - fullStars === 0.5;
-  const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
-  return { fullStars, hasHalfStar, emptyStars };
-};
-
 function DealerDetailSection(props: {
   userBusinessId?: number;
   businessName: string;
@@ -71,7 +53,7 @@ function DealerDetailSection(props: {
   title: string;
   subTitle: string;
   description: string;
-  location: number;
+  location: number | string | null;
   ratingCount: number;
   reviewsCount?: number;
   quote: number | string;
@@ -180,6 +162,16 @@ function DealerDetailSection(props: {
   };
 
   const subServices = props.subTitle?.split(",") ?? [];
+  const distanceNumber =
+    props.location !== null &&
+    props.location !== undefined &&
+    props.location !== ""
+      ? Number(props.location)
+      : null;
+  const formattedDistance =
+    distanceNumber !== null && Number.isFinite(distanceNumber)
+      ? `${distanceNumber.toFixed(1)} Miles away`
+      : "0.0 Miles away";
   return (
     <>
       <div className="border-b-[0.5px] border-b-slate-300 lg:py-10 xs:py-5 ">
@@ -221,36 +213,22 @@ function DealerDetailSection(props: {
 
           <div className="lg:my-3 xs:my-2 flex gap-1 text-gray-500 !font-normal tracking-wide !text-xs ">
             {(() => {
-              const { fullStars, hasHalfStar, emptyStars } = getStarDisplay(
-                props.ratingCount
-              );
-              const displayCount = getDisplayCount(props.ratingCount);
+              const raw = Number(props.ratingCount ?? 0);
+              const { fullStars, hasHalfStar, emptyStars } =
+                getProAggregateStarLayoutFromRaw(raw);
+              const displayText = formatProAggregateRatingLabel(raw);
 
               return (
                 <>
                   {Array.from({ length: fullStars }, (_, i) => (
                     <img key={`gold-${i}`} src={GoldStar} alt="Full star" />
                   ))}
-                  {hasHalfStar && (
-                    <div className="relative inline-block w-4 h-4">
-                      <img
-                        src={Star}
-                        alt="Empty star"
-                        className="absolute inset-0 w-4 h-4"
-                      />
-                      <div
-                        className="absolute inset-0 overflow-hidden"
-                        style={{ width: "50%" }}
-                      >
-                        <img src={GoldStar} alt="Half star" className="w-4 h-4" />
-                      </div>
-                    </div>
-                  )}
+                  {hasHalfStar && <HalfStarCut />}
                   {Array.from({ length: emptyStars }, (_, i) => (
                     <img key={`empty-${i}`} src={Star} alt="Empty star" />
                   ))}
                   <Heading
-                    text={`${displayCount} of 5 / ${props.reviewsCount ?? 0}`}
+                    text={`${displayText} of 5 / ${props.reviewsCount ?? 0}`}
                     variant="subHeader"
                     headingclassname="text-gray-500 !font-normal tracking-wide !text-xs mx-2 dark:text-darktextColor"
                   />
@@ -344,7 +322,7 @@ function DealerDetailSection(props: {
                   <div children={<LocationIcon color="white" />} />
                 )}
                 <Heading
-                  text={`${props.location ? Math.round(parseFloat(props.location.toString())) : 0} miles away`}
+                  text={formattedDistance}
                   variant="subHeader"
                   headingclassname="text-primaryYellow !font-semibold tracking-wide lg:text-xs text-md "
                 />

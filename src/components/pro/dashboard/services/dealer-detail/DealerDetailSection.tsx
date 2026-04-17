@@ -4,7 +4,6 @@ import Star from "../../../../../assets/Star.svg";
 import Button from "../../../../UI/Button";
 import NoImage from "../../../../../assets/no-photo.png";
 
-import { useTheme } from "../../../../../store/theme-context";
 import editicon from "../../../../../assets/edit-2-svgrepo-com.svg";
 import HomeCard from "../../home/HomeCard";
 import DealerDetailSkeleton from "../../../skeleton/Dealer/DealerDetailSkeleton";
@@ -12,29 +11,11 @@ import { Service } from "../../../../../models/home";
 import { useState } from "react";
 import EditNameDescriptionModal from "../../../../../layout/pro-models/EditNameDescriptionModalt";
 import "./check.css"; // Replace with your CSS file path
-
-const normalizeRating = (rating: number): number => {
-  if (!Number.isFinite(rating)) return 0;
-  return Math.min(5, Math.max(0, rating));
-};
-
-// Rating count text should be integer only: 1,2,3,4,5
-const getDisplayCount = (rating: number): number => {
-  const safe = normalizeRating(rating);
-  return Math.round(safe);
-};
-
-// Stars should follow normal half-step rounding.
-const getStarDisplay = (
-  rating: number
-): { fullStars: number; hasHalfStar: boolean; emptyStars: number } => {
-  const safe = normalizeRating(rating);
-  const roundedToHalf = Math.round(safe * 2) / 2;
-  const fullStars = Math.floor(roundedToHalf);
-  const hasHalfStar = roundedToHalf - fullStars === 0.5;
-  const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
-  return { fullStars, hasHalfStar, emptyStars };
-};
+import {
+  formatProAggregateRatingLabel,
+  getProAggregateStarLayoutFromRaw,
+} from "../../../../../utils/proReviewAggregateDisplay";
+import { HalfStarCut } from "../../../../UI/HalfStarCut";
 
 export function DangerousHTML({
   dangerouslySetInnerHTML,
@@ -60,6 +41,10 @@ function DealerDetailSection(props: {
 }) {
   const isLoading = false;
   const [show, setShow] = useState(false);
+  const rawRating = Number(props.ratingCount ?? 0);
+  const ratingLabel = formatProAggregateRatingLabel(rawRating);
+  const { fullStars, hasHalfStar, emptyStars } =
+    getProAggregateStarLayoutFromRaw(rawRating);
   const disableEmailsAndLinks = (text: any) => {
     const emailRegex = /\S+@\S+\.\S+/g;
     const urlRegex = /(?:https?|ftp):\/\/[\n\S]+|www\.[\S]+\.[a-z]+/g;
@@ -117,35 +102,19 @@ function DealerDetailSection(props: {
                 headingclassname="text-textColor !font-bold tracking-wide !text-lg dark:text-darktextColor"
               />
 
-              <div className="lg:my-2 xs:my-2 flex gap-1 text-gray-500 !font-normal tracking-wide !text-xs items-center">
-                {(() => {
-                  const { fullStars, hasHalfStar, emptyStars } = getStarDisplay(props.ratingCount);
-                  const displayCount = getDisplayCount(props.ratingCount);
-                  
-                  return (
-                    <>
-                      {Array.from({ length: fullStars }, (_, i) => (
-                        <img key={`gold-${i}`} src={GoldStar} alt="Full star" className="w-4 h-4" />
-                      ))}
-                      {hasHalfStar && (
-                        <div className="relative inline-block w-4 h-4">
-                          <img src={Star} alt="Empty star" className="absolute inset-0 w-4 h-4" />
-                          <div className="absolute inset-0 overflow-hidden" style={{ width: '50%' }}>
-                            <img src={GoldStar} alt="Half star" className="w-4 h-4" />
-                          </div>
-                        </div>
-                      )}
-                      {Array.from({ length: emptyStars }, (_, i) => (
-                        <img key={`empty-${i}`} src={Star} alt="Empty star" className="w-4 h-4" />
-                      ))}
-                      <Heading
-                        text={`${displayCount} of 5 / ${props.reviewsCount ?? 0}`}
-                        variant="subHeader"
-                        headingclassname="text-gray-500 !font-normal tracking-wide !text-xs mx-1 dark:text-darktextColor"
-                      />
-                    </>
-                  );
-                })()}
+              <div className="lg:my-2 xs:my-2 flex gap-1 text-gray-500 !font-normal tracking-wide !text-xs items-center flex-wrap">
+                {Array.from({ length: fullStars }, (_, i) => (
+                  <img key={`gold-${i}`} src={GoldStar} alt="Full star" className="w-4 h-4" />
+                ))}
+                {hasHalfStar && <HalfStarCut />}
+                {Array.from({ length: emptyStars }, (_, i) => (
+                  <img key={`empty-${i}`} src={Star} alt="Empty star" className="w-4 h-4" />
+                ))}
+                <Heading
+                  text={`${ratingLabel} of 5 / ${props.reviewsCount ?? 0}`}
+                  variant="subHeader"
+                  headingclassname="text-gray-500 !font-normal tracking-wide !text-xs mx-1 dark:text-darktextColor"
+                />
               </div>
               <div className="lg:mt-3 xs:mt-10 lg:flex xs:flex xs:flex-wrap gap-2 ">
                 {props.services.map((item, key) => {

@@ -61,7 +61,9 @@ function getTimeDifferenceString(time: any) {
 function MyResponses() {
   const navigate = useNavigate();
   const leadsId = useParams();
-  const dealerdetailurl = buildApiUrl(`${API_ENDPOINTS.USER_REQUESTS_DETAIL}/${leadsId.id}/detail`);
+  const dealerdetailurl = buildApiUrl(
+    `${API_ENDPOINTS.USER_REQUESTS_DETAIL}/${leadsId.id}/detail?with_leads=1`
+  );
   const {
     data: leadsDetailData,
     isLoading,

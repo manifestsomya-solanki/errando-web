@@ -18,6 +18,9 @@ const SignUpCustomer = () => {
       name: "",
       email: "",
       mobile_number: "",
+      password: "",
+      confirmPassword: "",
+      agree: false,
     },
     validate: (values) => {
       const errors: any = {};
@@ -30,6 +33,20 @@ const SignUpCustomer = () => {
       if (values.mobile_number.length === 0) {
         errors.mobile_number = "Please include a mobile number.";
       }
+      if (!values.password) {
+        errors.password = "Please include a password.";
+      } else if (values.password.length < 6) {
+        errors.password = "Password must be at least 6 characters.";
+      }
+      if (!values.confirmPassword) {
+        errors.confirmPassword = "Please confirm your password.";
+      }
+      if (values.password && values.confirmPassword && values.password !== values.confirmPassword) {
+        errors.confirmPassword = "Both the passwords do not match.";
+      }
+      if (!values.agree) {
+        errors.agree = "You must agree to the Terms & Conditions.";
+      }
 
       return errors;
     },
@@ -38,6 +55,7 @@ const SignUpCustomer = () => {
       formData.set("full_name", values.name);
       formData.set("email", values.email);
       formData.set("mobile_number", values.mobile_number);
+      formData.set("password", values.password);
       console.log(...formData);
       sendOtp(formData);
 
@@ -128,9 +146,79 @@ const SignUpCustomer = () => {
                     ) : null}
                   </div>
                 </div>
+                <div className="w-full flex flex-col ">
+                  <div className="mt-2 lg:px-10 xs:px-0 w-full">
+                    <Input
+                      className="rounded-lg bg-white dark:bg-black  dark:text-darktextColor  shadow-md xs:w-full outline-none pl-3 "
+                      type="password"
+                      placeholder="Password"
+                      id="password"
+                      name="password"
+                      onChange={formik.handleChange}
+                      value={formik.values.password}
+                    />
+                    {formik.touched.password && formik.errors.password ? (
+                      <Error error={formik.errors.password} className="my-1" />
+                    ) : null}
+                  </div>
+                  <div className="mt-2 lg:px-10 xs:px-0 w-full">
+                    <Input
+                      className="rounded-lg bg-white dark:bg-black  dark:text-darktextColor  shadow-md xs:w-full outline-none pl-3 "
+                      type="password"
+                      placeholder="Confirm Password"
+                      id="confirmPassword"
+                      name="confirmPassword"
+                      onChange={formik.handleChange}
+                      value={formik.values.confirmPassword}
+                    />
+                    {formik.touched.confirmPassword &&
+                    formik.errors.confirmPassword ? (
+                      <Error
+                        error={formik.errors.confirmPassword}
+                        className="my-1"
+                      />
+                    ) : null}
+                  </div>
+                </div>
+                <div className="mt-2 lg:px-10 xs:px-0 w-full flex items-center gap-3 justify-start">
+                  <input
+                    type="checkbox"
+                    className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                    id="agree"
+                    name="agree"
+                    onChange={formik.handleChange}
+                    checked={formik.values.agree}
+                  />
+                  <label className="flex gap-1 items-center" htmlFor="agree">
+                    <Heading
+                      variant="smallTitle"
+                      text="I agree to the"
+                      headingclassname="!font-medium !font-poppins-bold tracking-wide dark:text-darktextColor "
+                    />
+                    <a
+                      href="/terms-and-conditions"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-black dark:text-white hover:opacity-80 cursor-pointer"
+                    >
+                      <Heading
+                        variant="smallTitle"
+                        text="Terms & Conditions"
+                        headingclassname="!font-bold !font-poppins-bold tracking-wide"
+                      />
+                    </a>
+                  </label>
+                </div>
+                {formik.touched.agree && formik.errors.agree ? (
+                  <Error
+                    error={formik.errors.agree}
+                    className="text-center my-2"
+                  />
+                ) : null}
                 <div className=" mt-4 lg:px-10 xs:px-0 w-full">
                   <Button
                     loading={isLoading && !openModal ? true : false}
+                    disabled={!formik.values.agree}
                     type="submit"
                     centerClassName="flex justify-center items-center"
                     buttonClassName="bg-primaryBlue !font-bold !font-poppins-bold text-white xl:h-12 lg:h-10 xs:h-10 hover:bg-primaryBlue/80 hover:text-white dark:border-primaryBlue w-full rounded-xl"

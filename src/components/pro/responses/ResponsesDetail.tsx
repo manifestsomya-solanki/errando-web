@@ -12,7 +12,9 @@ import { buildApiUrl, API_ENDPOINTS } from "../../../config/api";
 
 function ResponsesDetail() {
   const leadsId = useParams();
-  const dealerdetailurl = buildApiUrl(`${API_ENDPOINTS.USER_REQUESTS_DETAIL}/${leadsId.id}/detail`);
+  const dealerdetailurl = buildApiUrl(
+    `${API_ENDPOINTS.USER_REQUESTS_DETAIL}/${leadsId.id}/detail?with_leads=1`
+  );
   const { data: leadsDetailData, isLoading, error: apiError } = useSWR(leadsId?.id ? dealerdetailurl : null, fetcher);
   const leadsDetail: UserRequestList = leadsDetailData?.data;
 

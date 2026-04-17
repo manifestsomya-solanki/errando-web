@@ -14,6 +14,9 @@ import { useAuth } from "../../../store/pro/auth-pro-context";
 import { buildApiUrl, API_ENDPOINTS } from "../../../config/api";
 import { getLeadPurchaseSlotCount } from "../../../utils/leadSlots";
 import "../dashboard/services/dealer-detail/check.css";
+import { useState } from "react";
+
+const PENDING_LEAD_PURCHASE_KEY = "pending_lead_purchase";
 
 function DangerousHTML({
   dangerouslySetInnerHTML,
@@ -31,7 +34,9 @@ function DangerousHTML({
 
 function LeadDetails() {
   const leadsId = useParams();
-  const dealerdetailurl = buildApiUrl(`${API_ENDPOINTS.USER_REQUESTS_DETAIL}/${leadsId.id}/detail`);
+  const dealerdetailurl = buildApiUrl(
+    `${API_ENDPOINTS.USER_REQUESTS_DETAIL}/${leadsId.id}/detail?for_pro=1`
+  );
   const { data: leadsDetailData, isLoading, error: apiError } = useSWR(
     leadsId?.id ? dealerdetailurl : null,
     fetcher
@@ -52,6 +57,18 @@ function LeadDetails() {
 
   const navigate = useNavigate();
   const purchasedSlots = getLeadPurchaseSlotCount(leadsDetail);
+  const availableCredits = Number(userData?.available_credits ?? 0);
+  const leadCreditsRequired = Number(leadsDetail?.calculated_base_credits ?? 3);
+  const outrightCreditsRequired = Number(
+    leadsDetail?.calculated_outright_credits ?? 6
+  );
+  const [insufficientMessage, setInsufficientMessage] = useState<string>("");
+  const hasInsufficientForLead = availableCredits < leadCreditsRequired;
+  const hasInsufficientForOutright = availableCredits < outrightCreditsRequired;
+  const leadBlockedBySlots = (leadsDetail?.leads_count ?? 0) >= 4;
+  const outrightBlockedBySlots = purchasedSlots > 0;
+  const insufficientButtonClass =
+    "!bg-gray-300 !border-gray-300 !text-slate-500 !cursor-not-allowed hover:!bg-gray-300";
 
   const disableEmailsAndLinks = (text: any) => {
     if (!text || typeof text !== 'string') {
@@ -84,15 +101,60 @@ function LeadDetails() {
   };
 
   const handleBuy = async (type: string) => {
+    setInsufficientMessage("");
+    if (type === "lead" && hasInsufficientForLead) {
+      localStorage.setItem(
+        PENDING_LEAD_PURCHASE_KEY,
+        JSON.stringify({
+          user_request_id: leadsId?.id ?? "",
+          purchase_type: "lead",
+          lead_credits_required: leadCreditsRequired,
+          created_at: Date.now(),
+        })
+      );
+      setInsufficientMessage(
+        `Insufficient credits. You need ${leadCreditsRequired} credits, but you only have ${availableCredits}.`
+      );
+      navigate("/pro/settings/credits");
+      return;
+    }
+    if (type === "outright" && hasInsufficientForOutright) {
+      localStorage.setItem(
+        PENDING_LEAD_PURCHASE_KEY,
+        JSON.stringify({
+          user_request_id: leadsId?.id ?? "",
+          purchase_type: "outright",
+          outright_credits_required: outrightCreditsRequired,
+          created_at: Date.now(),
+        })
+      );
+      setInsufficientMessage(
+        `Insufficient credits. You need ${outrightCreditsRequired} credits, but you only have ${availableCredits}.`
+      );
+      navigate("/pro/settings/credits");
+      return;
+    }
+
     const formData = new FormData();
     formData.append("user_request_id", leadsId?.id ?? "");
     formData.set("for_pro", "1");
+    let result = { success: false, code: "", message: "" };
     if (type === "outright") {
       formData.set("is_outright", "1");
-      await buyLead(formData, "outright");
+      result = await buyLead(formData, "outright");
     } else {
       formData.set("is_outright", "0");
-      await buyLead(formData, "lead");
+      result = await buyLead(formData, "lead");
+    }
+
+    if (!result.success) {
+      if (result.code === "INSUFFICIENT_CREDITS") {
+        setInsufficientMessage(
+          result.message ||
+            "Insufficient credits. Please buy credits to continue."
+        );
+      }
+      return;
     }
 
     await mutate();
@@ -194,14 +256,15 @@ function LeadDetails() {
               />
               <Button
                 disabled={
-                  (leadsDetail?.leads_count ?? 0) >= 4 ||
-                  (userData?.available_credits ?? 0) == 0
+                  leadBlockedBySlots
                 }
                 variant="filled"
                 color="primary"
                 size="normal"
                 children="Buy Leads"
-                buttonClassName="!px-4 py-2 text-sm tracking-wide  disabled:text-white"
+                buttonClassName={`!px-4 py-2 text-sm tracking-wide disabled:text-white ${
+                  hasInsufficientForLead ? insufficientButtonClass : ""
+                }`}
                 onClick={() => handleBuy("lead")}
                 loading={isBuyLeadLoading}
               />
@@ -216,14 +279,17 @@ function LeadDetails() {
                 />
                 <Button
                   disabled={
-                    purchasedSlots > 0 ||
-                    (userData?.available_credits ?? 0) == 0
+                    outrightBlockedBySlots
                   }
                   variant="filled"
                   color="primary"
                   size="normal"
                   children="Buy Outright"
-                  buttonClassName="!px-4 py-2 text-sm tracking-wide disabled:text-white"
+                  buttonClassName={`!px-4 py-2 text-sm tracking-wide disabled:text-white ${
+                    hasInsufficientForOutright
+                      ? insufficientButtonClass
+                      : ""
+                  }`}
                   onClick={() => handleBuy("outright")}
                   loading={isBuyOutrightLoading}
                 />
@@ -242,6 +308,23 @@ function LeadDetails() {
               </div>
             )}
           </div>
+          {insufficientMessage && (
+            <div className="pb-3 flex items-center gap-3">
+              <Heading
+                text={insufficientMessage}
+                variant="subHeader"
+                headingclassname="!font-normal !text-sm text-red-500 tracking-wide dark:text-red-400"
+              />
+              <Button
+                variant="filled"
+                color="primary"
+                size="normal"
+                children="Buy Credits"
+                buttonClassName="!px-4 py-2 text-sm tracking-wide"
+                onClick={() => navigate("/pro/settings/credits")}
+              />
+            </div>
+          )}
         </HomeCard>
       )}
     </div>

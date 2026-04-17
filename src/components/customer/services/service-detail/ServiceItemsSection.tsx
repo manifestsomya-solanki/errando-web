@@ -42,11 +42,7 @@ function ServiceItemsSection(props: {
                 title={item?.name}
                 subTitle={item?.services}
                 description={item?.description}
-                location={
-                  item?.business_postcode?.distance
-                    ? Math.round(+item?.business_postcode?.distance)
-                    : 0
-                }
+                location={item?.business_postcode?.distance ?? null}
                 ratingCount={item?.reviews_avg_rating}
                 reviewsCount={item?.reviews_count ?? 0}
                 isInterested={item?.is_interest}

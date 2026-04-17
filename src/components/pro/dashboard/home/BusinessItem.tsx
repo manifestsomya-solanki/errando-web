@@ -12,6 +12,11 @@ import React, { Suspense, useState } from "react";
 import { NavLink } from "react-router-dom";
 const EditBusinessModal = React.lazy(() => import("../../../../layout/pro-models/EditBusinessLayout"));
 import DeleteBusinessModal from "../../../../layout/pro-models/DeleteBusinessModal";
+import {
+  formatProAggregateRatingLabel,
+  getProAggregateStarLayoutFromRaw,
+} from "../../../../utils/proReviewAggregateDisplay";
+import { HalfStarCut } from "../../../UI/HalfStarCut";
 
 function DangerousHTML({
   dangerouslySetInnerHTML,
@@ -40,6 +45,10 @@ function BusinessItem(props: {
   const [show, setShow] = useState(false);
   const [openModal, setOpenModal] = useState(false);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
+  const rawRating = Number(props.ratingCount ?? 0);
+  const ratingLabel = formatProAggregateRatingLabel(rawRating);
+  const { fullStars, hasHalfStar, emptyStars } =
+    getProAggregateStarLayoutFromRaw(rawRating);
 
   const disableEmailsAndLinks = (text: any) => {
     const emailRegex = /\S+@\S+\.\S+/g;
@@ -188,15 +197,26 @@ function BusinessItem(props: {
             </div>
           </div>
           <div>
-            <div className=" flex gap-1 text-gray-500 !font-normal tracking-wide !text-xs dark:text-darktextColor">
-              {Array.from({ length: props.ratingCount }, () => (
-                <img src={GoldStar} />
+            <div className=" flex gap-1 text-gray-500 !font-normal tracking-wide !text-xs dark:text-darktextColor items-center flex-wrap">
+              {Array.from({ length: fullStars }, (_, index) => (
+                <img
+                  key={`gold-${index}`}
+                  src={GoldStar}
+                  alt=""
+                  className="w-4 h-4 shrink-0"
+                />
               ))}
-              {Array.from({ length: 5 - props.ratingCount }, () => (
-                <img src={Star} />
+              {hasHalfStar && <HalfStarCut />}
+              {Array.from({ length: emptyStars }, (_, index) => (
+                <img
+                  key={`empty-${index}`}
+                  src={Star}
+                  alt=""
+                  className="w-4 h-4 shrink-0"
+                />
               ))}
               <Heading
-                text={`${props.ratingCount ?? 0} of 5 / ` + props.review_count}
+                text={`${ratingLabel} of 5 / ` + props.review_count}
                 variant="subHeader"
                 headingclassname="text-gray-500 !font-normal tracking-wide !text-xs mx-2 dark:text-slate-400"
               />

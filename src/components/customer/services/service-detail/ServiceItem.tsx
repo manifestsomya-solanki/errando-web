@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import Heading from "../../../UI/Heading";
+import { HalfStarCut } from "../../../UI/HalfStarCut";
 import GoldStar from "../../../../assets/GoldStar.svg";
 import Star from "../../../../assets/Star.svg";
 import Button from "../../../UI/Button";
@@ -28,6 +29,35 @@ import { fetcher } from "../../../../store/customer/home-context";
 import { UserData } from "../../../../models/user";
 import { buildApiUrl, API_ENDPOINTS } from "../../../../config/api";
 import MailIcon from "../../../../assets/MailIcon";
+
+const normalizeRating = (rating: number): number => {
+  if (!Number.isFinite(rating)) return 0;
+  return Math.min(5, Math.max(0, rating));
+};
+
+const getDisplayRatingText = (rating: number): string => {
+  const safe = normalizeRating(rating);
+  if (safe >= 4.91 && safe <= 4.99) return "5.0";
+  if (safe >= 4.81 && safe <= 4.9) return "4.9";
+  return (Math.round(safe * 10) / 10).toFixed(1);
+};
+
+const getStarDisplay = (
+  rating: number
+): { fullStars: number; hasHalfStar: boolean; emptyStars: number } => {
+  const safe = normalizeRating(rating);
+  if (safe >= 4.5 && safe <= 5) {
+    return { fullStars: 5, hasHalfStar: false, emptyStars: 0 };
+  }
+  if (safe >= 4 && safe < 4.5) {
+    return { fullStars: 4, hasHalfStar: false, emptyStars: 1 };
+  }
+  const roundedToHalf = Math.round(safe * 2) / 2;
+  const fullStars = Math.floor(roundedToHalf);
+  const hasHalfStar = roundedToHalf - fullStars === 0.5;
+  const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+  return { fullStars, hasHalfStar, emptyStars };
+};
 
 function DangerousHTML({
   dangerouslySetInnerHTML,
@@ -247,6 +277,20 @@ function ServiceCard(props: any) {
   const requestQuote = props?.quote?.find(
     (d: any) => d?.user_request_id == requestId?.id
   );
+  const displayRatingText = getDisplayRatingText(Number(props.ratingCount ?? 0));
+  const { fullStars, hasHalfStar, emptyStars } = getStarDisplay(
+    Number(props.ratingCount ?? 0)
+  );
+  const distanceNumber =
+    props.location !== null &&
+    props.location !== undefined &&
+    props.location !== ""
+      ? Number(props.location)
+      : null;
+  const formattedDistance =
+    distanceNumber !== null && Number.isFinite(distanceNumber)
+      ? `${distanceNumber.toFixed(1)} Miles away`
+      : "0.0 Miles away";
   console.log(props.location, "loc");
   return (
     <div>
@@ -406,14 +450,15 @@ function ServiceCard(props: any) {
             }
             className=" flex gap-1 text-gray-500 !font-normal tracking-wide !text-xs dark:text-darktextColor"
           >
-            {Array.from({ length: props.ratingCount }, () => (
-              <img src={GoldStar} alt="Gold Star" />
+            {Array.from({ length: fullStars }, (_, i) => (
+              <img key={`gold-${i}`} src={GoldStar} alt="Full star" />
             ))}
-            {Array.from({ length: 5 - props.ratingCount }, () => (
-              <img src={Star} alt="Star" />
+            {hasHalfStar && <HalfStarCut />}
+            {Array.from({ length: emptyStars }, (_, i) => (
+              <img key={`empty-${i}`} src={Star} alt="Empty star" />
             ))}
             <Heading
-              text={`${props.ratingCount ?? 0} of 5 / ${props.reviewsCount ?? 0}`}
+              text={`${displayRatingText} of 5 / ${props.reviewsCount ?? 0}`}
               variant="subHeader"
               headingclassname="text-gray-500 !font-normal tracking-wide !text-xs mx-2 dark:text-slate-400"
             />
@@ -426,7 +471,7 @@ function ServiceCard(props: any) {
               <div children={<LocationIcon color="white" />} />
             )}
             <Heading
-              text={`${props.location ? Math.round(parseFloat(props.location.toString())) : 0} miles away`}
+              text={formattedDistance}
               variant="subHeader"
               headingclassname="text-textColor !font-semibold tracking-wide !text-xs dark:text-darktextColor"
             />

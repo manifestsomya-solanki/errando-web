@@ -41,6 +41,11 @@ function TopBar(props: {
   const { data, error, isLoading } = useSWR(url, fetcher);
   const profileData: UserData = data?.data ?? "";
   const profilePhoto = `https://erranddo.s3.eu-west-2.amazonaws.com/${profileData?.img_avatar}`;
+  const currentUserRole = (
+    profileData?.role || localStorage.getItem("role") || ""
+  )
+    .toString()
+    .toLowerCase();
   const switchToPro = async () => {
     const token = localStorage.getItem("token");
     if (!token) {
@@ -109,9 +114,7 @@ function TopBar(props: {
           buttonClassName="!px-7 text-sm xs:hidden lg:flex !text-primaryBlue !dark:text-slate-900"
           onClick={() => setOpenServiceModal(true)}
         />
-        {!profileData?.address ||
-        !profileData?.city ||
-        !profileData?.postcode ? (
+        {currentUserRole === "customer" ? (
           <Button
             variant="filled"
             color="primary"
@@ -120,7 +123,7 @@ function TopBar(props: {
             buttonClassName="!px-7 text-sm xs:hidden lg:flex"
             onClick={switchToPro}
           />
-        ) : (
+        ) : currentUserRole === "pro" ? (
           <Button
             variant="filled"
             color="primary"
@@ -129,7 +132,7 @@ function TopBar(props: {
             buttonClassName="!px-7 text-sm xs:hidden lg:flex"
             onClick={switchToPro}
           />
-        )}
+        ) : null}
         <div className="hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full h-7 w-7 flex items-center justify-center">
           {theme === "light" && (
             <button

@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../../../store/customer/auth-context";
 import pass1 from "../../../../assets/pass1.svg";
 import pass2 from "../../../../assets/pass2.svg";
+import ForgotPasswordModal from "../../../../layout/ForgotPasswordModal";
 function ResetPasswordForm() {
   const { resetPassword, error, isPasswordLoading } = useAuth();
 
@@ -15,6 +16,7 @@ function ResetPasswordForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [oldshowPassword, setOldShowPassword] = useState(false);
   const [confirmShowPassword, setConfirmShowPassword] = useState(false);
+  const [forgotPasswordModal, setForgotPasswordModal] = useState(false);
 
   const validate = (values: any) => {
     const errors: FormikErrors<any> = {};
@@ -57,8 +59,28 @@ function ResetPasswordForm() {
       validate={validate}
     >
       {(props) => (
-        <form autoComplete="off" onSubmit={props.handleSubmit}>
+        <>
+          {forgotPasswordModal && (
+            <ForgotPasswordModal
+              onCancel={() => {
+                setForgotPasswordModal(false);
+              }}
+            />
+          )}
+          <form autoComplete="off" onSubmit={props.handleSubmit}>
           <input className="hidden" autoComplete="false" />
+          <div className="w-full flex justify-end mb-2">
+            <Button
+              type="button"
+              variant="filled"
+              color="primary"
+              buttonClassName="!bg-green-500 !hover:bg-green-600 !border-green-500 !text-white !px-4 !py-2 !rounded-lg !font-semibold"
+              onClick={() => setForgotPasswordModal(true)}
+              centerClassName="flex justify-center items-center"
+            >
+              Forgot Password
+            </Button>
+          </div>
           <div className="my-5">
             <Label required label="Old Password" className="ml-1" />
             <div className="relative">
@@ -154,7 +176,8 @@ function ResetPasswordForm() {
               Submit
             </Button>
           </div>
-        </form>
+          </form>
+        </>
       )}
     </Formik>
   );

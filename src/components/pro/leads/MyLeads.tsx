@@ -42,7 +42,9 @@ function getTimeDifferenceString(time: any) {
 function MyLeads(props: any) {
   const leadsId = useParams();
   // Use /detail endpoint (same as LeadDetails) since route only has /detail
-  const dealerdetailurl = buildApiUrl(`${API_ENDPOINTS.USER_REQUESTS_DETAIL}/${leadsId.id}/detail`);
+  const dealerdetailurl = buildApiUrl(
+    `${API_ENDPOINTS.USER_REQUESTS_DETAIL}/${leadsId.id}/detail?for_pro=1`
+  );
   const { data: leadsDetailData, isLoading, error: apiError } = useSWR(
     leadsId?.id ? dealerdetailurl : null, 
     fetcher

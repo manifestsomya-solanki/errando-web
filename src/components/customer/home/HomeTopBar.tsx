@@ -34,6 +34,11 @@ function HomeTopBar(props: { isSettingDisabled?: boolean }) {
   const { data } = useSWR(url, fetcher);
   const profileData: UserData = data?.data ?? "";
   const profilePhoto = `https://erranddo.s3.eu-west-2.amazonaws.com/${profileData?.img_avatar}`;
+  const currentUserRole = (
+    profileData?.role || localStorage.getItem("role") || ""
+  )
+    .toString()
+    .toLowerCase();
   const switchToPro = async () => {
     const token = localStorage.getItem("token");
     if (!token) {
@@ -144,22 +149,25 @@ function HomeTopBar(props: { isSettingDisabled?: boolean }) {
               }}
             />
 
-            {(!profileData?.address || !profileData?.city || !profileData?.postcode) ?
-              (<Button
+            {currentUserRole === "customer" ? (
+              <Button
                 variant="filled"
                 color="primary"
                 size="normal"
                 children="Register as a Pro"
                 buttonClassName="!px-7 text-sm xs:hidden lg:flex"
                 onClick={switchToPro}
-              />) : (<Button
+              />
+            ) : currentUserRole === "pro" ? (
+              <Button
                 variant="filled"
                 color="primary"
                 size="normal"
                 children="Switch to Pro"
                 buttonClassName="!px-7 text-sm xs:hidden lg:flex"
                 onClick={switchToPro}
-              />)}
+              />
+            ) : null}
 
             <div className="hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full h-7 w-7 flex items-center justify-center">
               {theme === "light" && (

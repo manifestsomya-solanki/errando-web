@@ -14,7 +14,10 @@ type LeadResponeType = {
   leads?: UserRequestList[];
   business: BusinessData[];
   service: ServiceData[];
-  buyLead: (formData: FormData, key: string) => Promise<void>;
+  buyLead: (
+    formData: FormData,
+    key: string
+  ) => Promise<{ success: boolean; code?: string; message?: string }>;
   isBuyLeadLoading: boolean;
   isLoading: boolean;
   isDeleteLoading: boolean;
@@ -52,9 +55,7 @@ export const LeadContext = createContext<LeadResponeType>({
   handlePrevPage: () => {
     console.log();
   },
-  buyLead: async () => {
-    console.log();
-  },
+  buyLead: async () => ({ success: false }),
   filter: (ids) => {
     console.log();
   },
@@ -159,48 +160,69 @@ const LeadContextProProvider = (props: { children: React.ReactNode }) => {
   const [isBuyLeadLoading, setIsBuyLeadLoading] = useState(false);
   const [isBuyOutrightLoading, setIsBuyOutrightLoading] = useState(false);
 
+  const getToken = () => {
+    const tokenRaw = localStorage.getItem("token");
+    if (!tokenRaw) return "";
+    try {
+      return JSON.parse(tokenRaw)?.token || tokenRaw;
+    } catch {
+      return tokenRaw;
+    }
+  };
+
   const buyLead = async (formData: FormData, key: string) => {
-    const token = localStorage.getItem("token");
+    const token = getToken();
     if (key == "lead") {
       setIsBuyLeadLoading(true);
     } else {
       setIsBuyOutrightLoading(true);
     }
     setError("");
-    const res = await fetch(
-      buildApiUrl(API_ENDPOINTS.USER_REQUESTS_SHOW_INTEREST),
-      {
+    try {
+      const res = await fetch(buildApiUrl(API_ENDPOINTS.USER_REQUESTS_SHOW_INTEREST), {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
+          Accept: "application/json",
         },
         body: formData,
-      }
-    );
-    if (res.status === 200) {
+      });
+      const responseData: any = await res.json();
+
       setIsBuyLeadLoading(false);
       setIsBuyOutrightLoading(false);
-      if (data.status === "1") {
-        toast.success("Lead Bought successfully !", {
-          hideProgressBar: false,
-          position: "bottom-left",
-        });
-      } else {
+
+      if (res.ok && responseData?.status === "1") {
         setError("");
-        toast.error(data.message, {
+        await mutate();
+        toast.success("Lead bought successfully!", {
           hideProgressBar: false,
           position: "bottom-left",
         });
+        return { success: true };
       }
-    } else {
-      const data: any = await res.json();
-      setIsBuyLeadLoading(false);
-      setIsBuyOutrightLoading(false);
-      setError(data.message);
-      toast.error(data.message, {
+
+      const apiMessage = responseData?.message || "Failed to buy lead";
+      setError(apiMessage);
+      toast.error(apiMessage, {
         hideProgressBar: false,
         position: "bottom-left",
       });
+      return {
+        success: false,
+        code: responseData?.code,
+        message: apiMessage,
+      };
+    } catch (_error) {
+      setIsBuyLeadLoading(false);
+      setIsBuyOutrightLoading(false);
+      const message = "Network error. Please try again.";
+      setError(message);
+      toast.error(message, {
+        hideProgressBar: false,
+        position: "bottom-left",
+      });
+      return { success: false, message };
     }
   };
 

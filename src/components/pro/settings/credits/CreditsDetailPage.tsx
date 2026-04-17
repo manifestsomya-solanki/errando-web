@@ -10,6 +10,10 @@ import PurchaseCreditsModal from "../../../../layout/pro-models/PurchaseCreditsM
 import { toast } from "react-toastify";
 import CreditIcon from "../../../../assets/Credit.png";
 import { SavedCard } from "../payment-details/types";
+import { useNavigate } from "react-router";
+
+const PENDING_LEAD_PURCHASE_KEY = "pending_lead_purchase";
+const PENDING_LEAD_PURCHASE_TTL_MS = 30 * 60 * 1000;
 
 interface CreditPackage {
   id: number;
@@ -20,6 +24,7 @@ interface CreditPackage {
 }
 
 function CreditsDetailPage() {
+  const navigate = useNavigate();
   const [selectedPackage, setSelectedPackage] = useState<CreditPackage | null>(null);
   const [isPurchaseModalOpen, setIsPurchaseModalOpen] = useState(false);
   const [isPurchasing, setIsPurchasing] = useState(false);
@@ -56,7 +61,7 @@ function CreditsDetailPage() {
   };
 
   const url = buildApiUrl(`${API_ENDPOINTS.USER_REQUESTS}?for_pro=1&show_only_count=1`);
-  let { data: count } = useSWR(url, fetcher);
+  let { data: count, mutate: mutateCreditsCount } = useSWR(url, fetcher);
   count = count?.data;
   const availableCredits = count?.user?.available_credits ?? 0;
 
@@ -376,8 +381,74 @@ function CreditsDetailPage() {
         if (wasManualPurchase) {
           resetManualCalculator();
         }
-        mutate(url);
+        const refreshedCount = await mutateCreditsCount();
         mutatePackages();
+
+        // Auto-complete pending lead/outright purchase if user came from disabled buy button flow.
+        const pendingRaw = localStorage.getItem(PENDING_LEAD_PURCHASE_KEY);
+        if (pendingRaw) {
+          try {
+            const pending = JSON.parse(pendingRaw);
+            const pendingLeadId = String(pending?.user_request_id || "").trim();
+            const pendingType = pending?.purchase_type === "outright" ? "outright" : "lead";
+            const createdAt = Number(pending?.created_at || 0);
+            const isExpired = !createdAt || Date.now() - createdAt > PENDING_LEAD_PURCHASE_TTL_MS;
+
+            if (isExpired || !pendingLeadId) {
+              localStorage.removeItem(PENDING_LEAD_PURCHASE_KEY);
+            } else {
+              const refreshedAvailableCredits = Number(
+                refreshedCount?.data?.user?.available_credits ?? availableCredits
+              );
+              const leadCreditsRequired = Number(
+                pending?.lead_credits_required ?? pending?.calculated_base_credits ?? 0
+              );
+              const outrightCreditsRequired = Number(
+                pending?.outright_credits_required ?? pending?.calculated_outright_credits ?? 0
+              );
+              const requiredCredits =
+                pendingType === "outright" ? outrightCreditsRequired : leadCreditsRequired;
+
+              if (!requiredCredits || refreshedAvailableCredits >= requiredCredits) {
+                const interestFormData = new FormData();
+                interestFormData.append("user_request_id", pendingLeadId);
+                interestFormData.set("for_pro", "1");
+                interestFormData.set("is_outright", pendingType === "outright" ? "1" : "0");
+
+                const buyResponse = await fetch(buildApiUrl(API_ENDPOINTS.USER_REQUESTS_SHOW_INTEREST), {
+                  method: "POST",
+                  headers: {
+                    Authorization: `Bearer ${parsedToken}`,
+                    Accept: "application/json",
+                  },
+                  body: interestFormData,
+                });
+
+                const buyData = await buyResponse.json();
+                if (buyResponse.ok && buyData?.status === "1") {
+                  localStorage.removeItem(PENDING_LEAD_PURCHASE_KEY);
+                  toast.success(
+                    pendingType === "outright"
+                      ? "Outright lead purchased automatically."
+                      : "Lead purchased automatically."
+                  );
+                  navigate("/pro/responses");
+                } else if (buyData?.code === "INSUFFICIENT_CREDITS") {
+                  toast.error(
+                    buyData?.message || "Credits are still insufficient for this lead."
+                  );
+                } else {
+                  localStorage.removeItem(PENDING_LEAD_PURCHASE_KEY);
+                  toast.error(buyData?.message || "Auto purchase failed. Please try again.");
+                }
+              } else {
+                toast.error("Credits are still insufficient for the selected lead.");
+              }
+            }
+          } catch {
+            localStorage.removeItem(PENDING_LEAD_PURCHASE_KEY);
+          }
+        }
       } else if (response.status === 401) {
         toast.error("Please login to purchase credits");
         setIsPurchaseModalOpen(false);
