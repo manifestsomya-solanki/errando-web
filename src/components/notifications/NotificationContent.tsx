@@ -43,7 +43,7 @@ function NotificationContent() {
           onScroll={
             Math.ceil(total / 13) > currentPage ? handleScroll : undefined
           }
-          className="bg-white py-5 xs:px-24 flex flex-col dark:bg-dimGray rounded-lg w-full max-w-4xl mx-auto dark:text-white overflow-y-scroll h-[58vh] soft-searchbar shadow-md border-t-slate-100 border-t-[0.5px]"
+          className="bg-white py-5 xs:px-36 flex flex-col dark:bg-dimGray rounded-lg w-full max-w-6xl mx-auto dark:text-white overflow-y-scroll h-[58vh] soft-searchbar shadow-md border-t-slate-100 border-t-[0.5px]"
           ref={divRef}
         >
           {total === 0 ? (
