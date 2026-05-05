@@ -1,6 +1,7 @@
 import { useLeadResponse } from "../../../store/pro/response-context";
 import TableFooter from "../leads/TableFooter";
 import ResponsesListItem from "./ResponsesListItem";
+import { formatUKPostcode } from "../../../utils/postcodeFormatter";
 
 function ResponsesList() {
   const {
@@ -33,20 +34,41 @@ function ResponsesList() {
               service={`${item?.service?.name} `}
               answers={answers.length > 0 ? answers : ["No answers"]}
               location={(() => {
-                const city = item?.user?.city ? String(item.user.city).trim() : undefined;
+                const city = item?.user?.city
+                  ? String(item.user.city).trim()
+                  : undefined;
+                const townName = item?.town_name
+                  ? String(item.town_name).trim()
+                  : undefined;
                 let postcode: string | undefined;
-                
-                if (typeof item?.postcode === 'string') {
+
+                if (typeof item?.postcode === "string") {
                   postcode = item.postcode.trim();
-                } else if (item?.postcode && typeof item.postcode === 'object' && 'name' in item.postcode) {
+                } else if (
+                  item?.postcode &&
+                  typeof item.postcode === "object" &&
+                  "name" in item.postcode
+                ) {
                   const postcodeName = (item.postcode as { name: string }).name;
                   postcode = postcodeName ? String(postcodeName).trim() : undefined;
                 }
-                
-                if (city && city.length > 0 && postcode && postcode.length > 0) {
-                  return `${city}, ${postcode}`;
-                } else if (postcode && postcode.length > 0) {
-                  return postcode;
+
+                const formattedPostcode = formatUKPostcode(postcode);
+                const postcodeDisplay = formattedPostcode
+                  ? formattedPostcode.replace(/\s+/g, " ").trim()
+                  : "";
+
+                if (townName && postcodeDisplay) {
+                  if (city && city.length > 0) {
+                    return `${city}, ${townName}, ${postcodeDisplay}`;
+                  }
+                  return `${townName}, ${postcodeDisplay}`;
+                }
+
+                if (city && city.length > 0 && postcodeDisplay) {
+                  return `${city}, ${postcodeDisplay}`;
+                } else if (postcodeDisplay) {
+                  return postcodeDisplay;
                 } else if (city && city.length > 0) {
                   return city;
                 }

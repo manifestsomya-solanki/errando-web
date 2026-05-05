@@ -222,9 +222,22 @@ function EditServiceModal({
                   <div>
                     {locationNumber > 0 &&
                       Array.from({ length: locationNumber }, (_, index) => (
-                        <div className="pb-3 grid xl:grid-cols-2 xs:gap-5">
-                          <div className="">
-                            <Label label="Update Postcode " />
+                        <div
+                          key={`location-row-${index}`}
+                          className="pb-3 grid xl:grid-cols-2 xs:gap-5"
+                        >
+                          <div>
+                            <div className="flex items-center justify-between mb-1">
+                              <Label label="Update Postcode " />
+                              <Button
+                                type="button"
+                                variant="filled"
+                                children="Delete"
+                                disabled
+                                centerClassName="flex justify-center items-center"
+                                buttonClassName="!px-6 !py-1.5 !h-8 !rounded-md invisible pointer-events-none"
+                              />
+                            </div>
                             <ValidatedPostcodeInput
                               name="postcode"
                               value={props?.values?.postcode[index]
@@ -241,7 +254,27 @@ function EditServiceModal({
                             />
                           </div>
                           <div>
-                            <Label label="Update Radius " />
+                            <div className="flex items-center justify-between mb-1">
+                              <Label label="Update Radius " />
+                              <Button
+                                type="button"
+                                variant="filled"
+                                children="Delete"
+                                onClick={() => {
+                                  const nextPostcodes = [...props.values.postcode];
+                                  const nextRadius = [...props.values.radius];
+                                  nextPostcodes.splice(index, 1);
+                                  nextRadius.splice(index, 1);
+                                  props.setFieldValue("postcode", nextPostcodes);
+                                  props.setFieldValue("radius", nextRadius);
+                                  setlocationNumber((prev) =>
+                                    Math.max(0, prev - 1)
+                                  );
+                                }}
+                                centerClassName="flex justify-center items-center"
+                                buttonClassName="!px-6 !py-1.5 !h-8 !rounded-md !bg-red-500 hover:!bg-red-600 !border-red-500 !text-white"
+                              />
+                            </div>
                             <Input
                               className="border-black"
                               placeholder="Enter Radius"
@@ -257,6 +290,11 @@ function EditServiceModal({
 
                 <Button
                   onClick={() => {
+                    props.setFieldValue("postcode", [
+                      ...props.values.postcode,
+                      { label: "", value: "" },
+                    ]);
+                    props.setFieldValue("radius", [...props.values.radius, ""]);
                     setlocationNumber((prev) => prev + 1);
                   }}
                   loading={isLoading}

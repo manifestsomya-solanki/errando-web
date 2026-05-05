@@ -68,7 +68,7 @@ function LeadDetails() {
   const leadBlockedBySlots = (leadsDetail?.leads_count ?? 0) >= 4;
   const outrightBlockedBySlots = purchasedSlots > 0;
   const insufficientButtonClass =
-    "!bg-gray-300 !border-gray-300 !text-slate-500 !cursor-not-allowed hover:!bg-gray-300";
+    "!bg-primaryBlue !border-primaryBlue !text-white hover:!bg-primaryBlue/80";
 
   const disableEmailsAndLinks = (text: any) => {
     if (!text || typeof text !== 'string') {

@@ -36,6 +36,7 @@ import Flagman from "../../../assets/flagman.jpg";
 import dayjs from "dayjs";
 import { API_BASE_URL, buildApiUrl, API_ENDPOINTS } from "../../../config/api";
 import { getLeadPurchaseSlotCount } from "../../../utils/leadSlots";
+import { formatUKPostcode } from "../../../utils/postcodeFormatter";
 
 function getTimeDifferenceString(time: any) {
   const currentTime = dayjs();
@@ -342,8 +343,11 @@ function MyResponses() {
                 headingclassname="!font-semibold text-slate-400 !text-sm  mx-1 tracking-wide dark:text-white "
               />
               {(() => {
-                const postcodeDisplay = leadsDetail?.postcode || "";
-                
+                const formattedPostcode = formatUKPostcode(leadsDetail?.postcode);
+                const postcodeDisplay = formattedPostcode
+                  ? formattedPostcode.replace(/\s+/g, " ").trim()
+                  : "";
+
                 // If town_name is available, show it before postcode
                 if (leadsDetail?.town_name && postcodeDisplay) {
                   if (leadsDetail?.user?.city) {
