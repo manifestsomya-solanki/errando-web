@@ -17,6 +17,7 @@ import DeleteLeadModal from "../../../layout/pro-models/DeleteLeadModal";
 import { API_BASE_URL, buildApiUrl, API_ENDPOINTS } from "../../../config/api";
 import { formatUKPostcode } from "../../../utils/postcodeFormatter";
 import { getLeadPurchaseSlotCount } from "../../../utils/leadSlots";
+import { resolveAssetUrl } from "../../../utils/resolveAssetUrl";
 
 function getTimeDifferenceString(time: any) {
   const currentTime = dayjs();
@@ -164,7 +165,7 @@ function MyLeads(props: any) {
             <div className="flex items-center gap-2">
               {leadsDetail?.user?.img_avatar ? (
                 <img
-                  src={`https://erranddo.s3.eu-west-2.amazonaws.com/${leadsDetail?.user?.img_avatar}`}
+                  src={resolveAssetUrl(leadsDetail?.user?.img_avatar)}
                   className="w-20 h-20 rounded-full object-cover"
                 />
               ) : (

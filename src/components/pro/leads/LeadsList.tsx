@@ -10,26 +10,30 @@ function LeadsList() {
     <div className="flex flex-col gap-3 ">
       {leads && leads?.length > 0 ? (
         leads.map((item, key) => {
-          const answers = item?.answers.map((answerItem) => answerItem.answer);
+          const answers = (item?.answers ?? []).map((answerItem) => answerItem.answer);
 
           const createdAt = item?.created_at ? new Date(item.created_at) : null;
           
           return (
             <LeadsListItem
-              key={key}
+              key={item?.id ?? key}
               time={createdAt}
               title={item?.user?.full_name?.split(" ")[0] ?? "--"}
               business={
-                item?.provider_bussiness[0]?.name
+                item?.provider_bussiness?.[0]?.name
                   ? `${item.provider_bussiness[0]?.name}`
                   : "No business"
               }
-              service={`${item?.service?.name} `}
+              service={`${item?.service?.name ?? ""} `}
               answers={answers.length > 0 ? answers : ["No answers"]}
               location={
                 (() => {
                   // Format postcode first (adds correct spacing for UK postcodes)
-                  const formattedPostcode = formatUKPostcode(item?.postcode);
+                  const formattedPostcode = formatUKPostcode(
+                    typeof item?.postcode === "string"
+                      ? item.postcode
+                      : (item?.postcode as { postcode?: string } | undefined)?.postcode
+                  );
                   const postcodeDisplay = formattedPostcode
                     ? `${(formattedPostcode.split(" ")[0]?.slice(0, 4) || formattedPostcode.slice(0, 4)) + "**"}`
                     : "";
@@ -63,8 +67,8 @@ function LeadsList() {
               id={item?.id}
               userId={item?.user?.id}
               leads_count={item?.leads_count}
-              interested={item?.intrests?.length > 0 ? true : false}
-              quoteRequested={item?.quote_requests?.length > 0 ? true : false}
+              interested={(item?.intrests?.length ?? 0) > 0 ? true : false}
+              quoteRequested={(item?.quote_requests?.length ?? 0) > 0 ? true : false}
               is_read={item?.is_read == false}
               is_messaged={item?.is_messaged ?? false}
               is_email_verified={

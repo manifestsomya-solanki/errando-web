@@ -16,6 +16,7 @@ import {
   getProAggregateStarLayoutFromRaw,
 } from "../../../../../utils/proReviewAggregateDisplay";
 import { HalfStarCut } from "../../../../UI/HalfStarCut";
+import { resolveAssetUrl } from "../../../../../utils/resolveAssetUrl";
 
 export function DangerousHTML({
   dangerouslySetInnerHTML,
@@ -75,7 +76,7 @@ function DealerDetailSection(props: {
             <div className="rounded-full xs:float-left   lg:w-40 xs:w-20 border-slate-200 border-[0.5px] mr-5 ">
               {props.icon ? (
                 <img
-                  src={`https://erranddo.s3.eu-west-2.amazonaws.com/${props?.icon}`}
+                  src={resolveAssetUrl(props?.icon)}
                   className=" object-cover object-center rounded-full w-40  lg:h-40 xs:h-20"
                 />
               ) : (

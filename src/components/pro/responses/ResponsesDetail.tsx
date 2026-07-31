@@ -9,6 +9,7 @@ import useSWR from "swr";
 import { fetcher } from "../../../store/customer/home-context";
 import { UserRequestList } from "../../../models/pro/userrequestlist";
 import { buildApiUrl, API_ENDPOINTS } from "../../../config/api";
+import { resolveAssetUrl } from "../../../utils/resolveAssetUrl";
 
 function ResponsesDetail() {
   const leadsId = useParams();
@@ -105,7 +106,7 @@ function ResponsesDetail() {
               <img
                 src={
                   leadsDetail?.file
-                    ? `https://erranddo.s3.eu-west-2.amazonaws.com/${leadsDetail?.file}`
+                    ? resolveAssetUrl(leadsDetail?.file)
                     : NoImage
                 }
                 className="lg:h-60 md:h-36 xs:h-28 w-full object-cover"

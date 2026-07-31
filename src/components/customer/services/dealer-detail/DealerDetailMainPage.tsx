@@ -15,6 +15,7 @@ import ContactBar from "./ContactBar";
 import { Business } from "../../../../models/customer/businesslist";
 import TopBar from "../top-bar/TopBar";
 import { API_BASE_URL, buildApiUrl, API_ENDPOINTS } from "../../../../config/api";
+import { resolveAssetUrl } from "../../../../utils/resolveAssetUrl";
 
 function DealerDetailMainPage() {
   const location = useLocation();
@@ -34,7 +35,7 @@ function DealerDetailMainPage() {
   const { data, isLoading, mutate } = useSWR(url, fetcher);
   const serviceData: Business = data?.data;
 
-  const displayPhoto = `https://erranddo.s3.eu-west-2.amazonaws.com/${serviceData?.image}`;
+  const displayPhoto = resolveAssetUrl(serviceData?.image);
 
   const subTitle = serviceData?.services?.map((d) => d.name).toString();
 
@@ -78,19 +79,19 @@ function DealerDetailMainPage() {
                   icon={displayPhoto}
                   description={serviceData?.description}
                   quote={
-                    serviceData?.request_quotes && serviceData.request_quotes.length > 0
+                    serviceData?.request_quotes?.length
                       ? serviceData.request_quotes[0]?.quote
                       : ""
                   }
                   quoteType={
-                    serviceData?.request_quotes && serviceData.request_quotes.length > 0
+                    serviceData?.request_quotes?.length
                       ? serviceData.request_quotes[0]?.payment_type
                       : ""
                   }
                 />
               )}
             </div>
-            {serviceData?.responded_requests.length > 0 ||
+            {serviceData?.responded_requests?.length > 0 ||
             page_key === "pro" ? (
               <ContactBar
                 website={serviceData?.website_url}

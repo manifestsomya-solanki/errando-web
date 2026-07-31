@@ -34,6 +34,7 @@ function ServiceItemsSection(props: {
 
             return (
               <ServiceCard
+                key={item?.id ?? `${item?.user_id}-${item?.name}`}
                 userId={item?.user_id}
                 serviceName={props.name}
                 serviceId={props.id}

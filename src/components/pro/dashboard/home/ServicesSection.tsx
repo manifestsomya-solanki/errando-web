@@ -62,9 +62,9 @@ function ServiceSection() {
             />
             {data &&
               data?.length > 0 &&
-              data.map((item, key) => {
+              data.map((item) => {
                 return (
-                  <div key={key}>
+                  <div key={item?.id ?? `${item?.service_id}-${item?.user_business_id}`}>
                     <ServiceItem
                       serviceId={item?.service_id || item?.service?.id}
                       businessServiceId={item?.id}

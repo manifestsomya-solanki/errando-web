@@ -29,6 +29,7 @@ import { fetcher } from "../../../../store/customer/home-context";
 import { UserData } from "../../../../models/user";
 import { buildApiUrl, API_ENDPOINTS } from "../../../../config/api";
 import MailIcon from "../../../../assets/MailIcon";
+import { resolveAssetUrl } from "../../../../utils/resolveAssetUrl";
 
 const normalizeRating = (rating: number): number => {
   if (!Number.isFinite(rating)) return 0;
@@ -274,9 +275,9 @@ function ServiceCard(props: any) {
     return finalText;
   };
 
-  const requestQuote = props?.quote?.find(
-    (d: any) => d?.user_request_id == requestId?.id
-  );
+  const requestQuote =
+    props?.quote?.find((d: any) => d?.user_request_id == requestId?.id) ||
+    props?.quote?.[0];
   const displayRatingText = getDisplayRatingText(Number(props.ratingCount ?? 0));
   const { fullStars, hasHalfStar, emptyStars } = getStarDisplay(
     Number(props.ratingCount ?? 0)
@@ -342,7 +343,7 @@ function ServiceCard(props: any) {
             <div className="w-16 h-16">
               {props.icon ? (
                 <img
-                  src={`https://erranddo.s3.eu-west-2.amazonaws.com/${props?.icon}`}
+                  src={resolveAssetUrl(props?.icon)}
                   className="w-full h-full rounded-full object-cover"
                 />
               ) : (
@@ -410,7 +411,7 @@ function ServiceCard(props: any) {
                     headingclassname="text-primaryYellow !font-semibold tracking-wide !text-base dark:text-darkprimaryYellow"
                   />
                   <Heading
-                    text={requestQuote?.payment_type.replace("_", " ")}
+                    text={(requestQuote?.payment_type || "").replace("_", " ")}
                     variant="subTitle"
                     headingclassname="text-primaryYellow !font-semibold tracking-wide !text-base dark:text-darkprimaryYellow"
                   />

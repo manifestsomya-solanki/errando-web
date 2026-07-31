@@ -2,6 +2,7 @@ import React, { ReactNode, useContext, useState } from "react";
 import { Service } from "../../models/home";
 import useSWR from "swr";
 import { buildApiUrl, API_ENDPOINTS } from "../../config/api";
+import { handleAuthExpired } from "../../utils/authSession";
 
 
 type HomeServiceDetailsType = {
@@ -176,6 +177,7 @@ export const fetcher = async (url: string) => {
     if (!response.ok) {
       // Silently handle 401 errors (user not authenticated or token expired)
       if (response.status === 401) {
+        handleAuthExpired();
         return {
           status: "0",
           message: "Unauthorized",

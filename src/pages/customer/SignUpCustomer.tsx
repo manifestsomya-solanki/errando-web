@@ -95,7 +95,7 @@ const SignUpCustomer = () => {
                 Sign Up
               </p>
               <p className="p-2 2xl:text-2xl xl:text-xl md:text-xl xs:text-md font-medium 2xl:w-[540px] xl:w-[450px]  dark:text-slate-400 font-poppins flex justify-center">
-                Welcome to Erranddo.
+                Welcome to Errando.
               </p>
               <form onSubmit={formik.handleSubmit}>
                 <div className="w-full flex flex-col ">

@@ -169,7 +169,6 @@ function AddServiceModal({
           }}
           enableReinitialize={true}
           onSubmit={async (values) => {
-            console.log(values);
             const formData = new FormData();
             formData.set(
               "user_business_id",
@@ -304,8 +303,11 @@ function AddServiceModal({
                 </div>
               )}
               {locationNumber > 1 &&
-                Array.from({ length: locationNumber - 1 }, () => (
-                  <div className="pb-3 grid xl:grid-cols-2 xs:gap-5">
+                Array.from({ length: locationNumber - 1 }, (_, i) => (
+                  <div
+                    key={`extra-location-${i + 1}`}
+                    className="pb-3 grid xl:grid-cols-2 xs:gap-5"
+                  >
                     <div>
                       <Label label="Postcode" />
                       <ValidatedPostcodeInput

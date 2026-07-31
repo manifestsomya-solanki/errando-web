@@ -99,7 +99,9 @@ const ServiceContextProvider = (props: { children: ReactNode }) => {
       : true;
 
   const userRequestId = useParams().id;
-  const counturl = `${API_BASE_URL}/businesses/count?user_request_id=${userRequestId}`;
+  const counturl = userRequestId
+    ? `${API_BASE_URL}/businesses/count?user_request_id=${userRequestId}`
+    : null;
   const { mutate: countMutate } = useSWR(counturl, fetcher);
 
   const [error, setError] = useState("");

@@ -13,8 +13,14 @@ export function getAssetBaseUrl(): string {
 export function resolveAssetUrl(path?: string | null): string {
   if (path == null) return "";
   const normalized = String(path).trim();
-  if (!normalized) return "";
+  if (!normalized || normalized === "null" || normalized === "undefined") return "";
   if (/^https?:\/\//i.test(normalized)) return normalized;
   const base = getAssetBaseUrl().replace(/\/+$/, "");
-  return `${base}/${normalized.replace(/^\/+/, "")}`;
+  // DB keys are like `businesses/x.png`; strip accidental `uploads/` prefix
+  // when the asset base already ends with `/uploads`.
+  let key = normalized.replace(/^\/+/, "");
+  if (base.endsWith("/uploads")) {
+    key = key.replace(/^uploads\/+/i, "");
+  }
+  return `${base}/${key}`;
 }

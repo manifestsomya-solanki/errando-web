@@ -15,6 +15,7 @@ import { UserData } from "../../../../models/user";
 import profileAvatar from "../../../../assets/avatar.svg";
 import Credit from "../../../../assets/Credit.png";
 import { buildApiUrl, API_ENDPOINTS } from "../../../../config/api";
+import { resolveAssetUrl } from "../../../../utils/resolveAssetUrl";
   
 function TopBar(props: {
   isSettingDisabled?: boolean;
@@ -32,7 +33,7 @@ function TopBar(props: {
   const url = buildApiUrl(`${API_ENDPOINTS.USER_DETAIL}?user_id=${userData?.id}`);
   const { data, error, isLoading } = useSWR(url, fetcher);
   const profileData: UserData = data?.data ?? "";
-  const profilePhoto = `https://erranddo.s3.eu-west-2.amazonaws.com/${profileData?.img_avatar}`;
+  const profilePhoto = resolveAssetUrl(profileData?.img_avatar);
 
   const topbarClassName =
     "bg-white dark:bg-black fixed top-0 py-4 xl:px-36 lg:px-3 xs:px-5 flex shadow-sm justify-between w-screen items-center xl:h-[8.651474530831099vh] lg:h-[9.651474530831099vh] xs:h-[9.051474530831099vh] z-[100]";

@@ -15,6 +15,7 @@ import { buildApiUrl, API_ENDPOINTS } from "../../../config/api";
 import { getLeadPurchaseSlotCount } from "../../../utils/leadSlots";
 import "../dashboard/services/dealer-detail/check.css";
 import { useState } from "react";
+import { resolveAssetUrl } from "../../../utils/resolveAssetUrl";
 
 const PENDING_LEAD_PURCHASE_KEY = "pending_lead_purchase";
 
@@ -239,7 +240,7 @@ function LeadDetails() {
               <img
                 src={
                   leadsDetail?.file
-                    ? `https://erranddo.s3.eu-west-2.amazonaws.com/${leadsDetail?.file}`
+                    ? resolveAssetUrl(leadsDetail?.file)
                     : NoImage
                 }
                 className="lg:h-60 md:h-36 xs:h-28 w-full object-cover"

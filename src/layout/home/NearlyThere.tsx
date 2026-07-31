@@ -120,7 +120,7 @@ function NearlyThere(props: {
                   rel="noopener noreferrer"
                   className="text-primaryBlue hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 cursor-pointer"
                 >
-                  Erranddo's T&C's
+                  Errando's T&C's
                 </a>
                 <span>and I'm happy to receive occasional promotion.</span>
               </label>

@@ -33,6 +33,7 @@ import Download from "../../../../assets/Download";
 import { useChat } from "../../../../store/pro/chat-context";
 import { useLocation, useNavigate } from "react-router";
 import { useAuth } from "../../../../store/pro/auth-pro-context";
+import { resolveAssetUrl } from "../../../../utils/resolveAssetUrl";
 
 const initialPageSize = 12;
 function ChatItems() {
@@ -377,7 +378,7 @@ function ChatItems() {
                       <img
                         src={
                           currentUser?.photoURL
-                            ? `https://erranddo.s3.eu-west-2.amazonaws.com/${currentUser?.photoURL}`
+                            ? resolveAssetUrl(currentUser?.photoURL)
                             : NoImage
                         }
                         className="w-8 h-8 rounded-full object-cover"
@@ -445,7 +446,7 @@ function ChatItems() {
                       <img
                         src={
                           user?.photoURL
-                            ? `https://erranddo.s3.eu-west-2.amazonaws.com/${user?.photoURL}`
+                            ? resolveAssetUrl(user?.photoURL)
                             : NoImage
                         }
                         className="w-8 h-8 rounded-full object-cover"

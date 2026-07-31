@@ -172,7 +172,7 @@ const InvoicePro = () => {
     return `${day}/${month}/${year}`;
   };
 
-  // ─── Draw the Erranddo Logo ───
+  // ─── Draw the Errando Logo ───
   const drawLogo = (doc: jsPDF, x: number, y: number) => {
     // Draw the 3 orange horizontal lines (like a menu/hamburger icon with slant)
     doc.setDrawColor(232, 119, 34); // Orange
@@ -184,11 +184,11 @@ const InvoicePro = () => {
     doc.line(x, y + 7, x + 18, y + 5);
     doc.line(x, y + 12, x + 18, y + 10);
 
-    // "ERRANDDO" text in orange
+    // "ERRANDO" text in orange
     doc.setFont("helvetica", "bold");
     doc.setFontSize(22);
     doc.setTextColor(232, 119, 34);
-    doc.text("ERRANDDO", x + 22, y + 12);
+    doc.text("ERRANDO", x + 22, y + 12);
 
     // Running man icon in blue (simplified)
     const manX = x + 85;
@@ -211,7 +211,7 @@ const InvoicePro = () => {
     doc.line(manX + 1, manY + 9, manX + 4, manY + 13);
   };
 
-  // ─── Generate PDF matching the exact Erranddo invoice layout ───
+  // ─── Generate PDF matching the exact Errando invoice layout ───
   const generateInvoicePDF = async (invoice: InvoiceItem) => {
     const doc = new jsPDF("p", "mm", "a4");
     const leftMargin = 20;
@@ -236,9 +236,9 @@ const InvoicePro = () => {
     doc.setFont("helvetica", "normal");
     doc.setFontSize(9);
 
-    // "Erranddo.com" clickable link
+    // "Errando.com" clickable link
     doc.setTextColor(0, 51, 153); // Blue for links
-    const websiteText = "Erranddo.com";
+    const websiteText = "Errando.com";
     const websiteWidth = doc.getTextWidth(websiteText);
     const websiteStartX = rightTextX - websiteWidth;
     doc.textWithLink(websiteText, websiteStartX, rightY, {
@@ -369,7 +369,7 @@ const InvoicePro = () => {
 
     const lineItems: InvoiceLineItem[] = invoice.items || [
       {
-        description: "Erranddo Credits",
+        description: "Errando Credits",
         rate: invoice.subtotal
           ? (
               Number(

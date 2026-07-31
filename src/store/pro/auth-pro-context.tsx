@@ -6,6 +6,7 @@ import { toast } from "react-toastify";
 import useSWR, { KeyedMutator } from "swr";
 import { fetcher } from "../customer/home-context";
 import { API_BASE_URL, buildApiUrl, API_ENDPOINTS } from "../../config/api";
+import { clearAuthStorage, getBearerToken } from "../../utils/authSession";
 
 //auth response type declaration
 type AuthResponseType = {
@@ -236,6 +237,31 @@ const AuthContextProvider = (props: { children: React.ReactNode }) => {
 
   // const url = buildApiUrl(`${API_ENDPOINTS.USER_REQUESTS}?page=${currentPage}&per_page=${perPage}&status=PENDING&user_id=${id}`);
   const userData: UserData = userdata?.data;
+
+  useEffect(() => {
+    const onExpired = () => {
+      setData(undefined);
+      setIsLoggedIn(false);
+      navigate("/sign-in");
+    };
+    window.addEventListener("auth:expired", onExpired);
+    return () => window.removeEventListener("auth:expired", onExpired);
+  }, [navigate]);
+
+  useEffect(() => {
+    if (!userId || !userdata) return;
+    if (
+      userdata.status === "0" &&
+      (userdata.message === "Unauthorized" ||
+        userdata.message === "No token found" ||
+        userdata.message === "Invalid token format")
+    ) {
+      clearAuthStorage();
+      setData(undefined);
+      setIsLoggedIn(false);
+      navigate("/sign-in");
+    }
+  }, [userdata, userId, navigate]);
 
   //Manage Loading
   const manageLoading = async (boolean: boolean) => {
@@ -505,42 +531,30 @@ const AuthContextProvider = (props: { children: React.ReactNode }) => {
     }
   };
 
-  //logout
+  //logout — always clear local session (token may already be gone server-side)
   const logoutHandler = async () => {
     setIsLoading(true);
     setError("");
-    const token = localStorage.getItem("token");
+    const bearer = getBearerToken();
 
-    const res = await fetch(
-      buildApiUrl(API_ENDPOINTS.USER_LOGOUT),
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+    try {
+      if (bearer) {
+        await fetch(buildApiUrl(API_ENDPOINTS.USER_LOGOUT), {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${bearer}`,
+            Accept: "application/json",
+          },
+        });
       }
-    );
-    if (res.status === 200) {
-      const data = await res.json();
+    } catch {
+      // ignore network / 401 — local logout still proceeds
+    } finally {
+      clearAuthStorage();
+      setIsLoggedIn(false);
+      setData(undefined);
       setIsLoading(false);
-      if (data.status === "1") {
-        // on success
-        setTimeout(() => {
-          localStorage.removeItem("token");
-          localStorage.removeItem("role");
-          localStorage.removeItem("data");
-
-          localStorage.setItem("isLoggedIn", "false");
-          setIsLoggedIn(false);
-          setIsLoading(false);
-          navigate("/sign-in");
-        }, 1000);
-      } else {
-        setError(data.message);
-      }
-    } else {
-      const data = await res.json();
-      setIsLoading(false);
+      navigate("/sign-in");
     }
   };
 

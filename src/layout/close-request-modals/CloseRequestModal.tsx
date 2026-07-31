@@ -38,7 +38,7 @@ function CloseRequestModal(props: {
 
   const list = [
     ...(datarender ?? []),
-    { name: "I’ve hired a pro out of Erranddo", id: 0 },
+    { name: "I’ve hired a pro out of Errando", id: 0 },
     { name: "I’ve changed my mind and don’t need the service anymore", id: 0 },
   ];
   const { theme } = useTheme();

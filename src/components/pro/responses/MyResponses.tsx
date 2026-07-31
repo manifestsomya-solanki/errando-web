@@ -37,6 +37,7 @@ import dayjs from "dayjs";
 import { API_BASE_URL, buildApiUrl, API_ENDPOINTS } from "../../../config/api";
 import { getLeadPurchaseSlotCount } from "../../../utils/leadSlots";
 import { formatUKPostcode } from "../../../utils/postcodeFormatter";
+import { resolveAssetUrl } from "../../../utils/resolveAssetUrl";
 
 function getTimeDifferenceString(time: any) {
   const currentTime = dayjs();
@@ -303,7 +304,7 @@ function MyResponses() {
             <div className="flex items-center gap-2">
               {leadsDetail?.user?.img_avatar ? (
                 <img
-                  src={`https://erranddo.s3.eu-west-2.amazonaws.com/${leadsDetail?.user?.img_avatar}`}
+                  src={resolveAssetUrl(leadsDetail?.user?.img_avatar)}
                   className="w-20 h-20 rounded-full object-cover"
                 />
               ) : (

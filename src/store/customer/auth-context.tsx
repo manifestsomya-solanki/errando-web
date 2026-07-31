@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { createContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { RegisterUser, SendOtp, UserData, VerifyOtp } from "../../models/user";
@@ -7,6 +7,7 @@ import useSWR, { KeyedMutator } from "swr";
 import { mutate as globalMutate } from "swr";
 import { fetcher } from "./home-context";
 import { API_BASE_URL, buildApiUrl, API_ENDPOINTS } from "../../config/api";
+import { clearAuthStorage, getBearerToken } from "../../utils/authSession";
 
 //auth response type declaration
 type AuthResponseType = {
@@ -127,7 +128,9 @@ const AuthContextProvider = (props: { children: React.ReactNode }) => {
   if (initialToken) {
     id = JSON.parse(initialToken).id;
   }
-  const userDetailUrl = buildApiUrl(`${API_ENDPOINTS.USER_DETAIL}?user_id=${id}`);
+  const userDetailUrl = id
+    ? buildApiUrl(`${API_ENDPOINTS.USER_DETAIL}?user_id=${id}`)
+    : null;
   const {
     data: userdata,
     isLoading: detailLoading,
@@ -136,6 +139,32 @@ const AuthContextProvider = (props: { children: React.ReactNode }) => {
 
   // const url = buildApiUrl(`${API_ENDPOINTS.USER_REQUESTS}?page=${currentPage}&per_page=${perPage}&status=PENDING&user_id=${id}`);
   const userData: UserData = userdata?.data;
+
+  // Expired / invalid server session → force local logout
+  useEffect(() => {
+    const onExpired = () => {
+      setData(undefined);
+      setIsLoggedIn(false);
+      navigate("/sign-in");
+    };
+    window.addEventListener("auth:expired", onExpired);
+    return () => window.removeEventListener("auth:expired", onExpired);
+  }, [navigate]);
+
+  useEffect(() => {
+    if (!id || !userdata) return;
+    if (
+      userdata.status === "0" &&
+      (userdata.message === "Unauthorized" ||
+        userdata.message === "No token found" ||
+        userdata.message === "Invalid token format")
+    ) {
+      clearAuthStorage();
+      setData(undefined);
+      setIsLoggedIn(false);
+      navigate("/sign-in");
+    }
+  }, [userdata, id, navigate]);
 
   //Manage Loading
   const manageLoading = async (boolean: boolean) => {
@@ -451,56 +480,30 @@ const AuthContextProvider = (props: { children: React.ReactNode }) => {
     }
   };
 
-  //logout
+  //logout — always clear local session (token may already be gone server-side)
   const logoutHandler = async () => {
     setIsLoading(true);
     setError("");
-    const token = localStorage.getItem("token");
+    const bearer = getBearerToken();
 
-    const res = await fetch(
-      buildApiUrl(API_ENDPOINTS.USER_LOGOUT),
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+    try {
+      if (bearer) {
+        await fetch(buildApiUrl(API_ENDPOINTS.USER_LOGOUT), {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${bearer}`,
+            Accept: "application/json",
+          },
+        });
       }
-    );
-    if (res.status === 200) {
-      const data = await res.json();
+    } catch {
+      // ignore network / 401 — local logout still proceeds
+    } finally {
+      clearAuthStorage();
+      setIsLoggedIn(false);
+      setData(undefined);
       setIsLoading(false);
-      if (data.status === "1") {
-        // on success - clear all authentication and service flow data
-        setTimeout(() => {
-          // Clear all authentication data
-          localStorage.removeItem("token");
-          localStorage.removeItem("role");
-          localStorage.removeItem("data");
-          localStorage.removeItem("isLoggedIn");
-          
-          // Clear service flow data
-          localStorage.removeItem("service");
-          localStorage.removeItem("post_code");
-          localStorage.removeItem("question");
-          
-          // Clear registration data
-          localStorage.removeItem("email");
-          localStorage.removeItem("mobile_number");
-          
-          // Clear pending request data
-          localStorage.removeItem("pending_request_data");
-          localStorage.removeItem("pending_request_token");
-          
-          setIsLoggedIn(false);
-          setIsLoading(false);
-          navigate("/sign-in");
-        }, 1000);
-      } else {
-        setError(data.message);
-      }
-    } else {
-      const data = await res.json();
-      setIsLoading(false);
+      navigate("/sign-in");
     }
   };
 

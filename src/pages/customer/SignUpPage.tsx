@@ -12,7 +12,6 @@ import { NavLink } from "react-router-dom";
 const SignUpPage = () => {
   const [openModal, setOpenModal] = useState(false);
   const { register, error, isLoading, setError } = useAuth();
-  console.log(error);
   const formik = useFormik({
     initialValues: {
       name: "",
@@ -79,7 +78,6 @@ const SignUpPage = () => {
 
     return () => clearInterval(interval);
   }, []);
-  console.log(openModal);
   const inputClassName =
     "rounded-lg  bg-white dark:text-darktextColor dark:bg-black shadow-md xs:w-full outline-none pl-3 ";
   return (
@@ -108,7 +106,7 @@ const SignUpPage = () => {
                   />
                   <Heading
                     variant="headingTitle"
-                    text="Welcome to Erranddo. DashBoard"
+                    text="Welcome to Errando. DashBoard"
                     headingclassname="!font-medium !font-poppins-bold tracking-wide dark:text-darktextColor "
                   />
                 </div>

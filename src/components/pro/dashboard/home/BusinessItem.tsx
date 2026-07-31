@@ -17,6 +17,7 @@ import {
   getProAggregateStarLayoutFromRaw,
 } from "../../../../utils/proReviewAggregateDisplay";
 import { HalfStarCut } from "../../../UI/HalfStarCut";
+import { resolveAssetUrl } from "../../../../utils/resolveAssetUrl";
 
 function DangerousHTML({
   dangerouslySetInnerHTML,
@@ -98,7 +99,7 @@ function BusinessItem(props: {
                 <div className="flex gap-2 items-center w-full">
                   {props.image ? (
                     <img
-                      src={`https://erranddo.s3.eu-west-2.amazonaws.com/${props.image}`}
+                      src={resolveAssetUrl(props.image)}
                       className="w-16 h-16 rounded-full object-cover dark:border-[0.5px] dark:border-white border-[0.5px] border-textColor"
                     />
                   ) : (

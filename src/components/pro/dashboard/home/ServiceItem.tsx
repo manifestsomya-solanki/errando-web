@@ -96,9 +96,12 @@ function ServiceItem(props: {
                 </div>
               </div>
               {props?.location &&
-                props.location.map((item) => {
+                props.location.map((item, index) => {
                   return (
-                    <div className="flex items-center gap-2 my-0">
+                    <div
+                      key={`${item?.postcode ?? 'loc'}-${item?.radius ?? index}-${index}`}
+                      className="flex items-center gap-2 my-0"
+                    >
                       {theme === "light" && (
                         <div children={<Location color="black" />} />
                       )}

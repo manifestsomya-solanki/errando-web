@@ -12,7 +12,7 @@ function AnswersSections(props: { array: Request[]; location: string }) {
       <div className="py-4 grid lg:grid-cols-4 gap-7 w-full xs:grid-cols-1 ">
         {questions.map((item, key) => {
           return (
-            <div>
+            <div key={`${item}-${key}`}>
               <AnswerItem question={item} answer={answers[key]} />
             </div>
           );

@@ -13,6 +13,7 @@ import styles from "../../../../../styles/ReactModa.module.css";
 import Close from "../../../../../assets/close";
 import LeftArrow from "../../../../../assets/left-arrow.svg";
 import RightArrow from "../../../../../assets/right-arrow.svg";
+import { resolveAssetUrl } from "../../../../../utils/resolveAssetUrl";
 
 function PhotoWithDustbin(props: {
   src: any;
@@ -76,12 +77,12 @@ function PhotoWithDustbin(props: {
                 loop={true}
                 preload="auto"
                 autoPlay={true}
-                src={`https://erranddo.s3.eu-west-2.amazonaws.com/${props.images[currentImageIndex].file_path}`}
+                src={resolveAssetUrl(props.images[currentImageIndex].file_path)}
                 className="w-[100%] lg:max-h-[40rem] xs:max-h-[30rem] object-cover"
               />
             ) : (
               <img
-                src={`https://erranddo.s3.eu-west-2.amazonaws.com/${props.images[currentImageIndex].file_path}`}
+                src={resolveAssetUrl(props.images[currentImageIndex].file_path)}
                 alt={props.alt}
                 className="w-[100%] lg:max-h-[40rem] xs:max-h-[30rem] object-cover"
               />
@@ -152,7 +153,7 @@ function PhotosSection(props: { images: File[] }) {
                       index={key}
                       images={props.images}
                       id={image.id}
-                      src={`https://erranddo.s3.eu-west-2.amazonaws.com/${image.file_path}`}
+                      src={resolveAssetUrl(image.file_path)}
                       alt="Photo One"
                     />
                   </div>

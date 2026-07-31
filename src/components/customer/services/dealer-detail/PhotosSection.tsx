@@ -13,6 +13,7 @@ import RightArrow from "../../../../assets/right-arrow.svg";
 import Heading from "../../../UI/Heading";
 import { useState } from "react";
 import { API_BASE_URL, buildApiUrl, API_ENDPOINTS } from "../../../../config/api";
+import { resolveAssetUrl } from "../../../../utils/resolveAssetUrl";
 // import Modal from "../../../../layout/home/Modal";
 
 function PhotosSection() {
@@ -100,12 +101,12 @@ function PhotosSection() {
                   loop={true}
                   preload="auto"
                   autoPlay={true}
-                  src={`https://erranddo.s3.eu-west-2.amazonaws.com/${photoData.files[currentImageIndex].file_path}`}
+                  src={resolveAssetUrl(photoData.files[currentImageIndex].file_path)}
                   className="w-[100%] lg:max-h-[40rem] xs:max-h-[30rem] object-cover"
                 />
               ) : (
                 <img
-                  src={`https://erranddo.s3.eu-west-2.amazonaws.com/${photoData.files[currentImageIndex].file_path}`}
+                  src={resolveAssetUrl(photoData.files[currentImageIndex].file_path)}
                   alt={"image"}
                   className="w-[100%] lg:max-h-[40rem] xs:max-h-[30rem] object-cover"
                 />
@@ -126,7 +127,7 @@ function PhotosSection() {
                     setCurrentImageIndex(index);
                     setimgShow(true);
                   }}
-                  src={`https://erranddo.s3.eu-west-2.amazonaws.com/${photo.file_path}`}
+                  src={resolveAssetUrl(photo.file_path)}
                   className="lg:h-60 md:h-36 xs:h-44 w-full object-cover"
                 />
               ) : (
@@ -136,7 +137,7 @@ function PhotosSection() {
 
                     setimgShow(true);
                   }}
-                  src={`https://erranddo.s3.eu-west-2.amazonaws.com/${photo.file_path}`}
+                  src={resolveAssetUrl(photo.file_path)}
                   alt={`Photo`}
                   className="lg:h-60 md:h-36 xs:h-44 w-full object-cover"
                 />

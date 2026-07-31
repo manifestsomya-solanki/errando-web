@@ -38,6 +38,7 @@ import { useChatCustomer } from "../../../../store/customer/customer-chat-contex
 import { useLocation, useNavigate } from "react-router";
 import { useAuth } from "../../../../store/customer/auth-context";
 import Download from "../../../../assets/Download";
+import { resolveAssetUrl } from "../../../../utils/resolveAssetUrl";
 import useSWR from "swr";
 import { fetcher } from "../../../../store/customer/home-context";
 import { UserData } from "../../../../models/user";
@@ -393,7 +394,7 @@ const MessagesDetailMainPage = () => {
                     <img
                       src={
                         user?.photoURL
-                          ? `https://erranddo.s3.eu-west-2.amazonaws.com/${user?.photoURL}`
+                          ? resolveAssetUrl(user?.photoURL)
                           : NoImage
                       }
                       className="w-8 h-8 rounded-full object-cover"

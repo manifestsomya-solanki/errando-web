@@ -27,6 +27,7 @@ import useSWR, { KeyedMutator } from "swr";
 import { fetcher } from "../../../../store/customer/home-context";
 import { UserData } from "../../../../models/user";
 import { API_BASE_URL, buildApiUrl, API_ENDPOINTS } from "../../../../config/api";
+import NoImage from "../../../../assets/no-photo.png";
 import {
   formatProAggregateRatingLabel,
   getProAggregateStarLayoutFromRaw,
@@ -176,7 +177,7 @@ function DealerDetailSection(props: {
     <>
       <div className="border-b-[0.5px] border-b-slate-300 lg:py-10 xs:py-5 ">
         <img
-          src={props.icon}
+          src={props.icon || NoImage}
           className="lg:w-48 xs:w-20 float-left mr-5 lg:h-48 xs:h-20 rounded-full object-cover"
         />
         <div className=" my-2 relative">
@@ -301,7 +302,7 @@ function DealerDetailSection(props: {
             <div className="flex gap-2">
               <img src={LeftArrow} className="w-3 lg:hidden" />
               <Heading
-                text={`Erranddo Hires : 25`}
+                text={`Errando Hires : 25`}
                 variant="subHeader"
                 headingclassname="text-primaryYellow !font-semibold tracking-wide lg:text-xs text-md "
               />

@@ -12,7 +12,9 @@ import { buildApiUrl, API_ENDPOINTS } from "../../../../config/api";
 
 function FilterSection(props: any) {
   const { businessListHandler, to_show_interest } = useServices();
-  const url = buildApiUrl(`${API_ENDPOINTS.BUSINESSES_COUNT}?user_request_id=${props.userRequestId}`);
+  const url = props.userRequestId
+    ? buildApiUrl(`${API_ENDPOINTS.BUSINESSES_COUNT}?user_request_id=${props.userRequestId}`)
+    : null;
   const { data } = useSWR(url, fetcher);
 
   const dropDownOne = [

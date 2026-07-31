@@ -10,6 +10,7 @@ import { UserData } from "../../../../models/user";
 import profileAvatar from "../../../../assets/avatar.svg";
 import DeleteImageModal from "../../../../layout/pro-models/DeleteImageModal";
 import { API_BASE_URL, buildApiUrl, API_ENDPOINTS } from "../../../../config/api";
+import { resolveAssetUrl } from "../../../../utils/resolveAssetUrl";
 
 function PersonalInfo() {
   const [profileModal, setProfileModal] = useState(false);
@@ -22,7 +23,7 @@ function PersonalInfo() {
   const url = buildApiUrl(`${API_ENDPOINTS.USER_DETAIL}?user_id=${userData?.id}`);
   const { data } = useSWR(url, fetcher);
   const profileData: UserData = data?.data ?? "";
-  const profilePhoto = `https://erranddo.s3.eu-west-2.amazonaws.com/${profileData?.img_avatar}`;
+  const profilePhoto = resolveAssetUrl(profileData?.img_avatar);
   const [deleteImageHandler, setDeleteImageHandler] = useState(false);
 
   return (

@@ -70,11 +70,11 @@ function CommentItem(props: {
           )}
         </div>
         <div className=" flex gap-1 text-gray-500 !font-normal tracking-wide !text-xs">
-          {Array.from({ length: props.ratingCount }, () => (
-            <img src={GoldStar} />
+          {Array.from({ length: props.ratingCount }, (_, i) => (
+            <img key={`gold-${i}`} src={GoldStar} alt="" />
           ))}
-          {Array.from({ length: 5 - props.ratingCount }, () => (
-            <img src={Star} />
+          {Array.from({ length: 5 - props.ratingCount }, (_, i) => (
+            <img key={`empty-${i}`} src={Star} alt="" />
           ))}
           <Heading
             text={`${props.date}`}
