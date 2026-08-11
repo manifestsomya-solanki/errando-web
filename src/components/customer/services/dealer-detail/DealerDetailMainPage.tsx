@@ -67,6 +67,7 @@ function DealerDetailMainPage() {
                   requestId={userRequestId}
                   service={serviceName}
                   userBusinessId={userIdFromState || serviceData?.user_id}
+                  businessId={serviceData?.id}
                   title={serviceData?.name}
                   subTitle={subTitle}
                   location={distance}

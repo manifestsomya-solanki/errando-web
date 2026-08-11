@@ -1,38 +1,39 @@
-import React, { useState, useContext } from "react";
+import React, { useContext } from "react";
 import { createContext } from "react";
 import { buildApiUrl, API_ENDPOINTS } from "../../config/api";
 
 type ChatResposneType = {
-  addChat: (user_id: number, message: string) => void;
+  addChat: (user_id: number, message: string, business_id: number) => void;
 };
 
 export const ChatCustomerContext = createContext<ChatResposneType>({
-  addChat: (user_id: number, message: string) => console.log(user_id, message),
+  addChat: () => undefined,
 });
-// addChat: (user_id: number, message: string) => console.log(user_id, message),
 
 const ChatCustomerContextProvider = (props: { children: React.ReactNode }) => {
-  const AddChat = async (user_id: number, message: string) => {
+  const AddChat = async (
+    user_id: number,
+    message: string,
+    business_id: number
+  ) => {
     const token = localStorage.getItem("token");
-    // const formData: any = {
-    //     user_id: user_id,
-    //     message: message,
-    // }
-    const res = await fetch(
-      buildApiUrl(`${API_ENDPOINTS.CHAT_SEND_NOTIFICATION}?user_id=${user_id}&message=${message}`),
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-    if (res.status === 200) {
-      const data: any = await res.json();
-    } else {
-      const data: any = await res.json();
-    }
+    if (!user_id || !business_id || !message?.trim()) return;
+
+    await fetch(buildApiUrl(API_ENDPOINTS.CHAT_SEND_NOTIFICATION), {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify({
+        user_id,
+        message,
+        business_id,
+      }),
+    });
   };
+
   return (
     <ChatCustomerContext.Provider
       value={{

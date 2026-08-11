@@ -49,6 +49,7 @@ function DangerousHTML({
 
 function DealerDetailSection(props: {
   userBusinessId?: number;
+  businessId?: number;
   businessName: string;
   icon: any;
   title: string;
@@ -185,6 +186,7 @@ function DealerDetailSection(props: {
             to="/messages"
             state={{
               id: props?.userBusinessId,
+              businessId: props?.businessId,
               displayPhoto: props?.icon,
               name: props.service,
               quote: `Quote: £${props.quote} ${props.quoteType}`,
@@ -343,10 +345,13 @@ function DealerDetailSection(props: {
                 to="/messages"
                 state={{
                   id: props?.userBusinessId,
+                  businessId: props?.businessId,
                   displayPhoto: props?.icon,
                   name: props.service,
                   quote: `Quote: ${props.quote} ${props.quoteType}`,
                   isQuote: props.quote ? true : false,
+                  requestId: props?.requestId,
+                  businessName: props.businessName,
                 }}
               >
                 <Button

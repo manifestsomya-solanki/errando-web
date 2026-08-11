@@ -221,7 +221,9 @@ function ChatItems() {
         ],
       };
       const temp = await addDoc(collection(db, "chats"), { ...chatData });
-      if (user?.uid) addChat(user?.uid, userInput);
+      if (currentUser?.uid && state?.businessId) {
+        addChat(currentUser.uid, userInput, state.businessId);
+      }
       await addDoc(
         collection(db, "chats", temp.id, "messages"),
         {
@@ -232,7 +234,9 @@ function ChatItems() {
         }
       );
     } else {
-      if (user?.uid) addChat(user?.uid, userInput);
+      if (currentUser?.uid && state?.businessId) {
+        addChat(currentUser.uid, userInput, state.businessId);
+      }
       await addDoc(
         collection(db, "chats", getChatDocument.docs[0].id, "messages"), //docs[0] is already exisiting doc
         {

@@ -48,6 +48,7 @@ import { API_BASE_URL, buildApiUrl, API_ENDPOINTS } from "../../../../config/api
 const initialPageSize = 12;
 const MessagesDetailMainPage = () => {
   const businessUserId = useLocation()?.state?.id;
+  const businessIdFromState = useLocation()?.state?.businessId;
   const serviceName = useLocation()?.state?.name;
   const businessName = useLocation()?.state?.businessName;
   const quote = useLocation()?.state?.quote;
@@ -74,6 +75,10 @@ const MessagesDetailMainPage = () => {
   const { data: businessData } = useSWR(businessDetailUrl, fetcher);
   const businessList = businessData?.data || [];
   const proBusinessName = businessList?.length > 0 ? businessList[0]?.name : null;
+  const resolvedBusinessId =
+    Number(businessIdFromState) ||
+    Number(businessList?.[0]?.id) ||
+    0;
 
   const user = {
     uid: userData?.id,
@@ -247,7 +252,9 @@ const MessagesDetailMainPage = () => {
         ],
       };
       const temp = await addDoc(collection(db, "chats"), { ...chatData });
-      if (user?.uid) addChat(user?.uid, userInput);
+      if (currentUser?.uid && resolvedBusinessId) {
+        addChat(currentUser.uid, userInput, resolvedBusinessId);
+      }
       await addDoc(
         collection(db, "chats", temp.id, "messages"),
         {
@@ -258,7 +265,9 @@ const MessagesDetailMainPage = () => {
         }
       );
     } else {
-      if (user?.uid) addChat(user?.uid, userInput);
+      if (currentUser?.uid && resolvedBusinessId) {
+        addChat(currentUser.uid, userInput, resolvedBusinessId);
+      }
       await addDoc(
         collection(db, "chats", getChatDocument?.docs[0]?.id, "messages"), //docs[0] is already exisiting doc
         {

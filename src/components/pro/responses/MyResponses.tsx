@@ -277,7 +277,10 @@ function MyResponses() {
                     handleSelect();
                     navigate(`/pro/responses/chat`, {
                       state: {
-                        businessId: leadsDetail?.user_bussiness?.id,
+                        businessId:
+                          leadsDetail?.leads?.[0]?.user_business_id ||
+                          leadsDetail?.provider_bussiness?.[0]?.id ||
+                          leadsDetail?.user_bussiness?.id,
                         userId: leadsDetail?.user?.id,
                         fullName: leadsDetail?.user?.full_name,
                         imgAvatar: leadsDetail?.user?.img_avatar,

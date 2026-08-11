@@ -486,6 +486,7 @@ function ServiceCard(props: any) {
                   to="/messages"
                   state={{
                     id: props?.userId,
+                    businessId: props?.id,
                     displayPhoto: props?.icon,
                     name: props.serviceName,
                     quote: `Quote: £${props.quotes} ${props.quoteTypes}`,
@@ -521,6 +522,7 @@ function ServiceCard(props: any) {
                   to="/messages"
                   state={{
                     id: props?.userId,
+                    businessId: props?.id,
                     displayPhoto: props?.icon,
                     name: props.serviceName,
                     businessName: props.title,
