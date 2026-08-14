@@ -2,6 +2,7 @@ import { useNavigate } from "react-router";
 import { Request } from "../../../../models/customer/requestlist";
 import TableFooter from "../../../pro/leads/TableFooter";
 import { useProject } from "../../../../store/customer/project-context";
+import { isPendingRequest } from "../../../../utils/requestStatus";
 
 function CurrentProjectTable(props: { data: Request[] }) {
   const requestData = props?.data;
@@ -21,7 +22,7 @@ function CurrentProjectTable(props: { data: Request[] }) {
         </thead>
         <tbody>
         {requestData?.map((d, key) => {
-          if (d?.status === "PENDING") {
+          if (isPendingRequest(d)) {
             const date = d?.created_at;
             return (
               <tr

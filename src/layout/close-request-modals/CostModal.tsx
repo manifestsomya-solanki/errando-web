@@ -11,7 +11,6 @@ import { useTheme } from "../../store/theme-context";
 import { useNavigate, useParams } from "react-router";
 import { useCloseRequest } from "../../store/customer/close-request-context.tsx";
 import Button from "../../components/UI/Button.tsx";
-import { useProject } from "../../store/customer/project-context.tsx";
 function CostModal(props: {
   businessId: string;
   closeAnswer: string;
@@ -22,31 +21,40 @@ function CostModal(props: {
 }) {
   const requestId = useParams();
   const { closeRequestHandler, isLoading } = useCloseRequest();
-  const { isCompleteMutate, isCurrentMutate } = useProject();
 
   const formik = useFormik({
     initialValues: {
       price: "",
-      price_type: "",
+      price_type: "Fixed Price",
     },
 
     onSubmit: async (values) => {
       const formData = new FormData();
       if (props?.businessId) {
-        formData.set("business_id", props?.businessId);
+        formData.set("business_id", props.businessId);
       }
-      formData.set("close_answer", props?.closeAnswer);
+      if (props?.closeAnswer) {
+        formData.set("close_answer", props.closeAnswer);
+      }
       if (values?.price.length === 0) {
         formData.set("price", "0");
       } else {
         formData.set("price", values?.price);
       }
-      if (values?.price_type) {
-        formData.set("price_type", values?.price_type);
+      formData.set("price_type", values?.price_type || "Fixed Price");
+
+      if (!requestId?.id) return;
+
+      const closed = await closeRequestHandler(formData, +requestId.id);
+      if (!closed) return;
+
+      if (props?.businessId) {
+        setOpenReviewModal(true);
+        return;
       }
-      if (requestId?.id) await closeRequestHandler(formData, +requestId?.id);
-      await isCurrentMutate();
-      await isCompleteMutate();
+
+      props.onCancelAll();
+      navigate("/projects");
     },
   });
   const dropDownOne = [
@@ -164,15 +172,6 @@ function CostModal(props: {
                 <Button
                   loading={isLoading}
                   type="submit"
-                  onClick={async () => {
-                    if (props?.businessId) {
-                      setOpenReviewModal(true);
-                    } else {
-                      setTimeout(() => {
-                        navigate("/projects");
-                      }, 1000);
-                    }
-                  }}
                   buttonClassName="text-white w-36 bg-[#0003FF] hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 xl:text-lg md:text-sm rounded-xl xl:h-12 lg:h-10 xs:h-10 md:px-2 xs:px-5 text-center mr-3 md:mr-0 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
                 >
                   Close Request

@@ -51,12 +51,16 @@ function SeviceDetailMainPage() {
 
   const [openModal, setOpenModal] = useState(false);
   const customerPostingPaused = !!serviceRequestData?.customer_posting_paused;
+  const isClosed =
+    serviceRequestData?.status === "COMPLETED" ||
+    serviceRequestData?.is_closed === 1 ||
+    serviceRequestData?.is_closed === "1";
 
   return (
     <>
       {
         <CloseRequestModal
-          serviceId={data?.service_id}
+          serviceId={serviceRequestData?.service_id}
           open={openModal}
           onCancel={() => {
             setOpenModal(false);
@@ -104,15 +108,17 @@ function SeviceDetailMainPage() {
             )}
           </div>
           <div>
-            <Button
-              variant="filled"
-              color="secondary"
-              size="normal"
-              children="Close Request"
-              centerClassName="flex items-center justify-center"
-              buttonClassName="!px-4 py-2 text-sm tracking-wide md:hidden  w-full"
-              onClick={() => setOpenModal(true)}
-            />
+            {!isClosed && (
+              <Button
+                variant="filled"
+                color="secondary"
+                size="normal"
+                children="Close Request"
+                centerClassName="flex items-center justify-center"
+                buttonClassName="!px-4 py-2 text-sm tracking-wide md:hidden  w-full"
+                onClick={() => setOpenModal(true)}
+              />
+            )}
             {customerPostingPaused ? (
               <div className="w-full flex flex-col items-center justify-center py-10 gap-4">
                 <div className="w-14 h-14 rounded-full bg-red-50 dark:bg-red-900/30 flex items-center justify-center">

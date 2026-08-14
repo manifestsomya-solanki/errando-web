@@ -17,6 +17,7 @@ export interface Request {
   file?: any;
   comment: string;
   status: string;
+  is_closed?: number | string;
   created_at: string;
   updated_at: string;
   request_quotes_count: number;

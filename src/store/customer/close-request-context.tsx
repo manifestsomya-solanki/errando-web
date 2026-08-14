@@ -1,17 +1,34 @@
 import React, { ReactNode, useContext, useState } from "react";
 import { toast } from "react-toastify";
+import { mutate } from "swr";
 import { buildApiUrl, API_ENDPOINTS } from "../../config/api";
 
 type CloseRequestType = {
-  closeRequestHandler: (formData: FormData, requestId: number) => Promise<void>;
+  closeRequestHandler: (
+    formData: FormData,
+    requestId: number
+  ) => Promise<boolean>;
   isLoading: boolean;
   error: string;
 };
 
+async function refreshProjectLists() {
+  try {
+    await mutate(
+      (key) =>
+        typeof key === "string" &&
+        key.includes(API_ENDPOINTS.USER_REQUESTS) &&
+        key.includes("user_id="),
+      undefined,
+      { revalidate: true }
+    );
+  } catch {
+    // Ignore cache refresh errors; close already succeeded.
+  }
+}
+
 export const CloseRequestContext = React.createContext<CloseRequestType>({
-  closeRequestHandler: async (formData: FormData, requestId: number) => {
-    console.log(formData);
-  },
+  closeRequestHandler: async () => false,
   isLoading: false,
   error: "",
 });
@@ -19,7 +36,10 @@ export const CloseRequestContext = React.createContext<CloseRequestType>({
 const CloseRequestProvider = (props: { children: ReactNode }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
-  const closeRequestHandler = async (formData: FormData, requestId: number) => {
+  const closeRequestHandler = async (
+    formData: FormData,
+    requestId: number
+  ): Promise<boolean> => {
     setIsLoading(true);
     setError("");
     const token = localStorage.getItem("token");
@@ -28,12 +48,10 @@ const CloseRequestProvider = (props: { children: ReactNode }) => {
       setError("Authentication token not found");
       setIsLoading(false);
       toast.error("Please login again");
-      return;
+      return false;
     }
 
     try {
-      console.log("Closing request:", requestId, "FormData:", Object.fromEntries(formData));
-      
       const res = await fetch(
         buildApiUrl(`${API_ENDPOINTS.USER_REQUESTS}/${requestId}/close`),
         {
@@ -45,47 +63,46 @@ const CloseRequestProvider = (props: { children: ReactNode }) => {
           body: formData,
         }
       );
-      
-      console.log("Response status:", res.status, "Content-Type:", res.headers.get("content-type"));
-      
+
       let data: any = {};
       const contentType = res.headers.get("content-type");
-      
-      // Try to parse JSON response
+
       if (contentType && contentType.includes("application/json")) {
         try {
-          const responseText = await res.text();
-          console.log("Response body:", responseText);
-          data = JSON.parse(responseText);
-        } catch (parseError) {
-          console.error("Failed to parse JSON response:", parseError);
+          data = await res.json();
+        } catch {
           data = { message: "Invalid response from server", status: "0" };
         }
       } else {
-        // If not JSON, get text response
         const text = await res.text();
-        console.error("Non-JSON response:", text);
-        data = { message: text || `Server error occurred (${res.status})`, status: "0" };
+        data = {
+          message: text || `Server error occurred (${res.status})`,
+          status: "0",
+        };
       }
-      
-      console.log("Parsed data:", data);
-      
+
       if (res.status === 200 && data.status === "1") {
         setError("");
         setIsLoading(false);
+        await refreshProjectLists();
         toast.success(data.message || "Request closed successfully");
-      } else {
-        const errorMessage = data.message || data.error || `Failed to close request (Status: ${res.status})`;
-        setError(errorMessage);
-        setIsLoading(false);
-        toast.error(errorMessage);
+        return true;
       }
+
+      const errorMessage =
+        data.message ||
+        data.error ||
+        `Failed to close request (Status: ${res.status})`;
+      setError(errorMessage);
+      setIsLoading(false);
+      toast.error(errorMessage);
+      return false;
     } catch (error: any) {
-      console.error("Close request error:", error);
       const errorMessage = error.message || "Network error occurred";
       setError(errorMessage);
       setIsLoading(false);
       toast.error(errorMessage);
+      return false;
     }
   };
   return (

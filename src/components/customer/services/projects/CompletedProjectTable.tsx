@@ -1,6 +1,7 @@
 import { Request } from "../../../../models/customer/requestlist";
 import { useProject } from "../../../../store/customer/project-context";
 import TableFooter from "../../../pro/leads/TableFooter";
+import { isCompletedRequest } from "../../../../utils/requestStatus";
 function CompletedProjectTable(props: { data: Request[] }) {
   const completeRequestData = props?.data;
   const { completeNumber, handleNextPage, handlePrevPage, completePage } =
@@ -15,7 +16,7 @@ function CompletedProjectTable(props: { data: Request[] }) {
           <th className="py-5 text-left">Response</th>
         </tr>
         {completeRequestData?.map((d) => {
-          if (d?.status === "COMPLETED") {
+          if (isCompletedRequest(d)) {
             const date = d?.updated_at;
             return (
               <tr className="border-b-[0.5px] border-b-slate-300 dark:border-b-lineColor">

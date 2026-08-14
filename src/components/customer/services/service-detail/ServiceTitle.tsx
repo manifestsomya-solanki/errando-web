@@ -8,6 +8,10 @@ function ServiceTitle(props: { data: Request }) {
   const createdAt = new Date(props?.data?.created_at);
   const formattedDate = createdAt.toISOString().split("T")[0];
   const [openModal, setOpenModal] = useState(false);
+  const isClosed =
+    props?.data?.status === "COMPLETED" ||
+    props?.data?.is_closed === 1 ||
+    props?.data?.is_closed === "1";
 
   return (
     <>
@@ -32,14 +36,16 @@ function ServiceTitle(props: { data: Request }) {
           />
         </div>
         <div>
-          <Button
-            variant="filled"
-            color="secondary"
-            size="normal"
-            children="Close Request"
-            buttonClassName="!px-4 py-2 text-sm tracking-wide md:flex xs:hidden"
-            onClick={() => setOpenModal(true)}
-          />
+          {!isClosed && (
+            <Button
+              variant="filled"
+              color="secondary"
+              size="normal"
+              children="Close Request"
+              buttonClassName="!px-4 py-2 text-sm tracking-wide md:flex xs:hidden"
+              onClick={() => setOpenModal(true)}
+            />
+          )}
         </div>
       </div>
     </>
