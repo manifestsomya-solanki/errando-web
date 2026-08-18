@@ -8,6 +8,7 @@ import { mutate as globalMutate } from "swr";
 import { fetcher } from "./home-context";
 import { API_BASE_URL, buildApiUrl, API_ENDPOINTS } from "../../config/api";
 import { clearAuthStorage, getBearerToken } from "../../utils/authSession";
+import { getApiErrorMessage, isRateLimited } from "../../utils/httpErrors";
 
 //auth response type declaration
 type AuthResponseType = {
@@ -166,6 +167,20 @@ const AuthContextProvider = (props: { children: React.ReactNode }) => {
     }
   }, [userdata, id, navigate]);
 
+  const handleAuthHttpError = async (res: Response): Promise<string> => {
+    let data: { message?: string; error?: string } = {};
+    try {
+      data = await res.json();
+    } catch {
+      data = {};
+    }
+    const message = getApiErrorMessage(res, data);
+    if (isRateLimited(res)) {
+      toast.error(message);
+    }
+    return message;
+  };
+
   //Manage Loading
   const manageLoading = async (boolean: boolean) => {
     setIsLoading(boolean);
@@ -200,9 +215,9 @@ const AuthContextProvider = (props: { children: React.ReactNode }) => {
         setError("");
       }
     } else {
-      const data: any = await res.json();
+      const message = await handleAuthHttpError(res);
       setIsCustomerLoading(false);
-      setError(data.message);
+      setError(message);
     }
   };
 
@@ -236,9 +251,9 @@ const AuthContextProvider = (props: { children: React.ReactNode }) => {
         setError("");
       }
     } else {
-      const data: any = await res.json();
+      const message = await handleAuthHttpError(res);
       setIsProLoading(false);
-      setError(data.message);
+      setError(message);
     }
   };
 
@@ -298,9 +313,9 @@ const AuthContextProvider = (props: { children: React.ReactNode }) => {
         }
       }
     } else {
-      const data: any = await res.json();
+      const message = await handleAuthHttpError(res);
       setIsLoading(false);
-      setError(data.message);
+      setError(message);
     }
   };
 
@@ -364,10 +379,10 @@ const AuthContextProvider = (props: { children: React.ReactNode }) => {
         return 1;
       }
     } else {
-      const data: any = await res.json();
-      console.log('OTP Error Response:', data);
+      const message = await handleAuthHttpError(res);
+      console.log('OTP Error Response:', message);
       setIsLoading(false);
-      setError(data.message);
+      setError(message);
       return 0;
     }
   };
@@ -394,9 +409,9 @@ const AuthContextProvider = (props: { children: React.ReactNode }) => {
         return 1;
       }
     } else {
-      const data: any = await res.json();
+      const message = await handleAuthHttpError(res);
       setIsLoading(false);
-      setError(data.message);
+      setError(message);
       return 0;
     }
   };
@@ -425,8 +440,8 @@ const AuthContextProvider = (props: { children: React.ReactNode }) => {
         setError(data.message);
       }
     } else {
-      const data: any = await res.json();
-      setError(data.message);
+      const message = await handleAuthHttpError(res);
+      setError(message);
       setIsLoading(false);
     }
   };
@@ -471,10 +486,10 @@ const AuthContextProvider = (props: { children: React.ReactNode }) => {
         });
       }
     } else {
-      const data: any = await res.json();
+      const message = await handleAuthHttpError(res);
       setIsPasswordLoading(false);
-      setError(data.message);
-      toast.error("Error", {
+      setError(message);
+      toast.error(message, {
         position: "bottom-left",
       });
     }
@@ -674,9 +689,9 @@ const AuthContextProvider = (props: { children: React.ReactNode }) => {
         return true;
       }
     } else {
+      const message = await handleAuthHttpError(res);
       setIsLoading(false);
-      const data: any = await res.json();
-      setError(data.message);
+      setError(message);
       return false;
     }
   };

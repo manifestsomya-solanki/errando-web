@@ -3,6 +3,8 @@ import { Service } from "../../models/home";
 import useSWR from "swr";
 import { buildApiUrl, API_ENDPOINTS } from "../../config/api";
 import { handleAuthExpired } from "../../utils/authSession";
+import { getApiErrorMessage, isRateLimited } from "../../utils/httpErrors";
+import { toast } from "react-toastify";
 
 
 type HomeServiceDetailsType = {
@@ -89,8 +91,10 @@ export const publicFetcher = async (url: string) => {
 
     // Handle error responses
     if (!response.ok) {
-      // Don't log 401 errors to console as they're expected when user is not authenticated
-      if (response.status !== 401) {
+      const message = getApiErrorMessage(response, data, "Failed to load data");
+      if (isRateLimited(response)) {
+        toast.error(message);
+      } else if (response.status !== 401) {
         console.error("API Error:", {
           url,
           status: response.status,
@@ -99,7 +103,7 @@ export const publicFetcher = async (url: string) => {
       }
       return {
         status: "0",
-        message: data.message || "Failed to load data",
+        message,
         data: null,
       };
     }
@@ -175,7 +179,7 @@ export const fetcher = async (url: string) => {
 
     // Handle error responses - silently for 401
     if (!response.ok) {
-      // Silently handle 401 errors (user not authenticated or token expired)
+      const message = getApiErrorMessage(response, data, "Failed to load data");
       if (response.status === 401) {
         handleAuthExpired();
         return {
@@ -184,15 +188,18 @@ export const fetcher = async (url: string) => {
           data: null,
         };
       }
-      // Log other errors only
-      console.error("API Error:", {
-        url,
-        status: response.status,
-        data,
-      });
+      if (isRateLimited(response)) {
+        toast.error(message);
+      } else {
+        console.error("API Error:", {
+          url,
+          status: response.status,
+          data,
+        });
+      }
       return {
         status: "0",
-        message: data.message || "Failed to load data",
+        message,
         data: null,
       };
     }

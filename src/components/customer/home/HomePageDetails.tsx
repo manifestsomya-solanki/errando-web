@@ -31,7 +31,7 @@ const HomePageDetails = () => {
     dedupingInterval: 0,
   });
   const serviceData: Service[] = data?.data ?? [];
-  // const imageStorageUrl = "https://erranddo.kodecreators.com/storage";
+  // Uploaded images / files from erranddo-node (local dev or S3 in production)
   const [openMenu, setOpenMenu] = useState(false);
   const [openSearch, setOpenSearch] = useState(false);
 
